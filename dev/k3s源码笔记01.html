@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>k3s源码笔记01 | Hot</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="description" content="安全开发工程师(打杂工程师)的学习笔记">
+    
+    <link rel="preload" href="/assets/css/0.styles.35bcedcf.css" as="style"><link rel="preload" href="/assets/js/app.c319bac8.js" as="script"><link rel="preload" href="/assets/js/2.ee734a59.js" as="script"><link rel="preload" href="/assets/js/89.56c3e387.js" as="script"><link rel="prefetch" href="/assets/js/10.9841cdef.js"><link rel="prefetch" href="/assets/js/100.98c51b8e.js"><link rel="prefetch" href="/assets/js/101.80ca1839.js"><link rel="prefetch" href="/assets/js/102.1c33cf56.js"><link rel="prefetch" href="/assets/js/103.b0b93725.js"><link rel="prefetch" href="/assets/js/104.c0c62484.js"><link rel="prefetch" href="/assets/js/105.1134daba.js"><link rel="prefetch" href="/assets/js/106.f9a27c7b.js"><link rel="prefetch" href="/assets/js/107.d3560c2c.js"><link rel="prefetch" href="/assets/js/108.dc824726.js"><link rel="prefetch" href="/assets/js/109.56b97cf6.js"><link rel="prefetch" href="/assets/js/11.8bb5db91.js"><link rel="prefetch" href="/assets/js/110.9893b030.js"><link rel="prefetch" href="/assets/js/111.53623519.js"><link rel="prefetch" href="/assets/js/112.e5269575.js"><link rel="prefetch" href="/assets/js/113.2a3d6326.js"><link rel="prefetch" href="/assets/js/114.f28d91ec.js"><link rel="prefetch" href="/assets/js/115.4219f56e.js"><link rel="prefetch" href="/assets/js/116.2f15c358.js"><link rel="prefetch" href="/assets/js/117.7e79e8c3.js"><link rel="prefetch" href="/assets/js/118.cd0ccb4e.js"><link rel="prefetch" href="/assets/js/119.1a8f3bb4.js"><link rel="prefetch" href="/assets/js/12.c3457dbf.js"><link rel="prefetch" href="/assets/js/120.22b3dd05.js"><link rel="prefetch" href="/assets/js/121.48115499.js"><link rel="prefetch" href="/assets/js/122.49df4874.js"><link rel="prefetch" href="/assets/js/123.bb366ac5.js"><link rel="prefetch" href="/assets/js/124.a1091dce.js"><link rel="prefetch" href="/assets/js/125.cba9e1c7.js"><link rel="prefetch" href="/assets/js/126.5632c4d7.js"><link rel="prefetch" href="/assets/js/127.83f20d12.js"><link rel="prefetch" href="/assets/js/128.df2f79c7.js"><link rel="prefetch" href="/assets/js/129.714ec10b.js"><link rel="prefetch" href="/assets/js/13.5a5564aa.js"><link rel="prefetch" href="/assets/js/130.f648ae53.js"><link rel="prefetch" href="/assets/js/14.31b1fb86.js"><link rel="prefetch" href="/assets/js/15.1f1a4999.js"><link rel="prefetch" href="/assets/js/16.2445c170.js"><link rel="prefetch" href="/assets/js/17.00149ca9.js"><link rel="prefetch" href="/assets/js/18.14f17999.js"><link rel="prefetch" href="/assets/js/19.4dfbf270.js"><link rel="prefetch" href="/assets/js/20.4f419716.js"><link rel="prefetch" href="/assets/js/21.04f10048.js"><link rel="prefetch" href="/assets/js/22.d5ea4ea8.js"><link rel="prefetch" href="/assets/js/23.2da0cb4d.js"><link rel="prefetch" href="/assets/js/24.171bad48.js"><link rel="prefetch" href="/assets/js/25.c648bffe.js"><link rel="prefetch" href="/assets/js/26.f7412ad6.js"><link rel="prefetch" href="/assets/js/27.3358de23.js"><link rel="prefetch" href="/assets/js/28.f4a4badf.js"><link rel="prefetch" href="/assets/js/29.5581c8fb.js"><link rel="prefetch" href="/assets/js/3.208249f8.js"><link rel="prefetch" href="/assets/js/30.4f07acfb.js"><link rel="prefetch" href="/assets/js/31.ad87b1d0.js"><link rel="prefetch" href="/assets/js/32.218c7530.js"><link rel="prefetch" href="/assets/js/33.06ce8d5f.js"><link rel="prefetch" href="/assets/js/34.e645d5f9.js"><link rel="prefetch" href="/assets/js/35.d3c03632.js"><link rel="prefetch" href="/assets/js/36.3b7139b6.js"><link rel="prefetch" href="/assets/js/37.9d30b16f.js"><link rel="prefetch" href="/assets/js/38.37e19265.js"><link rel="prefetch" href="/assets/js/39.a7a5a417.js"><link rel="prefetch" href="/assets/js/4.2ecfd9d7.js"><link rel="prefetch" href="/assets/js/40.8bd9d455.js"><link rel="prefetch" href="/assets/js/41.6a059dcc.js"><link rel="prefetch" href="/assets/js/42.e2361cae.js"><link rel="prefetch" href="/assets/js/43.7101e1e6.js"><link rel="prefetch" href="/assets/js/44.d8df0a7a.js"><link rel="prefetch" href="/assets/js/45.7b4583e6.js"><link rel="prefetch" href="/assets/js/46.6cf5ac92.js"><link rel="prefetch" href="/assets/js/47.ffd093f8.js"><link rel="prefetch" href="/assets/js/48.f69288ff.js"><link rel="prefetch" href="/assets/js/49.006a40a0.js"><link rel="prefetch" href="/assets/js/5.20014036.js"><link rel="prefetch" href="/assets/js/50.2a75a383.js"><link rel="prefetch" href="/assets/js/51.192e7cb9.js"><link rel="prefetch" href="/assets/js/52.cc5ea856.js"><link rel="prefetch" href="/assets/js/53.b963fae3.js"><link rel="prefetch" href="/assets/js/54.1e75d52b.js"><link rel="prefetch" href="/assets/js/55.aaf95197.js"><link rel="prefetch" href="/assets/js/56.b57fb18c.js"><link rel="prefetch" href="/assets/js/57.d6ec3a28.js"><link rel="prefetch" href="/assets/js/58.a59a2bb3.js"><link rel="prefetch" href="/assets/js/59.2fd766d2.js"><link rel="prefetch" href="/assets/js/6.1aac11ee.js"><link rel="prefetch" href="/assets/js/60.9e6636d0.js"><link rel="prefetch" href="/assets/js/61.83fb732b.js"><link rel="prefetch" href="/assets/js/62.4ade8f03.js"><link rel="prefetch" href="/assets/js/63.bc5bd52e.js"><link rel="prefetch" href="/assets/js/64.0ee3dd03.js"><link rel="prefetch" href="/assets/js/65.ef7b2f39.js"><link rel="prefetch" href="/assets/js/66.c4321bd0.js"><link rel="prefetch" href="/assets/js/67.d0758688.js"><link rel="prefetch" href="/assets/js/68.014193b5.js"><link rel="prefetch" href="/assets/js/69.a6114edb.js"><link rel="prefetch" href="/assets/js/7.1848bf21.js"><link rel="prefetch" href="/assets/js/70.e685c54f.js"><link rel="prefetch" href="/assets/js/71.504c2b6b.js"><link rel="prefetch" href="/assets/js/72.4c7505ad.js"><link rel="prefetch" href="/assets/js/73.6790e908.js"><link rel="prefetch" href="/assets/js/74.71d69108.js"><link rel="prefetch" href="/assets/js/75.72af672f.js"><link rel="prefetch" href="/assets/js/76.c4a9226c.js"><link rel="prefetch" href="/assets/js/77.d38a498d.js"><link rel="prefetch" href="/assets/js/78.871d750a.js"><link rel="prefetch" href="/assets/js/79.527e7a49.js"><link rel="prefetch" href="/assets/js/8.8534ef4e.js"><link rel="prefetch" href="/assets/js/80.715f442a.js"><link rel="prefetch" href="/assets/js/81.74a2b8bd.js"><link rel="prefetch" href="/assets/js/82.066897b9.js"><link rel="prefetch" href="/assets/js/83.c264466b.js"><link rel="prefetch" href="/assets/js/84.18734103.js"><link rel="prefetch" href="/assets/js/85.afd2f665.js"><link rel="prefetch" href="/assets/js/86.073fdd24.js"><link rel="prefetch" href="/assets/js/87.29303003.js"><link rel="prefetch" href="/assets/js/88.d3d4f30c.js"><link rel="prefetch" href="/assets/js/9.73e739d0.js"><link rel="prefetch" href="/assets/js/90.022513aa.js"><link rel="prefetch" href="/assets/js/91.3cece5cd.js"><link rel="prefetch" href="/assets/js/92.1f9fa6f9.js"><link rel="prefetch" href="/assets/js/93.35733127.js"><link rel="prefetch" href="/assets/js/94.71526dfb.js"><link rel="prefetch" href="/assets/js/95.eff5cd3e.js"><link rel="prefetch" href="/assets/js/96.a30824e0.js"><link rel="prefetch" href="/assets/js/97.1e11427f.js"><link rel="prefetch" href="/assets/js/98.522292bb.js"><link rel="prefetch" href="/assets/js/99.6bf29dfd.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.35bcedcf.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">Hot</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><a href="/sec/" class="nav-link">
+  安全
+</a></div><div class="nav-item"><a href="/dev/" class="nav-link router-link-active">
+  开发
+</a></div><div class="nav-item"><a href="/ops/" class="nav-link">
+  运维
+</a></div><div class="nav-item"><a href="/other/" class="nav-link">
+  杂记
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="开源项目" class="dropdown-title"><span class="title">开源项目</span> <span class="arrow down"></span></button> <button type="button" aria-label="开源项目" class="mobile-dropdown-title"><span class="title">开源项目</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://github.com/zmf963/showip" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  show ip
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com/HotSec/subdomain" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  subdomain
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com/HotSec/hotfinger" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  hotfinger
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div><div class="nav-item"><a href="/about/" class="nav-link">
+  关于
+</a></div><div class="nav-item"><a href="https://github.com/HotSec" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><a href="/sec/" class="nav-link">
+  安全
+</a></div><div class="nav-item"><a href="/dev/" class="nav-link router-link-active">
+  开发
+</a></div><div class="nav-item"><a href="/ops/" class="nav-link">
+  运维
+</a></div><div class="nav-item"><a href="/other/" class="nav-link">
+  杂记
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="开源项目" class="dropdown-title"><span class="title">开源项目</span> <span class="arrow down"></span></button> <button type="button" aria-label="开源项目" class="mobile-dropdown-title"><span class="title">开源项目</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://github.com/zmf963/showip" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  show ip
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com/HotSec/subdomain" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  subdomain
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li><li class="dropdown-item"><!----> <a href="https://github.com/HotSec/hotfinger" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  hotfinger
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div><div class="nav-item"><a href="/about/" class="nav-link">
+  关于
+</a></div><div class="nav-item"><a href="https://github.com/HotSec" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <!----> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="k3s源码笔记01"><a href="#k3s源码笔记01" class="header-anchor">#</a> k3s源码笔记01</h1> <p><code>git clone https://github.com/k3s-io/k3s.git</code></p> <blockquote><p>commit：3f237230350b5170eef4e54c7826d88433182efc</p></blockquote> <h2 id="代码量"><a href="#代码量" class="header-anchor">#</a> 代码量</h2> <p>全部go代码3w2左右，排除_test.go后2w4左右。</p> <div class="language-bash line-numbers-mode"><pre class="language-bash"><code><span class="token number">1386</span> ± cloc <span class="token builtin class-name">.</span>
+     <span class="token number">579</span> text files.
+     <span class="token number">571</span> unique files.                                        
+      <span class="token number">65</span> files ignored.
+
+github.com/AlDanial/cloc <span class="token function">v</span> <span class="token number">1.90</span>  <span class="token assign-left variable">T</span><span class="token operator">=</span><span class="token number">0.45</span> s <span class="token punctuation">(</span><span class="token number">1157.5</span> files/s, <span class="token number">134920.2</span> lines/s<span class="token punctuation">)</span>
+--------------------------------------------------------------------------------
+Language                      files          blank        comment           code
+--------------------------------------------------------------------------------
+Go                              <span class="token number">281</span>           <span class="token number">4610</span>           <span class="token number">2729</span>          <span class="token number">32339</span>
+YAML                             <span class="token number">89</span>            <span class="token number">200</span>            <span class="token number">136</span>           <span class="token number">9552</span>
+Bourne Shell                     <span class="token number">31</span>            <span class="token number">470</span>            <span class="token number">419</span>           <span class="token number">2823</span>
+Markdown                         <span class="token number">57</span>            <span class="token number">859</span>              <span class="token number">0</span>           <span class="token number">2414</span>
+Bourne Again Shell               <span class="token number">37</span>            <span class="token number">429</span>            <span class="token number">130</span>           <span class="token number">1990</span>
+HCL                               <span class="token number">8</span>             <span class="token number">88</span>              <span class="token number">4</span>            <span class="token number">452</span>
+Dockerfile                        <span class="token number">8</span>             <span class="token number">57</span>             <span class="token number">11</span>            <span class="token number">206</span>
+Ruby                              <span class="token number">1</span>              <span class="token number">4</span>              <span class="token number">2</span>             <span class="token number">99</span>
+JSON                              <span class="token number">2</span>              <span class="token number">0</span>              <span class="token number">0</span>             <span class="token number">53</span>
+<span class="token function">make</span>                              <span class="token number">2</span>             <span class="token number">21</span>              <span class="token number">0</span>             <span class="token number">51</span>
+--------------------------------------------------------------------------------
+SUM:                            <span class="token number">516</span>           <span class="token number">6738</span>           <span class="token number">3431</span>          <span class="token number">49979</span>
+--------------------------------------------------------------------------------
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br></div></div><h2 id="编译"><a href="#编译" class="header-anchor">#</a> 编译</h2> <blockquote><p>https://github.com/k3s-io/k3s/blob/master/BUILDING.md</p></blockquote> <div class="language-zsh line-numbers-mode"><pre class="language-text"><code>make download &amp;&amp; make generate
+SKIP_VALIDATE=true make
+# 构建完成的k3s在 ./dist/artifacts/k3s
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><h2 id="运行"><a href="#运行" class="header-anchor">#</a> 运行</h2> <div class="language-bash line-numbers-mode"><pre class="language-bash"><code>./dist/artifacts/k3s  server --token<span class="token operator">=</span><span class="token number">123456</span>
+
+<span class="token number">1615</span> ± ./k3s kubectl get nodes                                                 ✹ ✭
+NAME     STATUS   ROLES                  AGE   VERSION
+fedora   Ready    control-plane,master   34m   v1.28.4+k3s-3f237230
+fedora ॐ  ~/code/k3s/dist/artifacts:<span class="token punctuation">(</span>7d19h57m<span class="token operator">|</span>git@master<span class="token operator">!</span><span class="token punctuation">)</span>
+<span class="token number">1616</span> ± ./k3s kubectl get pods -A -o wide                                       ✹ ✭
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE   IP           NODE     NOMINATED NODE   READINESS GATES
+kube-system   local-path-provisioner-84db5d44d9-qj9nx   <span class="token number">1</span>/1     Running     <span class="token number">0</span>          23h   <span class="token number">10.42</span>.0.5    fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+kube-system   coredns-6799fbcd5-c7l7f                   <span class="token number">1</span>/1     Running     <span class="token number">0</span>          23h   <span class="token number">10.42</span>.0.6    fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+kube-system   metrics-server-67c658944b-gxlfw           <span class="token number">1</span>/1     Running     <span class="token number">0</span>          23h   <span class="token number">10.42</span>.0.2    fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+kube-system   helm-install-traefik-crd-2s8cc            <span class="token number">0</span>/1     Completed   <span class="token number">0</span>          34m   <span class="token number">10.42</span>.0.8    fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+kube-system   helm-install-traefik-5xgnq                <span class="token number">0</span>/1     Completed   <span class="token number">1</span>          34m   <span class="token number">10.42</span>.0.4    fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+kube-system   svclb-traefik-16b857fd-sf7mc              <span class="token number">2</span>/2     Running     <span class="token number">0</span>          33m   <span class="token number">10.42</span>.0.9    fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+kube-system   traefik-f4564c4f4-kqr9k                   <span class="token number">1</span>/1     Running     <span class="token number">0</span>          33m   <span class="token number">10.42</span>.0.10   fedora   <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>           <span class="token operator">&lt;</span>none<span class="token operator">&gt;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br></div></div><p>启动agent</p> <div class="language-dotnetcli line-numbers-mode"><pre class="language-text"><code>./dist/artifacts/k3s agent --token=123456
+
+
+1649 ± ./k3s kubectl get nodes -o wide                                                   ✹ ✭
+NAME                   STATUS   ROLES                  AGE     VERSION                INTERNAL-IP    EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION           CONTAINER-RUNTIME
+fedora38.localdomain   Ready    &lt;none&gt;                 76s     v1.28.4+k3s-3f237230   192.168.1.6    &lt;none&gt;        Fedora Linux 38 (Thirty Eight)   6.4.15-200.fc38.x86_64   containerd://1.7.7-k3s1
+fedora                 Ready    control-plane,master   2m40s   v1.28.4+k3s-3f237230   192.168.1.26   &lt;none&gt;        Fedora Linux 38 (Thirty Eight)   6.5.6-200.fc38.x86_64    containerd://1.7.7-k3s1
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><h2 id="目录结构"><a href="#目录结构" class="header-anchor">#</a> 目录结构</h2> <div class="language-bash line-numbers-mode"><pre class="language-bash"><code><span class="token builtin class-name">.</span>
+├── ADOPTERS.md
+├── BUILDING.md
+├── channel.yaml
+├── cmd
+│   ├── agent
+│   │   └── main.go
+│   ├── cert
+│   │   └── main.go
+│   ├── completion
+│   │   └── main.go
+│   ├── containerd
+│   │   └── main.go
+│   ├── ctr
+│   │   └── main.go
+│   ├── encrypt
+│   │   └── main.go
+│   ├── etcdsnapshot
+│   │   └── main.go
+│   ├── k3s
+│   │   ├── main.go
+│   │   ├── main_linux.go
+│   │   ├── main_test.go
+│   │   └── main_windows.go
+│   ├── kubectl
+│   │   └── main.go
+│   ├── server
+│   │   └── main.go
+│   └── token
+│       └── main.go
+├── CODE_OF_CONDUCT.md
+├── CODEOWNERS
+├── conformance
+├── contrib
+├── CONTRIBUTING.md
+├── DCO
+├── docker-compose.yml
+├── Dockerfile.dapper
+├── Dockerfile.local
+├── Dockerfile.manifest
+├── Dockerfile.test
+├── docs
+├── go.mod
+├── go.sum
+├── hack
+│   └── crdgen.go
+├── install.sh
+├── install.sh.sha256sum
+├── k3s
+├── k3s-rootless.service
+├── k3s.service
+├── LICENSE
+├── main.go
+├── MAINTAINERS
+├── Makefile
+├── manifests
+│   └── traefik.yaml
+├── package
+│   ├── Dockerfile
+│   └── <span class="token function">rpm</span>
+│       ├── install.sh
+│       ├── k3s.spec
+│       └── repo-setup.sh
+├── pkg
+│   ├── agent
+│   │   ├── config
+│   │   │   ├── config.go
+│   │   │   ├── config_linux.go
+│   │   │   └── config_windows.go
+│   │   ├── containerd
+│   │   │   ├── command.go
+│   │   │   ├── command_windows.go
+│   │   │   ├── config_linux.go
+│   │   │   ├── config_windows.go
+│   │   │   ├── containerd.go
+│   │   │   ├── nvidia.go
+│   │   │   ├── nvidia_test.go
+│   │   │   ├── runtimes.go
+│   │   │   ├── runtimes_test.go
+│   │   │   ├── runwasi.go
+│   │   │   ├── runwasi_test.go
+│   │   │   └── selinux.go
+│   │   ├── cri
+│   │   │   ├── cri.go
+│   │   │   ├── cri_linux.go
+│   │   │   └── cri_windows.go
+│   │   ├── cridockerd
+│   │   │   ├── config_linux.go
+│   │   │   ├── config_windows.go
+│   │   │   ├── cridockerd.go
+│   │   │   └── nocridockerd.go
+│   │   ├── flannel
+│   │   │   ├── flannel.go
+│   │   │   ├── setup.go
+│   │   │   ├── setup_linux.go
+│   │   │   ├── setup_test.go
+│   │   │   └── setup_windows.go
+│   │   ├── loadbalancer
+│   │   │   ├── config.go
+│   │   │   ├── loadbalancer.go
+│   │   │   ├── loadbalancer_test.go
+│   │   │   ├── servers.go
+│   │   │   ├── utility.go
+│   │   │   ├── utility_windows.go
+│   │   │   └── utlity_linux.go
+│   │   ├── netpol
+│   │   │   ├── netpol.go
+│   │   │   └── netpol_windows.go
+│   │   ├── proxy
+│   │   │   └── apiproxy.go
+│   │   ├── run.go
+│   │   ├── run_linux.go
+│   │   ├── run_windows.go
+│   │   ├── syssetup
+│   │   │   ├── setup.go
+│   │   │   └── setup_windows.go
+│   │   ├── templates
+│   │   │   ├── templates.go
+│   │   │   ├── templates_linux.go
+│   │   │   └── templates_windows.go
+│   │   ├── tunnel
+│   │   │   └── tunnel.go
+│   │   └── util
+│   │       ├── file.go
+│   │       └── strings.go
+│   ├── apis
+│   │   └── k3s.cattle.io
+│   │       ├── v1
+│   │       │   ├── doc.go
+│   │       │   ├── types.go
+│   │       │   ├── zz_generated_deepcopy.go
+│   │       │   ├── zz_generated_list_types.go
+│   │       │   └── zz_generated_register.go
+│   │       └── zz_generated_register.go
+│   ├── authenticator
+│   │   ├── authenticator.go
+│   │   ├── basicauth
+│   │   │   ├── basicauth.go
+│   │   │   ├── basicauth_test.go
+│   │   │   └── interfaces.go
+│   │   ├── <span class="token builtin class-name">hash</span>
+│   │   │   ├── hash.go
+│   │   │   ├── scrypt.go
+│   │   │   └── scrypt_test.go
+│   │   └── passwordfile
+│   │       ├── passwordfile.go
+│   │       └── passwordfile_test.go
+│   ├── bootstrap
+│   │   ├── bootstrap.go
+│   │   └── bootstrap_test.go
+│   ├── cgroups
+│   │   ├── cgroups_linux.go
+│   │   └── cgroups_windows.go
+│   ├── cli
+│   │   ├── agent
+│   │   │   └── agent.go
+│   │   ├── cert
+│   │   │   └── cert.go
+│   │   ├── cmds
+│   │   │   ├── agent.go
+│   │   │   ├── certs.go
+│   │   │   ├── check-config.go
+│   │   │   ├── completion.go
+│   │   │   ├── config.go
+│   │   │   ├── const_linux.go
+│   │   │   ├── const_windows.go
+│   │   │   ├── cover_default.go
+│   │   │   ├── cover_linux.go
+│   │   │   ├── crictl.go
+│   │   │   ├── ctr.go
+│   │   │   ├── etcd_snapshot.go
+│   │   │   ├── init_default.go
+│   │   │   ├── init_linux.go
+│   │   │   ├── kubectl.go
+│   │   │   ├── log_default.go
+│   │   │   ├── log.go
+│   │   │   ├── log_linux.go
+│   │   │   ├── nostage.go
+│   │   │   ├── root.go
+│   │   │   ├── secrets_encrypt.go
+│   │   │   ├── server.go
+│   │   │   ├── stage.go
+│   │   │   └── token.go
+│   │   ├── completion
+│   │   │   └── completion.go
+│   │   ├── crictl
+│   │   │   └── crictl.go
+│   │   ├── ctr
+│   │   │   └── ctr.go
+│   │   ├── etcdsnapshot
+│   │   │   └── etcd_snapshot.go
+│   │   ├── kubectl
+│   │   │   └── kubectl.go
+│   │   ├── secretsencrypt
+│   │   │   └── secrets_encrypt.go
+│   │   ├── server
+│   │   │   └── server.go
+│   │   └── token
+│   │       └── token.go
+│   ├── clientaccess
+│   │   ├── kubeconfig.go
+│   │   ├── token.go
+│   │   └── token_test.go
+│   ├── cloudprovider
+│   │   ├── cloudprovider.go
+│   │   ├── instances.go
+│   │   ├── loadbalancer.go
+│   │   ├── servicelb.go
+│   │   └── servicelb_test.go
+│   ├── cluster
+│   │   ├── address_controller.go
+│   │   ├── bootstrap.go
+│   │   ├── bootstrap_test.go
+│   │   ├── cluster.go
+│   │   ├── encrypt.go
+│   │   ├── etcd.go
+│   │   ├── https.go
+│   │   ├── managed
+│   │   │   └── drivers.go
+│   │   ├── managed.go
+│   │   ├── router.go
+│   │   └── storage.go
+│   ├── codegen
+│   │   ├── cleanup
+│   │   │   └── main.go
+│   │   └── main.go
+│   ├── configfilearg
+│   │   ├── defaultparser.go
+│   │   ├── defaultparser_test.go
+│   │   ├── parser.go
+│   │   ├── parser_test.go
+│   │   └── testdata
+│   │       ├── data.yaml
+│   │       ├── data.yaml.d
+│   │       │   ├── 01-data.yml
+│   │       │   ├── 02-data-ignore-this.txt
+│   │       │   └── 02-data.yaml
+│   │       └── defaultdata.yaml
+│   ├── containerd
+│   │   ├── builtins_cri.go
+│   │   ├── builtins.go
+│   │   ├── builtins_linux.go
+│   │   ├── builtins_windows.go
+│   │   ├── main.go
+│   │   ├── none.go
+│   │   ├── utility_linux.go
+│   │   └── utility_windows.go
+│   ├── crd
+│   │   └── crds.go
+│   ├── ctr
+│   │   └── main.go
+│   ├── daemons
+│   │   ├── agent
+│   │   │   ├── agent.go
+│   │   │   ├── agent_linux.go
+│   │   │   ├── agent_windows.go
+│   │   │   └── agent_windows_test.go
+│   │   ├── config
+│   │   │   ├── types.go
+│   │   │   └── types_test.go
+│   │   ├── control
+│   │   │   ├── deps
+│   │   │   │   ├── deps.go
+│   │   │   │   └── deps_test.go
+│   │   │   ├── proxy
+│   │   │   │   └── proxy.go
+│   │   │   ├── server.go
+│   │   │   └── tunnel.go
+│   │   └── executor
+│   │       ├── embed.go
+│   │       ├── embed_linux.go
+│   │       ├── embed_windows.go
+│   │       ├── etcd.go
+│   │       └── executor.go
+│   ├── data
+│   │   └── data.go
+│   ├── datadir
+│   │   └── datadir.go
+│   ├── dataverify
+│   │   └── dataverify.go
+│   ├── deploy
+│   │   ├── controller.go
+│   │   ├── nostage.go
+│   │   ├── stage.go
+│   │   └── zz_generated_bindata.go
+│   ├── etcd
+│   │   ├── apiaddresses_controller.go
+│   │   ├── etcd.go
+│   │   ├── etcdproxy.go
+│   │   ├── etcd_test.go
+│   │   ├── member_controller.go
+│   │   ├── metadata_controller.go
+│   │   ├── s3.go
+│   │   ├── snapshot_controller.go
+│   │   └── snapshot.go
+│   ├── flock
+│   │   ├── flock_other.go
+│   │   ├── flock_unix.go
+│   │   └── flock_unix_test.go
+│   ├── generated
+│   │   ├── clientset
+│   │   │   └── versioned
+│   │   │       ├── clientset.go
+│   │   │       ├── fake
+│   │   │       │   ├── clientset_generated.go
+│   │   │       │   ├── doc.go
+│   │   │       │   └── register.go
+│   │   │       ├── scheme
+│   │   │       │   ├── doc.go
+│   │   │       │   └── register.go
+│   │   │       └── typed
+│   │   │           └── k3s.cattle.io
+│   │   │               └── v1
+│   │   │                   ├── addon.go
+│   │   │                   ├── doc.go
+│   │   │                   ├── etcdsnapshotfile.go
+│   │   │                   ├── fake
+│   │   │                   │   ├── doc.go
+│   │   │                   │   ├── fake_addon.go
+│   │   │                   │   ├── fake_etcdsnapshotfile.go
+│   │   │                   │   └── fake_k3s.cattle.io_client.go
+│   │   │                   ├── generated_expansion.go
+│   │   │                   └── k3s.cattle.io_client.go
+│   │   └── controllers
+│   │       └── k3s.cattle.io
+│   │           ├── factory.go
+│   │           ├── interface.go
+│   │           └── v1
+│   │               ├── addon.go
+│   │               ├── etcdsnapshotfile.go
+│   │               └── interface.go
+│   ├── kubeadm
+│   │   ├── token.go
+│   │   ├── types.go
+│   │   └── utils.go
+│   ├── kubectl
+│   │   └── main.go
+│   ├── <span class="token function">node</span>
+│   │   └── controller.go
+│   ├── nodeconfig
+│   │   ├── nodeconfig.go
+│   │   └── nodeconfig_test.go
+│   ├── nodepassword
+│   │   ├── nodepassword.go
+│   │   └── nodepassword_test.go
+│   ├── <span class="token function">passwd</span>
+│   │   └── passwd.go
+│   ├── rootless
+│   │   ├── mounts.go
+│   │   ├── portdriver.go
+│   │   ├── rootless.go
+│   │   └── rootless_windows.go
+│   ├── rootlessports
+│   │   ├── controller.go
+│   │   └── controller_windows.go
+│   ├── secretsencrypt
+│   │   ├── config.go
+│   │   └── controller.go
+│   ├── server
+│   │   ├── auth.go
+│   │   ├── cert.go
+│   │   ├── context.go
+│   │   ├── router.go
+│   │   ├── secrets-encrypt.go
+│   │   ├── server.go
+│   │   ├── token.go
+│   │   └── types.go
+│   ├── static
+│   │   ├── nostage.go
+│   │   ├── stage.go
+│   │   └── zz_generated_bindata.go
+│   ├── untar
+│   │   └── untar.go
+│   ├── util
+│   │   ├── api.go
+│   │   ├── cert.go
+│   │   ├── client.go
+│   │   ├── client_test.go
+│   │   ├── command.go
+│   │   ├── errors.go
+│   │   ├── file.go
+│   │   ├── gates.go
+│   │   ├── gates_test.go
+│   │   ├── labels.go
+│   │   ├── net.go
+│   │   ├── net_test.go
+│   │   ├── reflect.go
+│   │   └── token.go
+│   ├── version
+│   │   └── version.go
+│   └── vpn
+│       └── vpn.go
+├── README.md
+├── ROADMAP.md
+├── scripts
+├── tests
+│   ├── cgroup
+│   ├── e2e
+│   ├── <span class="token function">install</span>
+│   ├── integration
+│   ├── perf
+│   ├── snapshotter
+│   ├── TESTING.md
+│   └── unit.go
+└── updatecli
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br><span class="line-number">104</span><br><span class="line-number">105</span><br><span class="line-number">106</span><br><span class="line-number">107</span><br><span class="line-number">108</span><br><span class="line-number">109</span><br><span class="line-number">110</span><br><span class="line-number">111</span><br><span class="line-number">112</span><br><span class="line-number">113</span><br><span class="line-number">114</span><br><span class="line-number">115</span><br><span class="line-number">116</span><br><span class="line-number">117</span><br><span class="line-number">118</span><br><span class="line-number">119</span><br><span class="line-number">120</span><br><span class="line-number">121</span><br><span class="line-number">122</span><br><span class="line-number">123</span><br><span class="line-number">124</span><br><span class="line-number">125</span><br><span class="line-number">126</span><br><span class="line-number">127</span><br><span class="line-number">128</span><br><span class="line-number">129</span><br><span class="line-number">130</span><br><span class="line-number">131</span><br><span class="line-number">132</span><br><span class="line-number">133</span><br><span class="line-number">134</span><br><span class="line-number">135</span><br><span class="line-number">136</span><br><span class="line-number">137</span><br><span class="line-number">138</span><br><span class="line-number">139</span><br><span class="line-number">140</span><br><span class="line-number">141</span><br><span class="line-number">142</span><br><span class="line-number">143</span><br><span class="line-number">144</span><br><span class="line-number">145</span><br><span class="line-number">146</span><br><span class="line-number">147</span><br><span class="line-number">148</span><br><span class="line-number">149</span><br><span class="line-number">150</span><br><span class="line-number">151</span><br><span class="line-number">152</span><br><span class="line-number">153</span><br><span class="line-number">154</span><br><span class="line-number">155</span><br><span class="line-number">156</span><br><span class="line-number">157</span><br><span class="line-number">158</span><br><span class="line-number">159</span><br><span class="line-number">160</span><br><span class="line-number">161</span><br><span class="line-number">162</span><br><span class="line-number">163</span><br><span class="line-number">164</span><br><span class="line-number">165</span><br><span class="line-number">166</span><br><span class="line-number">167</span><br><span class="line-number">168</span><br><span class="line-number">169</span><br><span class="line-number">170</span><br><span class="line-number">171</span><br><span class="line-number">172</span><br><span class="line-number">173</span><br><span class="line-number">174</span><br><span class="line-number">175</span><br><span class="line-number">176</span><br><span class="line-number">177</span><br><span class="line-number">178</span><br><span class="line-number">179</span><br><span class="line-number">180</span><br><span class="line-number">181</span><br><span class="line-number">182</span><br><span class="line-number">183</span><br><span class="line-number">184</span><br><span class="line-number">185</span><br><span class="line-number">186</span><br><span class="line-number">187</span><br><span class="line-number">188</span><br><span class="line-number">189</span><br><span class="line-number">190</span><br><span class="line-number">191</span><br><span class="line-number">192</span><br><span class="line-number">193</span><br><span class="line-number">194</span><br><span class="line-number">195</span><br><span class="line-number">196</span><br><span class="line-number">197</span><br><span class="line-number">198</span><br><span class="line-number">199</span><br><span class="line-number">200</span><br><span class="line-number">201</span><br><span class="line-number">202</span><br><span class="line-number">203</span><br><span class="line-number">204</span><br><span class="line-number">205</span><br><span class="line-number">206</span><br><span class="line-number">207</span><br><span class="line-number">208</span><br><span class="line-number">209</span><br><span class="line-number">210</span><br><span class="line-number">211</span><br><span class="line-number">212</span><br><span class="line-number">213</span><br><span class="line-number">214</span><br><span class="line-number">215</span><br><span class="line-number">216</span><br><span class="line-number">217</span><br><span class="line-number">218</span><br><span class="line-number">219</span><br><span class="line-number">220</span><br><span class="line-number">221</span><br><span class="line-number">222</span><br><span class="line-number">223</span><br><span class="line-number">224</span><br><span class="line-number">225</span><br><span class="line-number">226</span><br><span class="line-number">227</span><br><span class="line-number">228</span><br><span class="line-number">229</span><br><span class="line-number">230</span><br><span class="line-number">231</span><br><span class="line-number">232</span><br><span class="line-number">233</span><br><span class="line-number">234</span><br><span class="line-number">235</span><br><span class="line-number">236</span><br><span class="line-number">237</span><br><span class="line-number">238</span><br><span class="line-number">239</span><br><span class="line-number">240</span><br><span class="line-number">241</span><br><span class="line-number">242</span><br><span class="line-number">243</span><br><span class="line-number">244</span><br><span class="line-number">245</span><br><span class="line-number">246</span><br><span class="line-number">247</span><br><span class="line-number">248</span><br><span class="line-number">249</span><br><span class="line-number">250</span><br><span class="line-number">251</span><br><span class="line-number">252</span><br><span class="line-number">253</span><br><span class="line-number">254</span><br><span class="line-number">255</span><br><span class="line-number">256</span><br><span class="line-number">257</span><br><span class="line-number">258</span><br><span class="line-number">259</span><br><span class="line-number">260</span><br><span class="line-number">261</span><br><span class="line-number">262</span><br><span class="line-number">263</span><br><span class="line-number">264</span><br><span class="line-number">265</span><br><span class="line-number">266</span><br><span class="line-number">267</span><br><span class="line-number">268</span><br><span class="line-number">269</span><br><span class="line-number">270</span><br><span class="line-number">271</span><br><span class="line-number">272</span><br><span class="line-number">273</span><br><span class="line-number">274</span><br><span class="line-number">275</span><br><span class="line-number">276</span><br><span class="line-number">277</span><br><span class="line-number">278</span><br><span class="line-number">279</span><br><span class="line-number">280</span><br><span class="line-number">281</span><br><span class="line-number">282</span><br><span class="line-number">283</span><br><span class="line-number">284</span><br><span class="line-number">285</span><br><span class="line-number">286</span><br><span class="line-number">287</span><br><span class="line-number">288</span><br><span class="line-number">289</span><br><span class="line-number">290</span><br><span class="line-number">291</span><br><span class="line-number">292</span><br><span class="line-number">293</span><br><span class="line-number">294</span><br><span class="line-number">295</span><br><span class="line-number">296</span><br><span class="line-number">297</span><br><span class="line-number">298</span><br><span class="line-number">299</span><br><span class="line-number">300</span><br><span class="line-number">301</span><br><span class="line-number">302</span><br><span class="line-number">303</span><br><span class="line-number">304</span><br><span class="line-number">305</span><br><span class="line-number">306</span><br><span class="line-number">307</span><br><span class="line-number">308</span><br><span class="line-number">309</span><br><span class="line-number">310</span><br><span class="line-number">311</span><br><span class="line-number">312</span><br><span class="line-number">313</span><br><span class="line-number">314</span><br><span class="line-number">315</span><br><span class="line-number">316</span><br><span class="line-number">317</span><br><span class="line-number">318</span><br><span class="line-number">319</span><br><span class="line-number">320</span><br><span class="line-number">321</span><br><span class="line-number">322</span><br><span class="line-number">323</span><br><span class="line-number">324</span><br><span class="line-number">325</span><br><span class="line-number">326</span><br><span class="line-number">327</span><br><span class="line-number">328</span><br><span class="line-number">329</span><br><span class="line-number">330</span><br><span class="line-number">331</span><br><span class="line-number">332</span><br><span class="line-number">333</span><br><span class="line-number">334</span><br><span class="line-number">335</span><br><span class="line-number">336</span><br><span class="line-number">337</span><br><span class="line-number">338</span><br><span class="line-number">339</span><br><span class="line-number">340</span><br><span class="line-number">341</span><br><span class="line-number">342</span><br><span class="line-number">343</span><br><span class="line-number">344</span><br><span class="line-number">345</span><br><span class="line-number">346</span><br><span class="line-number">347</span><br><span class="line-number">348</span><br><span class="line-number">349</span><br><span class="line-number">350</span><br><span class="line-number">351</span><br><span class="line-number">352</span><br><span class="line-number">353</span><br><span class="line-number">354</span><br><span class="line-number">355</span><br><span class="line-number">356</span><br><span class="line-number">357</span><br><span class="line-number">358</span><br><span class="line-number">359</span><br><span class="line-number">360</span><br><span class="line-number">361</span><br><span class="line-number">362</span><br><span class="line-number">363</span><br><span class="line-number">364</span><br><span class="line-number">365</span><br><span class="line-number">366</span><br><span class="line-number">367</span><br><span class="line-number">368</span><br><span class="line-number">369</span><br><span class="line-number">370</span><br><span class="line-number">371</span><br><span class="line-number">372</span><br><span class="line-number">373</span><br><span class="line-number">374</span><br><span class="line-number">375</span><br><span class="line-number">376</span><br><span class="line-number">377</span><br><span class="line-number">378</span><br><span class="line-number">379</span><br><span class="line-number">380</span><br><span class="line-number">381</span><br><span class="line-number">382</span><br><span class="line-number">383</span><br><span class="line-number">384</span><br><span class="line-number">385</span><br><span class="line-number">386</span><br><span class="line-number">387</span><br><span class="line-number">388</span><br><span class="line-number">389</span><br><span class="line-number">390</span><br><span class="line-number">391</span><br><span class="line-number">392</span><br><span class="line-number">393</span><br><span class="line-number">394</span><br><span class="line-number">395</span><br><span class="line-number">396</span><br><span class="line-number">397</span><br><span class="line-number">398</span><br><span class="line-number">399</span><br><span class="line-number">400</span><br><span class="line-number">401</span><br><span class="line-number">402</span><br><span class="line-number">403</span><br><span class="line-number">404</span><br><span class="line-number">405</span><br></div></div><h2 id="build流程"><a href="#build流程" class="header-anchor">#</a> build流程</h2> <ol><li>download 下载所需要的包
+<ol><li>version.sh 获取所需包的版本号</li> <li>git cne --single-branch --branch=v1.1.8 --depth=1 https://github.com/opencontainers/runc build/src/github.com/opencontainers/runc</li> <li>https://github.com/k3s-io/k3s-root/releases/download/v0.12.2/k3s-root-amd64.tar</li> <li>git clone --single-branch --branch=v1.7.7-k3s1 --depth=1 https://github.com/k3s-io/containerd build/src/github.com/containerd/containerd</li> <li>curl -sfL https://k3s.io/k3s-charts/assets/traefik-crd/traefik-crd-25.0.2+up25.0.0.tgz -o build/static/charts/traefik-crd-25.0.2+up25.0.0.tgz</li> <li>curl -sfL https://k3s.io/k3s-charts/assets/traefik/traefik-25.0.2+up25.0.0.tgz -o build/static/charts/traefik-25.0.2+up25.0.0.tgz</li></ol></li> <li>generate
+<ol><li>rm -rf build/data &amp;&amp; mkdir -p build/data</li> <li>go generate</li></ol></li> <li>SKIP_VALIDATE=true make
+<ol><li>make
+<ol><li>.dapper  下载.dapper这个工具</li> <li>.dapper ci
+<ol><li>./download 与上面的第一步重复</li> <li>./validate # SKIP_VALIDATE=true 跳过validate部分，主要就是不执行<code>golangci-lint run</code></li> <li>./build
+<ol><li>删除可能存在的旧文件</li> <li>build cni
+<ol><li><code>go build -tags 'static_build libsqlite3 ctrd apparmor seccomp netcgo osusergo providerless urfave_cli_no_docs selinux' -gcflags=all= -ldflags '-X ... -w -s -extldflags '\''-static -lm -ldl -lz -lpthread'\'' ' -o /go/src/github.com/k3s-io/k3s/bin/cni</code></li></ol></li> <li>build k3s
+<ol><li><code>go build -tags 'static_build libsqlite3 ctrd apparmor seccomp netcgo osusergo providerless urfave_cli_no_docs selinux' -buildvcs=false -gcflags=all= -ldflags '-X...... -w -s -extldflags '\''-static -lm -ldl -lz -lpthread'\'' ' -o bin/k3s ./cmd/server</code></li></ol></li> <li>build containerd-shim   bin/containerd-shim-runc-v2</li> <li>build runc   ./bin/runc</li></ol></li> <li>./package
+<ol><li>检查 ../bin/containerd 是否存在，不存在就执行./build</li> <li>package-ci
+<ol><li>生成.tar.zst</li> <li><code>CGO_ENABLED=0 go build -tags urfave_cli_no_docs -buildvcs=false -ldflags ' -X github.com/k3s-io/k3s/pkg/version.Version=v1.28.4+k3s-3f237230 -X github.com/k3s-io/k3s/pkg/version.GitCommit=3f237230 -w -s -extldflags '\''-static'\''' -o dist/artifacts/k3s ./cmd/k3s</code></li> <li>上传到aws s3 检查到没有配置key,会跳过</li></ol></li> <li>package-image
+<ol><li>docker save docker.io/rancher/klipper-helm:v0.8.2-build20230815 docker.io/rancher/klipper-lb:v0.4.4 docker.io/rancher/local-path-provisioner:v0.0.24 docker.io/rancher/mirrored-coredns-coredns:1.10.1 docker.io/rancher/mirrored-library-busybox:1.36.1 docker.io/rancher/mirrored-library-traefik:2.10.5 docker.io/rancher/mirrored-metrics-server:v0.6.3 docker.io/rancher/mirrored-pause:3.6 -o dist/artifacts/k3s-airgap-images-amd64.tar</li> <li>zstd压缩</li> <li>trivy扫描</li></ol></li> <li>package-airgap
+<ol><li>docker pull</li> <li>docker save    .tar</li> <li>zstd  .tar -&gt; .tar.zst</li> <li>pigz  .tar -&gt; .tar.gz</li></ol></li></ol></li> <li>binary_size_check.sh
+<ol><li>检查k3s文件大小是不是超过70m</li></ol></li></ol></li></ol></li></ol></li></ol> <div class="language-makefile line-numbers-mode"><pre class="language-makefile"><code>
+TARGETS <span class="token operator">:=</span> <span class="token variable">$</span><span class="token punctuation">(</span><span class="token function">shell</span> ls scripts <span class="token operator">|</span> grep -v \\.sh<span class="token punctuation">)</span>  <span class="token comment"># scripts下的全部非sh文件</span>
+GO_FILES <span class="token operator">?=</span> <span class="token variable">$$</span><span class="token punctuation">(</span>find . -name <span class="token string">'*.go'</span> <span class="token operator">|</span> grep -v generated<span class="token punctuation">)</span>   <span class="token comment"># 当前目录下的所有go文件（排除generated后）</span>
+
+<span class="token target symbol">.dapper</span><span class="token punctuation">:</span>  <span class="token comment"># 从github上下载dapper</span>
+	<span class="token operator">@</span>echo Downloading dapper
+<span class="token target symbol">	@curl -sL https</span><span class="token punctuation">:</span>//releases.rancher.com/dapper/v0.6.0/dapper-<span class="token variable">$$</span><span class="token punctuation">(</span>uname -s<span class="token punctuation">)</span>-<span class="token variable">$$</span><span class="token punctuation">(</span>uname -m<span class="token punctuation">)</span> &gt; .dapper.tmp
+	<span class="token operator">@</span><span class="token operator">@</span>chmod +x .dapper.tmp
+	<span class="token operator">@</span>./.dapper.tmp -v
+	<span class="token operator">@</span>mv .dapper.tmp .dapper
+
+<span class="token target symbol"><span class="token variable">$</span>(TARGETS)</span><span class="token punctuation">:</span> .dapper
+	./.dapper <span class="token variable">$@</span>  
+
+<span class="token builtin-target builtin">.PHONY</span><span class="token punctuation">:</span> deps
+<span class="token target symbol">deps</span><span class="token punctuation">:</span>
+	go mod tidy
+
+<span class="token target symbol">release</span><span class="token punctuation">:</span>
+	./scripts/release.sh
+
+.DEFAULT_GOAL <span class="token operator">:=</span> ci  <span class="token comment"># 默认执行的target</span>
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br></div></div><h2 id="k3s-server-流程"><a href="#k3s-server-流程" class="header-anchor">#</a> k3s server 流程</h2> <h2 id="k3s-agnet-流程"><a href="#k3s-agnet-流程" class="header-anchor">#</a> k3s agnet 流程</h2></div> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">Last Updated:</span> <span class="time">12/4/2023, 3:19:11 PM</span></div></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.c319bac8.js" defer></script><script src="/assets/js/2.ee734a59.js" defer></script><script src="/assets/js/89.56c3e387.js" defer></script>
+  </body>
+</html>
