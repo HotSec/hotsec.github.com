@@ -33,7 +33,7 @@ projects:
     desc: showip、subdomain3
     link: https://你的伙伴链接
 
-  - icon: https://theme-hope-assets.vuejs.press/logo.svg
+  - icon: edit
     name: DIY
     desc: 自定义详细介绍
     link: https://你的自定义链接
