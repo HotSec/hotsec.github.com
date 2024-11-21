@@ -1,5 +1,5 @@
 ---
-title: Blog
+title: vuepress
 index: false
 icon: laptop-code
 category:
