@@ -16,17 +16,14 @@ commit = subprocess.check_output(['git', 'log', '-1', '--pretty=format:%s']).dec
 files = subprocess.check_output(['git', '-c', 'core.quotepath=false', 'show','-1', '--pretty=','--name-only',]).decode('utf-8').split('\n')
 print(files)
 # 生成changelog
-changelog = f'## {date} {commit}\n'
-changelog += '### 新增\n'
+changelog = f'## {date} {commit}\n\n'
 for file in files:
     if ".md" in file and "notebook" in file:
         print(file)
         wfile = re.sub(r'src/notebook/', '', file)
         changelog += f'- {wfile}\n'
-        # changelog += f'- {file}\n'
-
 
 # 写入文件
-with open('src/notebook/README.md', 'w+') as f:
+with open('src/notebook/README.md', 'a+') as f:
     f.write(changelog)
 print('changelog.md已生成')
