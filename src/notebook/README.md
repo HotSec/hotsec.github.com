@@ -7,6 +7,79 @@ author: XiaoMing
 
 持续更新中...
 
+## 2025-01-10 临时保存python+lua文档
+
+- README.md
+- cpp/C++MAP.md
+- cpp/C笔记.md
+- cpp/clang-tutorial/
+- cpp/cmake-and-vcpkg.md
+- cpp/第三方库/zeromq.md
+- lua/01_lua.md
+- lua/02_lua数据类型与变量.md
+- lua/08_函数.md
+- lua/11_面向对象.md
+- lua/12_环境.md
+- lua/14_lua_coroutine.md
+- lua/15_luaJIT.md
+- lua/16_lua_FFI.md
+- lua/20_lua标准库.md
+- lua/21_luafilesystem.md
+- lua/30_Lua与C++.md
+- lua/40_openresty安装.md
+- lua/50_luago.md
+- lua/60_lua_ngx_waf.md
+- lua/70_openstar.md
+- python/Python基础_第2版.md
+- python/Python工匠/00-start.md
+- python/Python工匠/13-大型项目.md
+- python/Python工匠/备忘/
+- python/mongodb.md
+- python/web开发/Python基础_第2版.md
+- python/web开发/bottle.md
+- python/web开发/django/django.md
+- python/web开发/fastapi.md
+- python/web开发/flask/flask-admin.md
+- python/web开发/flask/flask-sqlarch.md
+- python/web开发/flask/flask.md
+- python/web开发/pynecone_note/pynecone.md
+- python/web开发/quart.md
+- python/web开发/sanic.md
+- python/web开发/tornado.md
+- python/常用库/celery.md
+- python/常用库/hrq.md
+- python/提高研发效能.md
+- python/标准库/内置函数.md
+- python/标准库/内置常量.md
+- python/标准库/内置异常.md
+- python/标准库/内置类型.md
+- python/标准库/函数式编程模块.md
+- python/标准库/垃圾回收.md
+- python/标准库/并发执行.md
+- python/标准库/文件和目录访问.md
+- python/标准库/文本处理服务.md
+- python/标准库/标准库.md
+- python/标准库/网络和进程间通信.md
+- python/第三方库/Elasticsearch.md
+- python/第三方库/PythonAI绘画.md
+- python/第三方库/SQLAlchemy.md
+- python/第三方库/playwright.md
+- python/第三方库/pygame.md
+- python/第三方库/pypiserver.md
+- python/第三方库/python-memcached.md
+- python/第三方库/rabbitmq.md
+- python/第三方库/redis-py.md
+- python/第三方库/scrapy.md
+- python/第三方库/常用包.md
+- python/第三方库/并发.md
+- python/第三方库/数据可视化.md
+- python/第三方库/日志库.md
+- python/第三方库/自动化运维/ansible.md
+- python/第三方库/自动化运维/fabric.md
+- python/第三方库/自动化运维/terraform.md
+- python/第三方库/自动化运维/负载均衡.md
+- python/面试题.md
+
 ## 2025-01-10 临时提交
 
 - README.md
