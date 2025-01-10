@@ -7,6 +7,24 @@ author: XiaoMing
 
 持续更新中...
 
+## 2025-01-10 临时提交
+
+- README.md
+- go/1_语言基础/10_错误和异常.md
+- go/1_语言基础/11_包-模块-库.md
+- go/1_语言基础/4_函数.md
+- go/2_高级特性-原理/13_make与new.md
+- go/4_常用框架/4_zinx.md
+- go/6_其它/2_性能调试.md
+- go/6_其它/6_分布式.md
+- other/docker-swarm.md
+- python/常用库/celecry.md
+- python/常用库/gevent.md
+- python/常用库/hrq.md
+- python/常用库/huey.md
+- python/常用库/uvloop.md
+- python/新特性/3.13.md
+
 ## 2024-11-21 2024年11月21日
 
 - README.md
