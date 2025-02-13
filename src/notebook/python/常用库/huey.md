@@ -51,7 +51,7 @@ def nightly_backup():
 
 调用 -decorated 函数会将 由消费者执行。将立即返回一个特殊的结果句柄 可用于在任务完成后获取结果：`task`
 
-```
+```pyhton
 >>> from demo import add_numbers
 >>> res = add_numbers(1, 2)
 >>> res
@@ -63,7 +63,7 @@ def nightly_backup():
 
 可以将任务安排在将来运行：
 
-```
+```python
 >>> res = add_numbers.schedule((2, 3), delay=10)  # Will be run in ~10s.
 >>> res(blocking=True)  # Will block until task finishes, in ~10s.
 5
@@ -75,18 +75,29 @@ def nightly_backup():
 
 使用 4 个 worker 进程运行使用者：
 
-```
-$ huey_consumer.py my_app.huey -k process -w 4
+```sh
+huey_consumer.py my_app.huey -k process -w 4
 ```
 
 要使用单个工作线程运行使用者（默认）：
 
-```
-$ huey_consumer.py my_app.huey
+```sh
+huey_consumer.py my_app.huey
 ```
 
 如果您的工作负载主要受 IO 限制，则可以使用线程运行使用者 或绿皮。因为 greenlet 非常轻量级，所以您可以运行相当多的 他们中的少数有效：
 
+```sh
+huey_consumer.py my_app.huey -k greenlet -w 32
+
 ```
-$ huey_consumer.py my_app.huey -k greenlet -w 32
-```
+
+-----------------------------
+
+400   Bad Request
+
+
+------------------------------
+
+
+400

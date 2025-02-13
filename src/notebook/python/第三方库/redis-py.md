@@ -1,10 +1,35 @@
 # redis
 
-## 介绍
+- [1. 介绍](#1-介绍)
+  - [1.1. Memcache与Redis的区别都有哪些？](#11-memcache与redis的区别都有哪些)
+  - [1.2. Redis 常见的性能问题都有哪些？如何解决？](#12-redis-常见的性能问题都有哪些如何解决)
+  - [1.3. redis 最适合的场景](#13-redis-最适合的场景)
+- [2. 安装](#2-安装)
+- [3. 入门](#3-入门)
+  - [3.1. 连接池](#31-连接池)
+  - [3.2. 基础操作](#32-基础操作)
+  - [3.3. String](#33-string)
+  - [3.4. List](#34-list)
+  - [3.5. Set](#35-set)
+  - [3.6. Hash](#36-hash)
+  - [3.7. ZSet](#37-zset)
+  - [3.8. 管道](#38-管道)
+  - [3.9. Geo](#39-geo)
+  - [3.10. hyperloglog](#310-hyperloglog)
+  - [3.11. bitmap](#311-bitmap)
+  - [3.12. Pub/Sub](#312-pubsub)
+  - [3.13. sentinel](#313-sentinel)
+- [4. 主从复制](#4-主从复制)
+- [5. 哨兵模式](#5-哨兵模式)
+- [6. 集群模式](#6-集群模式)
+- [7. 分布式锁](#7-分布式锁)
+- [8. 面试题](#8-面试题)
+
+## 1. 介绍
 
 - 使用Redis有哪些好处？
   - 速度快，因为数据存在内存中，类似于HashMap，HashMap的优势就是查找和操作的时间复杂度都是O(1)
-  - 支持丰富数据类型，支持string，list，set，sorted set，hash
+  - 支持丰富数据类型，支持string，list，set，sorted set，hash HyperLogLog、Geo、Pub/Sub、Bitmaps
   - 支持事务，操作都是原子性，所谓的原子性就是对数据的更改要么全部执行，要么全部不执行
   - 丰富的特性：可用于缓存，消息，按key设置过期时间，过期后将会自动删除
 
@@ -29,7 +54,9 @@
   - allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
   - no-enviction（驱逐）：禁止驱逐数据
 
-- Memcache与Redis的区别都有哪些？
+### 1.1. Memcache与Redis的区别都有哪些？
+
+- 区别
   - 类型
     - memcached：
       - 支持内存
@@ -65,45 +92,43 @@
   - 附加功能
     - redis: 发布订阅模式、事务、每个类型不同的crud、
     - memcached: crud 、少量的其它命令
-- Redis 常见的性能问题都有哪些？如何解决？
-    1. Master写内存快照，save命令调度rdb Save函数，会阻塞主线程的工作，当快照比较大时对性能影响是非常大的，会间断性暂停服务，所以Master最好不要写内存快照。
-    2. Master AOF持久化，如果不重写AOF文件，这个持久化方式对性能的影响是最小的，但是AOF文件会不断增大，AOF文件过大会影响Master重启的恢复速度。Master最好不要做任何持久化工作，包括内存快照和AOF日志文件，特别是不要启用内存快照做持久化,如果数据比较关键，某个Slave开启AOF备份数据，策略为每秒同步一次。
-    3. Master调用BGREWRITEAOF重写AOF文件，AOF在重写的时候会占大量的CPU和内存资源，导致服务load过高，出现短暂服务暂停现象。
-    4. Redis主从复制的性能问题，为了主从复制的速度和连接的稳定性，Slave和Master最好在同一个局域网内
 
-- redis 最适合的场景
-  - Redis最适合所有数据in-momory的场景，虽然Redis也提供持久化功能，但实际更多的是一个disk-backed的功能，跟传统意义上的持久化有比较大的差别，那么可能大家就会有疑问，似乎Redis更像一个加强版的Memcached，那么何时使用Memcached,何时使用Redis呢?
+### 1.2. Redis 常见的性能问题都有哪些？如何解决？
 
-- 如果简单地比较Redis与Memcached的区别，大多数都会得到以下观点：
+1. Master写内存快照，save命令调度rdb Save函数，会阻塞主线程的工作，当快照比较大时对性能影响是非常大的，会间断性暂停服务，所以Master最好不要写内存快照。
+2. Master AOF持久化，如果不重写AOF文件，这个持久化方式对性能的影响是最小的，但是AOF文件会不断增大，AOF文件过大会影响Master重启的恢复速度。Master最好不要做任何持久化工作，包括内存快照和AOF日志文件，特别是不要启用内存快照做持久化,如果数据比较关键，某个Slave开启AOF备份数据，策略为每秒同步一次。
+3. Master调用BGREWRITEAOF重写AOF文件，AOF在重写的时候会占大量的CPU和内存资源，导致服务load过高，出现短暂服务暂停现象。
+4. Redis主从复制的性能问题，为了主从复制的速度和连接的稳定性，Slave和Master最好在同一个局域网内
+
+### 1.3. redis 最适合的场景
+
+Redis最适合所有数据in-momory的场景。
+
+- 果简单地比较Redis与Memcached的区别
   1. Redis不仅仅支持简单的k/v类型的数据，同时还提供list，set，zset，hash等数据结构的存储。
   2. Redis支持数据的备份，即master-slave模式的数据备份。
   3. Redis支持数据的持久化，可以将内存中的数据保持在磁盘中，重启的时候可以再次加载进行使用。
 
 - 会话缓存（Session Cache）
-  - 最常用的一种使用Redis的情景是会话缓存（session cache）。用Redis缓存会话比其他存储（如Memcached）的优势在于：Redis提供持久化。当维护一个不是严格要求一致性的缓存时，如果用户的购物车信息全部丢失，大部分人都会不高兴的，现在，他们还会这样吗？
-  - 幸运的是，随着 Redis 这些年的改进，很容易找到怎么恰当的使用Redis来缓存会话的文档。甚至广为人知的商业平台Magento也提供Redis的插件。
+  - 会话缓存（session cache）。
 
 - 全页缓存（FPC）
-  - 除基本的会话token之外，Redis还提供很简便的FPC平台。回到一致性问题，即使重启了Redis实例，因为有磁盘的持久化，用户也不会看到页面加载速度的下降，这是一个极大改进，类似PHP本地FPC。
-  - 再次以Magento为例，Magento提供一个插件来使用Redis作为全页缓存后端。
-  - 此外，对WordPress的用户来说，Pantheon有一个非常好的插件  wp-redis，这个插件能帮助你以最快速度加载你曾浏览过的页面。
 
 - 队列
-  - Reids在内存存储引擎领域的一大优点是提供 list 和 set 操作，这使得Redis能作为一个很好的消息队列平台来使用。Redis作为队列使用的操作，就类似于本地程序语言（如Python）对 list 的 push/pop 操作。
-  - 如果你快速的在Google中搜索“Redis queues”，你马上就能找到大量的开源项目，这些项目的目的就是利用Redis创建非常好的后端工具，以满足各种队列需求。例如，Celery有一个后台就是使用Redis作为broker，你可以从这里去查看。
+  - 提供 list 和 set 操作，能作为一个消息队列平台来使用。Redis作为队列使用的操作，就类似于本地程序语言（如Python）对 list 的 push/pop 操作。
+  - 例如，Celery有一个后台就是使用Redis作为broker。
 
 - 排行榜/计数器
-  - Redis在内存中对数字进行递增或递减的操作实现的非常好。集合（Set）和有序集合（Sorted Set）也使得我们在执行这些操作的时候变的非常简单，Redis只是正好提供了这两种数据结构。所以，我们要从排序集合中获取到排名最靠前的10个用户–我们称之为“user_scores”，我们只需要像下面一样执行即可：
-  - 当然，这是假定你是根据你用户的分数做递增的排序。如果你想返回用户及用户的分数，你需要这样执行：
-  - ZRANGE user_scores 0 10 WITHSCORES
+  - Redis在内存中对数字进行递增或递减的操作实现的非常好。集合（Set）和有序集合（Sorted Set)。
+  - zset 数据结构让你可以很容易的实现排行榜的功能。
 - 发布/订阅
-  - 最后（但肯定不是最不重要的）是Redis的发布/订阅功能。发布/订阅的使用场景确实非常多。我已看见人们在社交网络连接中使用，还可作为基于发布/订阅的脚本触发器，甚至用Redis的发布/订阅功能来建立聊天系统！（不，这是真的，你可以去核实）。
+  - 最后（但肯定不是最不重要的）是Redis的发布/订阅功能。发布/订阅的使用场景确实非常多。我已看见人们在社交网络连接中使用，还可作为基于发布/订阅的脚本触发器，甚至用Redis的发布/订阅功能来建立聊天系统。
 
-## 安装
+## 2. 安装
 
 `https://github.com/redis/redis-py`
 
-## 入门
+## 3. 入门
 
 - 示例
 
@@ -116,14 +141,14 @@ True
 b'bar'
 ```
 
-### 连接池
+### 3.1. 连接池
 
 ```python
 >>> pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
 >>> r = redis.Redis(connection_pool=pool)
 ```
 
-### set
+### 3.2. 基础操作
 
 - set
   - set(name, value, ex=None, px=None, nx=False, xx=False)
@@ -131,7 +156,7 @@ b'bar'
     - ex，过期时间（秒）
     - px，过期时间（毫秒）
     - nx，如果设置为True，则只有name不存在时，当前set操作才执行
-    - xx，如果设置为True，则只有name存在时，岗前set操作才执行
+    - xx，如果设置为True，则只有name存在时，当前set操作才执行
 - setnx(name,value)
   - 设置值，只有name不存在时，执行设置操作（添加）
 - setex(name,value,time)
@@ -140,58 +165,46 @@ b'bar'
   - 批量设置值
   - mset(k1='v1', k2='v2')
   - mget({'k1': 'v1', 'k2': 'v2'})
-- get
-- mget
-- getset
-- getrange
-- setrange
-- setbit
-- getbit
-- bitcount
-- bitop
-- strlen
-- incr
-- incrbyfloat
-- decr
-- append
+- get(name)
+  - 根据key获取值
+- getset(name, value)
+  - 设置新值并返回旧值
+- mget(keys, *args)
+  - 批量获取
+- keys(pattern='*')
+  - 根据模型获取key
+  - keys('*')
+  - keys('user:*')
+- exists(name)
+  - 判断name是否存在
+- expire(name, time)
+  - 为name设置过期时间
+- rename(src, dst)
+  - 重命名
+- type(name)
+  - 获取值的类型
+- delete(names, *args)
+  - 根据key删除
+- unlink(names, *args)
+  - 根据key删除（非阻塞删除）
+- flushdb()
+  - 清空当前库
+- flushall()
+  - 清空所有库
+- save
+- bgsave
 
-- hset
-- hmset
-- hget
-- hmget
-- hgetall
-- hlen
-- hkeys
-- hvals
-- hexists
-- hdel
-- hincrby
-- hincrbyfloat
-- hscan
-- hscan_iter
+### 3.3. String
 
-- lpush
-- lpushx
-- llen
-- linsert
-- r.lset
-- r.lrem
-- lpop
-- rpop
-- lindex
-- lrange
-- ltrim
-- rpoplpush
-- blpop
-- brpoplpush
+### 3.4. List
 
-- sadd
-- scard
+### 3.5. Set
 
-- zadd
-- zcard
+### 3.6. Hash
 
-### 管道
+### 3.7. ZSet
+
+### 3.8. 管道
 
 ```python
 >>> pipe = r.pipeline()
@@ -202,7 +215,51 @@ b'bar'
 [True, True, True]
 ```
 
-### Pub/Sub
+### 3.9. Geo
+
+```python
+>>> r = redis.Redis(host='localhost', port=6379, db=0)
+>>> r.geoadd('mycity', 116.404, 39.915, '北京')
+1
+>>> r.geoadd('mycity', 121.4737, 31.2304, '上海')
+1
+>>> r.geodist('mycity', '北京', '上海', unit='km')
+1068.6984
+>>> r.geodist('mycity', '北京', '上海', unit='mi')
+664.9114
+```
+
+### 3.10. hyperloglog
+
+```python
+>>> r = redis.Redis(host='localhost', port=6379, db=0)
+>>> r.pfadd('hll1', 'a', 'b', 'c', 'd', 'e')
+1
+>>> r.pfadd('hll2', 'c', 'd', 'e', 'f', 'g')
+1
+>>> r.pfmerge('hll3', 'hll1', 'hll2')
+True
+>>> r.pfcount('hll3')
+7
+```
+
+### 3.11. bitmap
+
+```python
+>>> r = redis.Redis(host='localhost', port=6379, db=0)
+>>> r.setbit('mykey', 7, 1)
+True
+>>> r.setbit('mykey', 8, 0)
+True
+>>> r.getbit('mykey', 7)
+1
+>>> r.getbit('mykey', 8)
+0
+>>> r.bitcount('mykey')
+1
+```
+
+### 3.12. Pub/Sub
 
 ```python
 >>> r = redis.Redis(...)
@@ -212,7 +269,7 @@ b'bar'
 {'pattern': None, 'type': 'subscribe', 'channel': b'my-second-channel', 'data': 1}
 ```
 
-### sentinel
+### 3.13. sentinel
   
 - sentinel主要用于在redis主从复制中，如果master顾上，则自动将slave替换成master
 
@@ -246,7 +303,7 @@ r_ret = slave.get('foo')
 print(r_ret)
 ```
 
-## 主从复制
+## 4. 主从复制
 
 ```conf
 # 配置主节点的ip和端口
@@ -272,7 +329,7 @@ master.replicate(slave1)
 master.replicate(slave2)
 ```
 
-## 哨兵模式
+## 5. 哨兵模式
 
 `redis> redis-sentinel /path/to/sentinel.conf`
 
@@ -303,7 +360,7 @@ sentinel = redis.sentinel(master='127.0.0.1:6379',
 sentinel.master_failover('master')
 ```
 
-## 集群模式
+## 6. 集群模式
 
 集群部署至少要 3 台以上的master节点，最好使用 3 主 3 从六个节点的模式
 
@@ -432,7 +489,58 @@ services:
     command: redis-server /etc/redis/redis.conf
 ```
 
-## 面试题
+## 7. 分布式锁
+
+```python
+import redis
+import time
+
+# 创建连接
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+# 加锁
+def acquire_lock(lock_name, acquire_timeout=10, lock_timeout=10):
+    identifier = str(time.time())
+    lock_key = 'lock:' + lock_name
+    lock_timeout = int(lock_timeout)
+    end = time.time() + acquire_timeout
+    while time.time() < end:
+        if r.set(lock_key, identifier, nx=True, ex=lock_timeout):
+            return identifier
+        time.sleep(0.001)
+    return False
+
+# 释放锁
+def release_lock(lock_name, identifier):
+    lock_key = 'lock:' + lock_name
+    pipe = r.pipeline(True)
+    while True:
+        try:
+            pipe.watch(lock_key)
+            if pipe.get(lock_key) == identifier:
+                pipe.multi()
+                pipe.delete(lock_key)
+                pipe.execute()
+                return True
+            pipe.unwatch()
+            break
+        except redis.exceptions.WatchError:
+            pass
+    return False
+
+# 使用锁
+lock_name = 'my_lock'
+identifier = acquire_lock(lock_name, acquire_timeout=10, lock_timeout=10)
+if identifier:
+    print('Acquired lock:', identifier)
+    # 执行需要加锁的操作
+    # ...
+    # 释放锁
+    release_lock(lock_name, identifier)
+            
+```
+
+## 8. 面试题
 
 1. 为什么要用缓存 （内存缓存）
     1. 缓解关系型数据库并发访问压力：热点数据
@@ -458,7 +566,7 @@ services:
       1. r RDB、AOF
       2. m 不支持
 3. redis常用数据类型与使用场景
-   1. string: 用来实现简单的kv键值对存储，比如计数器
+   1. string: 用来实现简单的kv键值对存储，比如计数器  单个最大容量512M
    2. list：实现双向链表，比如用户的关注，粉丝列表
    3. hash：用来存储彼此相关信息的键值对
    4. set：存储不重复元素，比如用户的关注者
@@ -508,10 +616,13 @@ services:
                       1. 增大数组
                       2. 增加hash函数
 10. 如何解决缓存击穿问题？
-    1. 某些非常热点的数据key过期，大量请求打到后端数据库
-    2. 热点数据key失效导致大量请求打到数据库增加数据库压力
-    3. 分布式锁：获取锁的线程从数据库拉数据更新缓存，其他线程等待
-    4. 异步后台更新：后台任务针对过期的key自动刷新
+    1. 原因
+       1. 某些非常热点的数据key过期，大量请求打到后端数据库
+       2. 热点数据key失效导致大量请求打到数据库增加数据库压力
+    2. 解决
+       1. 直接设置热点数据永不过期
+       2. 分布式锁：获取锁的线程从数据库拉数据更新缓存，其他线程等待
+       3. 异步后台更新：后台任务针对过期的key自动刷新
 11. 如何解决缓存雪崩问题？
     1. 缓存不可用 redis挂了 -> 解决：集群
     2. 大量缓存key同时失效，大量请求直接打到数据库
@@ -646,15 +757,20 @@ services:
 28. redis集群方案应该怎么做?
 29. redis集群方案什么情况下会导致集群不可用
 30. redis哈希槽的概念
+    1. edis-cluster中有16384(即2的14次方）个哈希槽，每个key通过CRC16校验后对16384取模来决定放置哪个槽。
 31. redis集群写操作会有丢失吗？为什么
 32. redis常见性能问题和解决方案有哪些?
 33. 热点数据和冷数据是什么?
 34. 什么情况下可能会导致redis阻塞
-    1. 客户端 阻塞 命令 keys* Hgetall smembers 时间复杂度 O(N)
-    2. BIGkey删除 zset (100万的元素 删除2s)
+    1. 客户端阻塞命令   keys* Hgetall smembers 时间复杂度 O(N)
+    2. BIGkey删除    zset (100万的元素 删除2s)
     3. 清空库 flushdb flushall
-    4. AOF日志同步写， 记录AOF日志 大量的写操作  1个同步写磁盘耗时1-2ms
-    5. 从库 加载RDB文件
+    4. SAVE创建RDB文件
+    5. AOF日志同步写， 记录AOF日志 大量的写操作  1个同步写磁盘耗时1-2ms
+    6. AOF重写阻塞,执行BGREWRITEAOF命令时，会将缓存中的数据写入到一个临时文件中，然后替换旧的AOF文件，如果AOF文件很大，那么重写的过程可能会阻塞主线程。
+    7. 从库 加载RDB文件
+    8. 发生了Swap(内存交换)
+    9. CPU竞争
 35. 什么时候选择redis，什么时候选择memcached
     1. redis功能更加强大 kv模式 string/list/hash/set/zset  memcache kv简单存储
     2. redis有持久化 memcache 不支持持久化
@@ -666,3 +782,7 @@ services:
        1. 多路复用io   命令 单线程， 子命令 锁冲突
        2. 非阻塞的IO多路复用
 36. redis过期策略都有哪些？LRU算法
+
+37. redis常见性能问题和解决方案
+    1.  Master最好不要写内存快照
+
