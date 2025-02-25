@@ -7,6 +7,27 @@ author: XiaoMing
 
 持续更新中...
 
+## 2025-02-13 临时提交
+
+- go/1_语言基础/9_并发.md
+- go/2_高级特性-原理/13_make与new.md
+- go/2_高级特性-原理/8_GC-垃圾回收.md
+- go/3_常用库/2_gopsutil.md
+- go/3_常用库/3_gorm.md
+- go/3_常用库/6_gache.md
+- go/3_常用库/7_分库分表.md
+- go/5_开源项目/cdk_note.md
+- go/5_开源项目/k3s源码笔记03-server流程.md
+- go/6_其它/0_常用工具.md
+- python/高并发设计/分布式.md
+- python/高并发设计/分库分表.md
+- python/高并发设计/可观测性.md
+- python/高并发设计/微服务.md
+- python/高并发设计/缓存.md
+- python/高并发设计/高可用.md
+- python/高并发设计/高并发.md
+- python/高并发设计/高性能.md
+
 ## 2025-01-10 临时保存python+lua文档
 
 - README.md
@@ -149,3 +170,4 @@ author: XiaoMing
 - go/5_开源项目/1_go-zero.md
 - go/6_其它/0_常用工具.md
 - go/6_其它/1_常见陷阱.md
+

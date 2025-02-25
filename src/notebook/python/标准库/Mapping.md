@@ -1,0 +1,58 @@
+# Mapping
+
+`Mapping` 是 Python 标准库 `collections.abc` 模块中的一个抽象基类，用于定义映射类型（如字典）的接口。它提供了一种方式来检查一个对象是否提供了字典的接口，即是否实现了某些特定的方法。
+
+### Mapping 的主要方法
+
+`Mapping` 要求实现以下方法：
+
+* `__getitem__(self, key)`: 通过键获取值。
+* `__iter__(self)`: 返回映射的键的迭代器。
+* `__len__(self)`: 返回映射中键值对的数量。
+
+### Mapping 的常见用法
+
+在代码中，`Mapping` 可以用于类型注解，确保函数或方法的参数或返回值是映射类型。例如：
+
+<pre><div class="insertbox command-bar"><div class="command-bar-lang">python</div><div class="command-bar-tools"><button class="insert-button"><span><span role="img" aria-label="copy" size="12" class="anticon anticon-copy"><svg viewBox="64 64 896 896" focusable="false" data-icon="copy" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M832 64H296c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h496v688c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V96c0-17.7-14.3-32-32-32zM704 192H192c-17.7 0-32 14.3-32 32v530.7c0 8.5 3.4 16.6 9.4 22.6l173.3 173.3c2.2 2.2 4.7 4 7.4 5.5v1.9h4.2c3.5 1.3 7.2 2 11 2H704c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32zM350 856.2L263.9 770H350v86.2zM664 888H414V746c0-22.1-17.9-40-40-40H232V264h432v624z"></path></svg></span><span class="insert-button-text"> 复制</span></span></button><button class="insert-button"><span><span role="img" aria-label="export" class="anticon anticon-export"><svg fill-rule="evenodd" viewBox="64 64 896 896" focusable="false" data-icon="export" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 912H144c-17.7 0-32-14.3-32-32V144c0-17.7 14.3-32 32-32h360c4.4 0 8 3.6 8 8v56c0 4.4-3.6 8-8 8H184v656h656V520c0-4.4 3.6-8 8-8h56c4.4 0 8 3.6 8 8v360c0 17.7-14.3 32-32 32zM770.87 199.13l-52.2-52.2a8.01 8.01 0 014.7-13.6l179.4-21c5.1-.6 9.5 3.7 8.9 8.9l-21 179.4c-.8 6.6-8.9 9.4-13.6 4.7l-52.4-52.4-256.2 256.2a8.03 8.03 0 01-11.3 0l-42.4-42.4a8.03 8.03 0 010-11.3l256.1-256.3z"></path></svg></span><span class="insert-button-text"> 插入</span></span></button><button class="insert-button"><span><span role="img" class="anticon"><svg width="1em" height="1em" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_4266_3992)"><path d="M11.4545 4.90909V7.63637C11.4545 10.3636 10.3636 11.4545 7.63632 11.4545H4.36359C1.63632 11.4545 0.54541 10.3636 0.54541 7.63637V4.36364C0.54541 1.63637 1.63632 0.545456 4.36359 0.545456H7.09086" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M11.4546 4.90909H9.27276C7.6364 4.90909 7.09094 4.36364 7.09094 2.72727V0.545456L11.4546 4.90909Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3.27271 6.54546H6.54543" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3.27271 8.72728H5.45452" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></g><defs><clipPath id="clip0_4266_3992"><rect width="12" height="12" fill="transparent"></rect></clipPath></defs></svg></span><span class="insert-button-text"> 新文件</span></span></button><button class="ant-dropdown-trigger insert-button"><span role="img" class="anticon"><svg width="1em" height="1em" viewBox="0 0 12 12" fill="none"><path d="M6.00218 12C4.61726 12.0016 3.27449 11.5234 2.202 10.6467C1.12952 9.76993 0.393492 8.54868 0.118969 7.19044C-0.155554 5.83219 0.0483649 4.42074 0.696078 3.19589C1.34379 1.97104 2.39534 1.00835 3.67207 0.471398C5.13784 -0.146952 6.78907 -0.157356 8.26251 0.442476C9.73595 1.04231 10.9109 2.20324 11.5289 3.66988C12.1469 5.13652 12.1573 6.78873 11.5578 8.26304C10.9583 9.73735 9.79807 10.913 8.3323 11.5313C7.59491 11.8425 6.80245 12.0019 6.00218 12ZM6.00218 0.94004C3.21542 0.94004 0.943849 3.21295 0.943849 6.00137C0.943849 8.78979 3.21542 11.0627 6.00218 11.0627C8.78895 11.0627 11.0605 8.78979 11.0605 6.00137C11.0605 3.21295 8.78895 0.94004 6.00218 0.94004Z" fill="currentColor"></path><path d="M6.00192 6.92706C5.81897 6.92706 5.64013 6.87278 5.48801 6.77108C5.33589 6.66937 5.21733 6.52482 5.14732 6.35569C5.0773 6.18657 5.05899 6.00047 5.09468 5.82093C5.13037 5.64138 5.21847 5.47646 5.34783 5.34702C5.4772 5.21758 5.64202 5.12943 5.82146 5.09371C6.0009 5.058 6.18689 5.07633 6.35591 5.14638C6.52494 5.21644 6.66941 5.33507 6.77105 5.48728C6.87269 5.63949 6.92694 5.81844 6.92694 6.0015C6.92694 6.24697 6.82948 6.48239 6.65601 6.65597C6.48254 6.82955 6.24725 6.92706 6.00192 6.92706ZM3.33225 6.92706C3.14929 6.92706 2.97045 6.87278 2.81833 6.77108C2.66621 6.66937 2.54765 6.52482 2.47764 6.35569C2.40763 6.18657 2.38931 6.00047 2.425 5.82093C2.46069 5.64138 2.54879 5.47646 2.67816 5.34702C2.80753 5.21758 2.97235 5.12943 3.15178 5.09371C3.33122 5.058 3.51721 5.07633 3.68624 5.14638C3.85526 5.21644 3.99973 5.33507 4.10137 5.48728C4.20301 5.63949 4.25727 5.81844 4.25727 6.0015C4.25727 6.12304 4.23334 6.2434 4.18685 6.35569C4.14037 6.46799 4.07223 6.57002 3.98633 6.65597C3.90044 6.74192 3.79846 6.81009 3.68624 6.85661C3.57401 6.90312 3.45372 6.92706 3.33225 6.92706ZM8.6716 6.92706C8.48865 6.92706 8.3098 6.87278 8.15769 6.77108C8.00557 6.66937 7.887 6.52482 7.81699 6.35569C7.74698 6.18657 7.72866 6.00047 7.76435 5.82093C7.80005 5.64138 7.88815 5.47646 8.01751 5.34702C8.14688 5.21758 8.3117 5.12943 8.49114 5.09371C8.67057 5.058 8.85656 5.07633 9.02559 5.14638C9.19461 5.21644 9.33908 5.33507 9.44072 5.48728C9.54237 5.63949 9.59662 5.81844 9.59662 6.0015C9.59662 6.24697 9.49916 6.48239 9.32569 6.65597C9.15221 6.82955 8.91693 6.92706 8.6716 6.92706Z" fill="currentColor"></path></svg></span></button></div></div><div class="foldable-highlight"><pre><code class="python hljs">from collections.abc import Mapping
+
+def process_data(data: Mapping[str, int]) -> None:
+    for key, value in data.items():
+        print(f"{key}: {value}")
+</code></pre></div></pre>
+
+在这个例子中，`process_data` 函数接受一个 `Mapping` 类型的参数 `data`，它要求 `data` 是一个键为字符串类型、值为整数类型的映射。
+
+### Mapping 的优点
+
+使用 `Mapping` 的优点包括：
+
+* **类型检查** ：可以在静态类型检查器（如 mypy）中使用，以确保代码的类型安全。
+* **灵活性** ：可以接受任何实现了映射接口的对象，而不仅仅是内置的 `dict` 类型。
+* **代码清晰** ：使用 `Mapping` 可以使代码的意图更加明确，表明该对象应该被视为映射。
+
+### Mapping 的实现
+
+要创建一个自定义的映射类型，你可以继承 `Mapping` 并实现其要求的方法。例如：
+
+<pre><div class="insertbox command-bar"><div class="command-bar-lang">python</div><div class="command-bar-tools"><button class="insert-button"><span><span role="img" aria-label="copy" size="12" class="anticon anticon-copy"><svg viewBox="64 64 896 896" focusable="false" data-icon="copy" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M832 64H296c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h496v688c0 4.4 3.6 8 8 8h56c4.4 0 8-3.6 8-8V96c0-17.7-14.3-32-32-32zM704 192H192c-17.7 0-32 14.3-32 32v530.7c0 8.5 3.4 16.6 9.4 22.6l173.3 173.3c2.2 2.2 4.7 4 7.4 5.5v1.9h4.2c3.5 1.3 7.2 2 11 2H704c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32zM350 856.2L263.9 770H350v86.2zM664 888H414V746c0-22.1-17.9-40-40-40H232V264h432v624z"></path></svg></span><span class="insert-button-text"> 复制</span></span></button><button class="insert-button"><span><span role="img" aria-label="export" class="anticon anticon-export"><svg fill-rule="evenodd" viewBox="64 64 896 896" focusable="false" data-icon="export" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M880 912H144c-17.7 0-32-14.3-32-32V144c0-17.7 14.3-32 32-32h360c4.4 0 8 3.6 8 8v56c0 4.4-3.6 8-8 8H184v656h656V520c0-4.4 3.6-8 8-8h56c4.4 0 8 3.6 8 8v360c0 17.7-14.3 32-32 32zM770.87 199.13l-52.2-52.2a8.01 8.01 0 014.7-13.6l179.4-21c5.1-.6 9.5 3.7 8.9 8.9l-21 179.4c-.8 6.6-8.9 9.4-13.6 4.7l-52.4-52.4-256.2 256.2a8.03 8.03 0 01-11.3 0l-42.4-42.4a8.03 8.03 0 010-11.3l256.1-256.3z"></path></svg></span><span class="insert-button-text"> 插入</span></span></button><button class="insert-button"><span><span role="img" class="anticon"><svg width="1em" height="1em" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_4266_3992)"><path d="M11.4545 4.90909V7.63637C11.4545 10.3636 10.3636 11.4545 7.63632 11.4545H4.36359C1.63632 11.4545 0.54541 10.3636 0.54541 7.63637V4.36364C0.54541 1.63637 1.63632 0.545456 4.36359 0.545456H7.09086" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M11.4546 4.90909H9.27276C7.6364 4.90909 7.09094 4.36364 7.09094 2.72727V0.545456L11.4546 4.90909Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3.27271 6.54546H6.54543" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3.27271 8.72728H5.45452" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></g><defs><clipPath id="clip0_4266_3992"><rect width="12" height="12" fill="transparent"></rect></clipPath></defs></svg></span><span class="insert-button-text"> 新文件</span></span></button><button class="ant-dropdown-trigger insert-button"><span role="img" class="anticon"><svg width="1em" height="1em" viewBox="0 0 12 12" fill="none"><path d="M6.00218 12C4.61726 12.0016 3.27449 11.5234 2.202 10.6467C1.12952 9.76993 0.393492 8.54868 0.118969 7.19044C-0.155554 5.83219 0.0483649 4.42074 0.696078 3.19589C1.34379 1.97104 2.39534 1.00835 3.67207 0.471398C5.13784 -0.146952 6.78907 -0.157356 8.26251 0.442476C9.73595 1.04231 10.9109 2.20324 11.5289 3.66988C12.1469 5.13652 12.1573 6.78873 11.5578 8.26304C10.9583 9.73735 9.79807 10.913 8.3323 11.5313C7.59491 11.8425 6.80245 12.0019 6.00218 12ZM6.00218 0.94004C3.21542 0.94004 0.943849 3.21295 0.943849 6.00137C0.943849 8.78979 3.21542 11.0627 6.00218 11.0627C8.78895 11.0627 11.0605 8.78979 11.0605 6.00137C11.0605 3.21295 8.78895 0.94004 6.00218 0.94004Z" fill="currentColor"></path><path d="M6.00192 6.92706C5.81897 6.92706 5.64013 6.87278 5.48801 6.77108C5.33589 6.66937 5.21733 6.52482 5.14732 6.35569C5.0773 6.18657 5.05899 6.00047 5.09468 5.82093C5.13037 5.64138 5.21847 5.47646 5.34783 5.34702C5.4772 5.21758 5.64202 5.12943 5.82146 5.09371C6.0009 5.058 6.18689 5.07633 6.35591 5.14638C6.52494 5.21644 6.66941 5.33507 6.77105 5.48728C6.87269 5.63949 6.92694 5.81844 6.92694 6.0015C6.92694 6.24697 6.82948 6.48239 6.65601 6.65597C6.48254 6.82955 6.24725 6.92706 6.00192 6.92706ZM3.33225 6.92706C3.14929 6.92706 2.97045 6.87278 2.81833 6.77108C2.66621 6.66937 2.54765 6.52482 2.47764 6.35569C2.40763 6.18657 2.38931 6.00047 2.425 5.82093C2.46069 5.64138 2.54879 5.47646 2.67816 5.34702C2.80753 5.21758 2.97235 5.12943 3.15178 5.09371C3.33122 5.058 3.51721 5.07633 3.68624 5.14638C3.85526 5.21644 3.99973 5.33507 4.10137 5.48728C4.20301 5.63949 4.25727 5.81844 4.25727 6.0015C4.25727 6.12304 4.23334 6.2434 4.18685 6.35569C4.14037 6.46799 4.07223 6.57002 3.98633 6.65597C3.90044 6.74192 3.79846 6.81009 3.68624 6.85661C3.57401 6.90312 3.45372 6.92706 3.33225 6.92706ZM8.6716 6.92706C8.48865 6.92706 8.3098 6.87278 8.15769 6.77108C8.00557 6.66937 7.887 6.52482 7.81699 6.35569C7.74698 6.18657 7.72866 6.00047 7.76435 5.82093C7.80005 5.64138 7.88815 5.47646 8.01751 5.34702C8.14688 5.21758 8.3117 5.12943 8.49114 5.09371C8.67057 5.058 8.85656 5.07633 9.02559 5.14638C9.19461 5.21644 9.33908 5.33507 9.44072 5.48728C9.54237 5.63949 9.59662 5.81844 9.59662 6.0015C9.59662 6.24697 9.49916 6.48239 9.32569 6.65597C9.15221 6.82955 8.91693 6.92706 8.6716 6.92706Z" fill="currentColor"></path></svg></span></button></div></div><div class="foldable-highlight"><pre><code class="python hljs">from collections.abc import Mapping
+
+class CustomMapping(Mapping):
+    def __init__(self, data: dict):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+</code></pre></div></pre>
+
+在这个例子中，`CustomMapping` 是一个自定义的映射类型，它接受一个字典作为初始化参数，并实现了 `Mapping` 所需的方法。
+
+### 总结
+
+`Mapping` 是一个非常有用的抽象基类，它定义了映射类型的基本接口，并允许你在类型注解中使用它来确保类型安全。通过继承 `Mapping` 并实现其方法，你可以创建自定义的映射类型。
