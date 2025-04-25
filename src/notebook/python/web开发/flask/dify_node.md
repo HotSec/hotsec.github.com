@@ -46,7 +46,7 @@ poetry env activate
 .venv/bin/flask db upgrade
 .venv/bin/flask run --host 0.0.0.0 --port 5001 --debug
 
-celery -A app.celery worker -P gevent -c 1 -Q dataset,generation,mail,ops_trace --loglevel INFO
+.venv/bin/celery -A app.celery worker -P gevent -c 1 -Q dataset,generation,mail,ops_trace --loglevel INFO
 
 
 cd web 

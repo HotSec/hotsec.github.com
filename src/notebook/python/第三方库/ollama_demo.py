@@ -9,17 +9,21 @@ class MyOllama(object):
         """
         Ollama模型列表
         """
-        Qwen2_5_3b = "qwen2.5:3b"
+
+        Qwen2_5_3b = "deepseek-r1:7b"
 
     class Role:
         """
         由Ollama官方定义，用于区分消息是由哪个角色提供
         """
+
         User = "user"  # 用户信息，一般指用户提问
         System = "system"  # 系统信息，一般用于设定场景
         Assistant = "assistant"  # 系统回答
 
-    def __init__(self, host: str, port: int, temperature=0, history_size: int = 5 * 1024 * 1024):
+    def __init__(
+        self, host: str, port: int, temperature=0, history_size: int = 5 * 1024 * 1024
+    ):
         """
         初始化一个客户端
         :param host:
@@ -40,8 +44,11 @@ class MyOllama(object):
         :return:
         """
         try:
-            res = self.client.chat(model=model, messages=[{"role": MyOllama.Role.User, "content": content}],
-                                   options={"temperature": self.temperature})
+            res = self.client.chat(
+                model=model,
+                messages=[{"role": MyOllama.Role.User, "content": content}],
+                options={"temperature": self.temperature},
+            )
 
             return res["message"]["content"]
 
@@ -64,7 +71,11 @@ class MyOllama(object):
             self.content.pop(0)  # 移除最早的消息
 
         try:
-            res = self.client.chat(model=model, messages=self.content, options={"temperature": self.temperature})
+            res = self.client.chat(
+                model=model,
+                messages=self.content,
+                options={"temperature": self.temperature},
+            )
             message = res["message"]["content"]
             self.content.append({"role": "assistant", "content": message})
 
@@ -76,23 +87,21 @@ class MyOllama(object):
     @staticmethod
     def get_history_size(history):
         """历史记录的大小（字节）"""
-        return sum(len(json.dumps(message).encode('utf-8')) for message in history)
+        return sum(len(json.dumps(message).encode("utf-8")) for message in history)
 
 
-
-
-host = "127.0.0.1"
+host = "192.168.66.17"
 port = 11434
 
 my_ollama = MyOllama(host, port, temperature=100)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     while True:
         in_put = input("请输入：")
         if in_put == "":
             continue
 
-        message = my_ollama.single_conversation(MyOllama.ModelList.Qwen2_5_3b, content=in_put)
+        message = my_ollama.single_conversation(
+            MyOllama.ModelList.Qwen2_5_3b, content=in_put
+        )
         print(message)
-        
-        

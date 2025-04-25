@@ -15,17 +15,10 @@ def index():
 
     return pc.vstack(
         pc.breadcrumb(
-    pc.breadcrumb_item(
-        pc.breadcrumb_link("Home", href="#")
-    ),
-    pc.breadcrumb_item(
-        pc.breadcrumb_link("Docs", href="#")
-    ),
-    pc.breadcrumb_item(
-        pc.breadcrumb_link("Breadcrumb", href="#")
-    ),
-),
-
+            pc.breadcrumb_item(pc.breadcrumb_link("Home", href="#")),
+            pc.breadcrumb_item(pc.breadcrumb_link("Docs", href="#")),
+            pc.breadcrumb_item(pc.breadcrumb_link("Breadcrumb", href="#")),
+        ),
         pc.heading(State.count, font_size="2em"),
         pc.button(
             "-",
@@ -98,6 +91,7 @@ def navbar():
         top="0px",
         z_index="5",
     )
+
 
 app = pc.App(state=State)
 app.add_page(index, route="/", title="Home")
