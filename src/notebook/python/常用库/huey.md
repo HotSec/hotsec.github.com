@@ -92,12 +92,9 @@ huey_consumer.py my_app.huey -k greenlet -w 32
 
 ```
 
------------------------------
+## 优先级队列
 
-400   Bad Request
-
-
-------------------------------
+```python
 
 
-400
+```

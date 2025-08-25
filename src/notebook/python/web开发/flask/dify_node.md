@@ -1,6 +1,41 @@
 # dify学习笔记
 
-## 介绍
+
+- [1. 介绍](#1-介绍)
+- [2. 部署](#2-部署)
+  - [2.1. docker compose部署](#21-docker-compose部署)
+  - [2.2. 源码部署](#22-源码部署)
+- [3. 连接ollama](#3-连接ollama)
+- [4. 目录结构](#4-目录结构)
+  - [4.1. API](#41-api)
+- [5. .vscode](#5-vscode)
+- [6. 项目依赖](#6-项目依赖)
+- [7. configs](#7-configs)
+- [8. constants](#8-constants)
+- [9. contexts](#9-contexts)
+- [10. controllers](#10-controllers)
+  - [10.1. common](#101-common)
+  - [10.2. console](#102-console)
+  - [10.3. fields](#103-fields)
+  - [10.4. inner\_api](#104-inner_api)
+  - [10.5. service\_api](#105-service_api)
+  - [10.6. web](#106-web)
+- [11. core](#11-core)
+- [12. services](#12-services)
+- [13. events](#13-events)
+- [14. extensions](#14-extensions)
+- [15. factories](#15-factories)
+- [16. fields](#16-fields)
+- [17. libs](#17-libs)
+- [18. migrations](#18-migrations)
+- [19. models](#19-models)
+- [20. schedule](#20-schedule)
+- [21. services](#21-services)
+- [22. tasks](#22-tasks)
+- [23. templates](#23-templates)
+- [24. 小结](#24-小结)
+
+## 1. 介绍
 
 Dify 是一个开源的 LLM 应用开发平台。其直观的界面结合了 AI 工作流、RAG 管道、Agent、模型管理、可观测性功能等，让您可以快速从原型到生产。
 
@@ -12,9 +47,9 @@ Dify 是一个开源的 LLM 应用开发平台。其直观的界面结合了 AI 
 6. LLMOps: 随时间监视和分析应用程序日志和性能。您可以根据生产数据和标注持续改进提示、数据集和模型。
 7. 后端即服务: 所有 Dify 的功能都带有相应的 API，因此您可以轻松地将 Dify 集成到自己的业务逻辑中。
 
-## 部署
+## 2. 部署
 
-### docker compose部署
+### 2.1. docker compose部署
 
 ```bash
 git clone https://github.com/langgenius/dify.git
@@ -23,7 +58,7 @@ cp .env.example .env
 docker compose up -d
 ```
 
-### 源码部署
+### 2.2. 源码部署
 
 ```bash
 git clone https://github.com/langgenius/dify.git
@@ -56,19 +91,19 @@ npm run build
 npm run start 
 ```
 
-## 连接ollama
+## 3. 连接ollama
 
 ![alt text](image/dify_node/image.png)
 
-## 目录结构
+## 4. 目录结构
 
-```
+```bash
 api 后端服务代码
 web 前端
 docker 容器相关
 ```
 
-### API
+### 4.1. API
 
 这是一个后端项目，主要用的是flask+celery，
 
@@ -105,11 +140,11 @@ docker 容器相关
 
 ```
 
-## .vscode
+## 5. .vscode
 
 launch.json 定义了vscode调试的配置项，方便F5进行调试。
 
-## 项目依赖
+## 6. 项目依赖
 
 - poetry
   - python的项目管理工具
@@ -149,7 +184,7 @@ launch.json 定义了vscode调试的配置项，方便F5进行调试。
 - pypdfium2
 - transformers
 
-## configs
+## 7. configs
 
 configs目录通过定义配置类和实例化配置对象，实现了项目的配置管理。
 
@@ -160,14 +195,14 @@ configs目录通过定义配置类和实例化配置对象，实现了项目的�
 - 在extensions/ext_hosting_provider.py文件中，使用hosting_configuration对象加载了HostingConfiguration。
 - DifyConfig()
 
-## constants
+## 8. constants
 
 存储项目中使用的常量
 
 constants/languages.py 文件中定义了一个字典 language_timezone_mapping,用于将语言代码映射到对应的时区。
 例如，"en-US" 映射到 "America/New_York","zh-Hans" 映射到 "Asia/Shanghai"。
 
-## contexts
+## 9. contexts
 
 定义和管理应用程序中的上下文变量
 
@@ -176,11 +211,11 @@ constants/languages.py 文件中定义了一个字典 language_timezone_mapping,
 - tenant_id: 这个上下文变量用于存储当前租户的 ID
 - workflow_variable_pool: 这个上下文变量用于存储当前工作流的变量池。这可以用于在工作流的不同节点之间共享和传递变量。
 
-## controllers
+## 10. controllers
 
 controllers 目录是应用程序的控制器部分,它负责处理来自客户端的HTTP请求,调用相应的服务层逻辑,并返回响应.
 
-### common
+### 10.1. common
 
 common 目录包含了一些通用的控制器,这些控制器可以在多个地方使用。
 
@@ -188,13 +223,13 @@ common 目录包含了一些通用的控制器,这些控制器可以在多个地
 - helpers.py 定义了一些通用的帮助函数,这些函数可以在多个控制器中使用。
 - errors.py 定义了RemoteFileUploadError与FilenameNotExistsError两个自定义异常类。
 
-### console
+### 10.2. console
 
 console目录的作用是提供与控制台交互相关的功能
 
-### fields
+### 10.3. fields
 
-### inner_api
+### 10.4. inner_api
 
 - 要是处理内部API请求
 
@@ -220,7 +255,8 @@ workspace.py: 包含处理工作区相关操作的资源类。
   - 比较签名结果与 `token` 是否一致，如果不一致，则直接调用原视图函数。
   - 如果验证通过，则从数据库中查询用户信息，并将其作为关键字参数传递给原视图函数。
 
-### service_api
+### 10.5. service_api
+
 service_api 是一个基于 Flask 的蓝图（Blueprint），用于定义和管理一组与特定功能相关的路由和视图函数。在提供的代码信息中，service_api 主要用于处理与以下功能模块相关的 API 请求：
 
 - app: 应用相关的 API 端点。
@@ -237,11 +273,11 @@ service_api 是一个基于 Flask 的蓝图（Blueprint），用于定义和管�
   - upload_file: 文件上传相关的 API 端点。
 - wraps.py 一些装饰器和辅助函数，用于在 Flask 应用中处理 API 请求的验证和权限检查
 
-### web
+### 10.6. web
 
 理与Web相关的HTTP请求，并将这些请求路由到相应的处理函数
 
-## core
+## 11. core
 
 核心功能目录，包含业务逻辑和工具。
 
@@ -269,7 +305,7 @@ service_api 是一个基于 Flask 的蓝图（Blueprint），用于定义和管�
 - variables：变量相关的功能。
 - workflow：工作流相关的功能。
 
-## services
+## 12. services
 
 服务层目录，包含业务逻辑的实现。
 
@@ -314,11 +350,11 @@ service_api 是一个基于 Flask 的蓝图（Blueprint），用于定义和管�
 - workflow_service.py：工作流相关的服务。
 - workspace_service.py：工作空间相关的服务。
 
-## events
+## 13. events
 
 一个使用blinker的事件处理部分，处理各种与文档、数据集、应用、消息等相关的操作，并在特定事件发生时执行相应的清理、更新等操作。
 
-## extensions
+## 14. extensions
 
 extensions目录的作用是初始化和管理各种扩展功能。
 
@@ -339,7 +375,7 @@ extensions目录的作用是初始化和管理各种扩展功能。
 - ext_warnings.py：初始化警告扩展，用于配置Python警告。
 - storage：存储实现目录，包含各种存储服务的实现，如阿里云OSS、百度OBS、腾讯COS等。
 
-## factories
+## 15. factories
 
 提供各种工厂函数，用于创建和管理应用中的不同组件和对象。
 
@@ -347,7 +383,7 @@ extensions目录的作用是初始化和管理各种扩展功能。
 
 - file_factory.py：包含用于创建和管理文件的工厂函数。例如，build_from_message_files函数用于从消息文件中构建文件对象，build_from_message_file函数用于从单个消息文件中构建文件对象
 
-## fields
+## 16. fields
 
 fields目录的作用是定义和存储各种数据字段，用于序列化和反序列化数据对象
 
@@ -369,7 +405,7 @@ fields目录的作用是定义和存储各种数据字段，用于序列化和�
 - member_fields.py：定义了与成员相关的字段，如简单账户字段、账户字段、带角色账户字段、带角色账户列表字段等。
 
 
-## libs
+## 17. libs
 
 
 提供了一些通用的功能或工具，这些功能或工具可以在整个应用程序中被重复使用。
@@ -390,9 +426,9 @@ exception.py：定义了一个BaseHTTPException类，继承自HTTPException，�
 
 helper.py：提供了一些辅助函数和类，如运行脚本、生成随机字符串、提取远程IP、生成文本哈希等。
 
-## migrations
+## 18. migrations
 
-## models
+## 19. models
 
 提供各种数据库模型，使得应用能够灵活地存储和管理各种数据
 
@@ -414,8 +450,7 @@ source.py：定义了与数据源相关的模型，如DataSourceOauthBinding、D
 
 task.py：定义了与任务相关的模型，如CeleryTask、CeleryTaskSet等。
 
-
-## schedule
+## 20. schedule
 
 celery的定时任务，包括清理缓存、清理消息、清理未使用数据集等。queue用的dataset.
 
@@ -427,7 +462,7 @@ clean_unused_datasets_task.py：定义了一个清理未使用数据集的任务
 
 mail_clean_document_notify_task.py：定义了一个发送文档清理通知的任务。这个任务会在文档清理完成后，发送通知邮件给相关人员。
 
-## services
+## 21. services
 
 提供各种服务类，使得应用能够灵活地处理各种业务逻辑。
 
@@ -454,7 +489,7 @@ agent_service.py：定义了与代理相关的服务，如AgentService。
 audio_service.py：定义了与音频相关的服务，如AudioService。
 
 
-## tasks
+## 22. tasks
 
 提供各种异步任务，使得应用能够灵活地处理各种后台任务
 
@@ -508,11 +543,11 @@ process_trace_tasks：异步处理跟踪任务。
 
 retry_document_indexing_task：异步重试文档索引。
 
-## templates
+## 23. templates
 
 渲染模板，主要是邮件发送的内容。
 
-## 小结
+## 24. 小结
 
 api是一个典型的flask应用，采用的flask-restful+sqlalchemy+celery。
 数据存储在postgres中，通过sqlalchemy进行操作,通过celery进行异步处理。

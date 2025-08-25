@@ -33,22 +33,22 @@ Vagrant.configure("2") do |config|
         sudo sed -ri 's/.*swap.*/#&/' /etc/fstab
         INSTALL_K3S_MIRROR=cn
         INSTALL_K3S_EXEC="server"
-        K3S_TOKEN="k3stoekn123456"
+        K3S_TOKEN="k3sToKeN123456"
 
         # 3个master，若干个worker
         # 第一个master，相当于集群初始化
-        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sha123456  sh -s - server --cluster-init
+        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --cluster-init  --system-default-registry "registry.cn-hangzhou.aliyuncs.com"
         # 其余两个master，加入到第一个的集群当中
-        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sha123456  sh -s - server --server https://192.168.30.11:6443
+        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --server https://192.168.9.201:6443  --system-default-registry "registry.cn-hangzhou.aliyuncs.com"
         # worker节点
-        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sha123456"  K3S_URL=https://192.168.30.11:6443 sh -
+        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sToKeN123456"  K3S_URL=https://192.168.9.201:6443 sh -
    
-        # vagrant ssh k3s-master-1 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sha123456  sh -s - server --cluster-init'
-        # vagrant ssh k3s-master-2 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sha123456  sh -s - server --server https://192.168.30.11:6443'
-        # vagrant ssh k3s-master-3 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sha123456  sh -s - server --server https://192.168.30.11:6443'
-        # vagrant ssh k3s-worker-1 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sha123456"  K3S_URL=https://192.168.30.11:6443 sh -'
-        # vagrant ssh k3s-worker-2 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sha123456"  K3S_URL=https://192.168.30.11:6443 sh -'
-        # vagrant ssh k3s-worker-3 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sha123456"  K3S_URL=https://192.168.30.11:6443 sh -'
+        # vagrant ssh k3s-master-1 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --cluster-init'
+        # vagrant ssh k3s-master-2 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --server https://192.168.9.201:6443'
+        # vagrant ssh k3s-master-3 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --server https://192.168.9.201:6443'
+        # vagrant ssh k3s-worker-1 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sToKeN123456"  K3S_URL=https://192.168.9.201:6443 sh -'
+        # vagrant ssh k3s-worker-2 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sToKeN123456"  K3S_URL=https://192.168.9.201:6443 sh -'
+        # vagrant ssh k3s-worker-3 -c 'sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sToKeN123456"  K3S_URL=https://192.168.9.201:6443 sh -'
 
         # 卸载
         ## 卸载 master
@@ -83,9 +83,9 @@ Vagrant.configure("2") do |config|
 
 
         # 单master
-        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="server"  K3S_TOKEN="k3sha123456" sh -
+        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="server"  K3S_TOKEN="k3sToKeN123456" sh -
         # worker节点
-        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sha123456"  K3S_URL=https://192.168.30.10:6443 sh -
+        # sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sToKeN123456"  K3S_URL=https://192.168.30.10:6443 sh -
   
 
         # 二进制运行
@@ -232,8 +232,8 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6Ik9aenFvVENlU3U5ZjMzMmNObnpqY0QxVEF2QmlGcjNOcml5eGZE
 ## [kubectl proxy](https://hotsec.github.io/dev/k3s.html#kubectl-proxy)
 
 ```shell
-# 创建一个运行 MongoDB 的 Deployment：
-root@k3s-master-1:/home/vagrant# kubectl apply -f https://k8s.io/examples/application/mongodb/mongo-deployment.yaml
+# 创建一个运行 MongoDB 的 Deployment-------------
+root@k3s-master-1:/home/vagrant# 
 deplyment.apps/mongo created
 
 # 查看 Pod 状态
@@ -285,11 +285,62 @@ kubectl port-forward service/mongo 28015:27017
 以上所有命令效果相同。输出类似于：
 
 ```bash
-root@k3s-master-1:/home/vagrantkubectl port-forward replicaset/mongo-7d96cb4cf 28015:2701717
+root@k3s-master-1:/home/vagrant# kubectl port-forward replicaset/mongo-7d96cb4cf 28015:2701717
 Forwarding from 127.0.0.1:28015 -> 27017
 ```
 
 ```bash
 root@k3s-master-1:/home/vagrant# kubectl port-forward deployment/mongo :27017  # 让 *kubectl* 来选择本地端口
 Forwarding from 127.0.0.1:33627 -> 27017
+```
+
+## QA
+
+### lxc容器中部署k3s
+
+**一定要是特权容器**,创建的时候设置的，创建完之后改不管用
+
+sysctl -w net.bridge.bridge-nf-call-iptables=1
+
+```bash
+# /dev/kmsg 设备挂载
+
+cat <<'EOF' | tee /etc/rc.local > /dev/null
+#!/bin/sh -e
+if [ ! -e /dev/kmsg ];then
+ln -s /dev/console /dev/kmsg
+fi
+mount --make-rshared /
+
+EOF
+
+chmod +x /etc/rc.local
+```
+
+```bash
+lxc.apparmor.profile: unconfined
+lxc.cgroup.devices.allow: a
+lxc.cap.drop:
+lxc.mount.auto: "proc:rw sys:rw"
+```
+
+```bash
+ cat >> /etc/rancher/k3s/registries.yaml << EOF
+mirrors:
+  docker.io:
+    endpoint:
+      - "https://docker.m.daocloud.io"
+
+  gcr.io:
+    endpoint:
+      - "https://gcr.m.daocloud.io"
+
+  quay.io:
+    endpoint:
+      - "https://quay.m.daocloud.io"
+
+  registry.k8s.io:
+    endpoint:
+      - "https://k8s.m.daocloud.io"
+EOF
 ```

@@ -869,3 +869,51 @@ MongoDB 中的文档排序是通过 sort() 方法来实现的。 sort() 方法�
 ## 在MongoDB中什么是副本集
 
 在MongoDB中副本集由一组MongoDB实例组成，包括一个主节点多个次节点，MongoDB客户端的所有数据都写入主节点(Primary),副节点从主节点同步写入数据，以保持所有复制集内存储相同的数据，提高数据可用性。
+
+## 部署一个高可用集群
+
+主从备份（Master - Slave）模式，或者叫主从复制模式。
+副本集（Replica Set）模式。
+分片（Sharding）模式。
+
+Mongo集群的概念，Mongo集群有3个主要组件
+
+​- mazConfigServer：在集群中扮演存储整个集群的配置信息，负责配置存储，如果需要高可用的ConfigServer那么需要3个节点。
+
+​- hard：分片，存储真实的数据，每一个Shard分片都负责存储集群中的数据，例如一个集群有3个分片，然后我们定义分片规则为哈希，那么整个集群的数据就会（分割）到3个分片中的某一个分片，那么分片是特别重要的，如果集群中的一个分片全部崩溃了那么集群将不可用，所以我们要保证集群的高可用，那么我们需要一个分片配置3个节点，2个副本集一个仲裁节点，仲裁节点类似于Redis的哨兵模式，如果发现主节点挂了那么让另一个副本集进行数据存储。
+
+​- Mongos：Mongos我们可以理解为整个集群的入口，类似于Kafka的Broker代理，也就是客户端，我们通过客户端连接集群进行查询。
+
+```
+version: '3'
+services:
+  mongo1:
+    image: mongo:5.0
+    container_name: mongo1
+    restart: always
+    ports:
+     - "27017:27017"
+    volumes:
+     - ./data/mongo1:/data/db
+    command: mongod --replSet rs0 --bind_ip_all --port 27017
+
+  mongo2:
+    image: mongo:5.0
+    container_name: mongo2
+    restart: always
+    ports:
+     - "27018:27017"
+    volumes:
+     - ./data/mongo2:/data/db
+    command: mongod --replSet rs0 --bind_ip_all --port 27017
+
+  mongo3:
+    image: mongo:5.0
+    container_name: mongo3
+    restart: always
+    ports:
+     - "27019:27017"
+    volumes:
+     - ./data/mongo3:/data/db
+    command: mongod --replSet rs0 --bind_ip_all --port 27017
+```

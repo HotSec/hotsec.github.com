@@ -8,6 +8,7 @@
 
 ## 1. hyper-v虚拟机开机嵌套虚拟化的流程
 
+```cmd
 PS C:\Users\Administrator> Stop-VM  fedora_default
 PS C:\Users\Administrator> Get-VM
 
@@ -96,6 +97,7 @@ IsDeleted                                    : False
 VMCheckpointId                               : 00000000-0000-0000-0000-000000000000
 VMCheckpointName                             :
 PS C:\Users\Administrator> Start-VM  fedora_default
+```
 
 ## 2. hyper-v 虚拟机 lvm 扩容
 

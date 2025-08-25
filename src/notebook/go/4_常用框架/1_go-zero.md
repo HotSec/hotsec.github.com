@@ -93,13 +93,23 @@ EOF
 goctl model mysql ddl --src user.sql --dir .
 ```
 
+## mongo demo
+
 ```bash
 mkdir -p model/mongo
 cd model/mongo
 goctl model mongo --type user --dir .
 ```
 
-## rpc demo
+## api format
+
+```
+cd api/format
+goctl api format --dir demo.api
+```
+
+## grpc client
+
 
 ```bash
 # 创建 demo 服务目录
@@ -110,17 +120,52 @@ $ go mod init demo
 $ goctl rpc -o greet.proto
 # 生 pb.go 文件
 $ protoc greet.proto --go_out=. --go-grpc_out=.
-# 创建 server 目录
-$ mkdir server && cd server
+# 创建 client 目录
+$ mkdir client && cd client
 # 新增配置文件
 $ mkdir etc && cd etc
-$ touch greet-server.yaml
-# 新增 server.go 文件
-$ touch server.go
+$ touch greet-client.yaml
+# 新增 client.go 文件
+$ touch client.go
 ```
 
-## mongo demo
+```yaml
+Target: 127.0.0.1:8080
+```
+
+```go
+func main() {
+    var clientConf zrpc.RpcClientConf
+    conf.MustLoad("etc/client.yaml", &clientConf)
+    conn := zrpc.MustNewClient(clientConf)
+    client := greet.NewGreetClient(conn.Conn())
+    resp, err := client.Ping(context.Background(), &greet.Request{})
+    if err != nil {
+        log.Fatal(err)
+        return
+    }
+
+    log.Println(resp)
+}
+```
+
+## 配置无法解密
+
+### 环境变量
+
+### 配置继承
+
+## mcp 
+
+## 部署
+
+
+## 压测
 
 ```bash
+# 我们用 hey 工具来进行压测，压测 90 个并发，执行 1 秒
+hey -z 1s -c 90 -q 1 'http://localhost:8888/ping'
 
+# 压测 110 qps，共请求 110 次
+ghz --insecure --proto=limit.proto --call=proto.limit.Ping -d '{}' -c 110 -n 110  127.0.0.1:8080
 ```
