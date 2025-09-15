@@ -11,11 +11,7 @@ export default navbar([
       {
         text: "C++",
         icon: "pen-to-square",
-        prefix: "c/",
-        children: [
-          { text: "基础", icon: "pen-to-square", link: "1" },
-          { text: "高级", icon: "pen-to-square", link: "2" },
-        ],
+        link: "/notebook/cpp/",
       },
       {
         text: "Golang",
@@ -25,17 +21,17 @@ export default navbar([
           {
             text: "基础",
             icon: "pen-to-square",
-            link: "1",
+            link: "/notebook/go/1_语言基础/",
           },
           {
             text: "高级特性-原理",
             icon: "pen-to-square",
-            link: "2",
+            link: "/notebook/go/2_高级特性-原理/",
           },
         ],
       },
-      { text: "Python", icon: "pen-to-square", link: "cherry" },
-      { text: "Lua", icon: "pen-to-square", link: "dragonfruit" },
+      { text: "Python", icon: "pen-to-square", link: "/notebook/python/" },
+      { text: "Lua", icon: "pen-to-square", link: "/notebook/lua/" },
     ],
   },
 ]);

@@ -3,40 +3,40 @@ home: true
 layout: BlogHome
 icon: home
 title: 首页
-heroImage: https://theme-hope-assets.vuejs.press/logo.svg
+# heroImage: https://theme-hope-assets.vuejs.press/logo.svg
 heroText: 小明的笔记本
-heroFullScreen: true
+heroFullScreen: false
 tagline: 一个安全开发者的笔记本。
 projects:
   - icon: project
     name: C++
     desc: C/C++相关笔记
-    link: https://你的项目链接
-
+    link: /notebook/cpp/
+  
   - icon: link
     name: Golang
     desc: Go语言笔记
-    link: https://链接地址
+    link: /notebook/go/
 
   - icon: book
     name: Python
     desc: 人生苦短，我用Python！
-    link: https://你的书籍链接
+    link: /notebook/python/
 
   - icon: article
     name: Lua
     desc: Lua笔记
-    link: https://你的文章链接
+    link: /notebook/lua/
 
   - icon: friend
     name: 开源项目
     desc: showip、subdomain3
-    link: https://你的伙伴链接
+    link: /notebook/opensource/
 
   - icon: edit
     name: DIY
     desc: 自定义详细介绍
-    link: https://你的自定义链接
+    link: /notebook/diy/
 
 footer: XiaoMing
 ---
