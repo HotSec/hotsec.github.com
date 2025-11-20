@@ -74,9 +74,12 @@ pyenv global 3.12
 cd api
 cp .env.example .env
 awk -v key="$(openssl rand -base64 42)" '/^SECRET_KEY=/ {sub(/=.*/, "=" key)} 1' .env > temp_env && mv temp_env .env
-poetry env use 3.12
-poetry install
-poetry env activate
+
+# 推荐使用清华源
+echo 'export UV_DEFAULT_INDEX="https://pypi.tuna.tsinghua.edu.cn/simple"'>> ~/.bashrc
+export UV_DEFAULT_INDEX="https://pypi.tuna.tsinghua.edu.cn/simple"
+
+uv sync
 
 .venv/bin/flask db upgrade
 .venv/bin/flask run --host 0.0.0.0 --port 5001 --debug

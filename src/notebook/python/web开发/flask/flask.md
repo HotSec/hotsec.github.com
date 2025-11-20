@@ -46,7 +46,6 @@ my_flask_app/
 └── run.py
 ```
 
-
 ## 路由
 
 ## 视图函数
@@ -68,6 +67,7 @@ my_flask_app/
 ### 模板继承
 
 base.html
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -93,7 +93,8 @@ base.html
 {% endblock %}
 ```
 
-### 条件语句 
+### 条件语句
+
 ```html
 {% if user %}
     <p>Welcome, {{ user }}!</p>
@@ -101,6 +102,7 @@ base.html
     <p>Please log in.</p>
 {% endif %}
 ```
+
 ### 循环
 
 ```html
@@ -118,6 +120,7 @@ base.html
 `{{ price|round(2) }}`：将 price 变量的值四舍五入到小数点后两位。
 
 ### 宏和模板包含
+
 ```html
 ## templates/macros.html ##
 {% macro render_item(item) %}
@@ -180,7 +183,6 @@ def submit():
 if __name__ == '__main__':
     app.run(debug=True)
 ```
-
 
 ### Flask-WTF
 
@@ -317,7 +319,6 @@ def index():
 
 ## 错误处理
 
-
 ### 处理HTTP错误
 
 ```python
@@ -367,23 +368,13 @@ if __name__ == '__main__':
     app.run()
 ```
 
-## 模板
-
 ## 数据库
-
-## 表单
-
-## 文件上传
 
 ## 邮件
 
 ## 日志
 
 ## 中间件
-
-## 路由
-
-### 路由参数
 
 ## flash闪现消息
 
@@ -425,7 +416,7 @@ if __name__ == '__main__':
 
 添加了一个自定义响应头
 
-myextension.py 
+myextension.py
 
 ```python
 class MyExtension:
@@ -442,7 +433,7 @@ class MyExtension:
         return response
 ```
 
-app.py 
+app.py
 
 ```python
 from flask import Flask

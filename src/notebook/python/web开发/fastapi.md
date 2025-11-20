@@ -59,3 +59,43 @@ my_fastapi_project/
 - dramatiq
 - huey
 
+## Sentry错误追踪
+
+```bash
+pip install sentry-sdk[flask]
+```
+
+```python
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn="https://examplePublicKey@o0.ingest.sentry.io/0",
+    integrations=[FlaskIntegration()]
+)
+```
+
+## 指标监控
+
+```bash
+pip install prometheus-flask-exporter
+```
+
+```python
+from prometheus_flask_exporter import PrometheusMetrics
+
+app = Flask(__name__)
+metrics = PrometheusMetrics(app)
+
+@app.route("/")
+def hello():
+    return "Hello, World!"
+
+if __name__ == "__main__":
+    app.run()
+```
+
+```bash
+uvicorn main:app --reload
+```
+

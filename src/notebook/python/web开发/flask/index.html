@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask 多文件上传系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
+        }
+        .upload-area.drag-over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        .file-card {
+            transition: all 0.3s ease;
+        }
+        .file-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 头部 -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-cloud-upload-alt text-blue-500 mr-3"></i>
+                Flask 多文件上传系统
+            </h1>
+            <p class="text-gray-600 text-lg">支持上传进度显示和断点续传功能</p>
+        </header>
+
+        <!-- 上传区域 -->
+        <div class="max-w-4xl mx-auto">
+            <div id="uploadArea" class="upload-area bg-white rounded-xl p-8 text-center cursor-pointer mb-8">
+                <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+                拖放文件到此处或点击选择
+                </h2>
+                <p class="text-gray-500">支持多文件上传，自动断点续传</p>
+                <input type="file" id="fileInput" multiple class="hidden">
+            </div>
+
+            <!-- 上传进度区域 -->
+            <div id="progressSection" class="hidden">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                上传进度
+                </h3>
+                <div id="progressContainer" class="space-y-4">
+                    <!-- 动态生成进度条 -->
+                </div>
+            </div>
+
+            <!-- 文件列表 -->
+            <div class="mt-12">
+                <h3 class="text-xl font-semibold text-gray-700 mb-6">
+                <i class="fas fa-folder-open mr-2"></i>
+                已上传文件
+                </h3>
+                <div id="fileList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 动态生成文件卡片 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文件卡片模板 -->
+    <template id="fileCardTemplate">
+        <div class="file-card bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-semibold text-gray-800 file-name"></span>
+                <i class="fas fa-check-circle text-green-500 text-sm"></i>
+            </div>
+            <div class="text-sm text-gray-600 file-info"></div>
+            <div class="mt-2">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="progress-bar bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+    </template>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.2/spark-md5.min.js"></script>
+    <script src="upload.js"></script>
+</body>
+</html>
