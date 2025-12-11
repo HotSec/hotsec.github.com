@@ -1,0 +1,21 @@
+syslog:
+  addr: "0.0.0.0:514"
+  proto: "udp"
+  tls: false
+  cert: ""
+  key: ""
+
+nsq:
+  nsqd: "172.17.0.1:4150"
+  topic: "syslog"
+  channel: "es"
+
+batch:
+  size: 100
+  timeout: 1
+
+log:
+  file: "./logs/zsyslog.log"
+  maxsize: 100
+  maxbackups: 3
+  maxage: 28
