@@ -344,3 +344,30 @@ mirrors:
       - "https://k8s.m.daocloud.io"
 EOF
 ```
+## 升级k3s集群
+
+```bash
+# 查看当前版本
+k3s --version
+
+# 升级主master
+/usr/local/bin/k3s-killall.sh 
+curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_CHANNEL=latest INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --cluster-init  --system-default-registry "registry.cn-hangzhou.aliyuncs.com"
+# 剩余两个master
+/usr/local/bin/k3s-killall.sh 
+curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  | INSTALL_K3S_CHANNEL=latest INSTALL_K3S_MIRROR=cn K3S_TOKEN=k3sToKeN123456  sh -s - server --server https://192.168.9.201:6443  --system-default-registry "registry.cn-hangzhou.aliyuncs.com"
+# 3个worker
+/usr/local/bin/k3s-killall.sh 
+sudo curl -sfL https://rancher-mirror.rancher.cn/k3s/k3s-install.sh  |  INSTALL_K3S_CHANNEL=latest INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC="agent" K3S_TOKEN="k3sToKeN123456"  K3S_URL=https://192.168.9.201:6443 sh -
+
+# 查看升级后的版本
+kubectl get nodes -o wide
+
+NAME           STATUS   ROLES                       AGE    VERSION        INTERNAL-IP     EXTERNAL-IP   OS-IMAGE           KERNEL-VERSION   CONTAINER-RUNTIME
+k3s-master-1   Ready    control-plane,etcd,master   137d   v1.34.2+k3s1   192.168.9.201   <none>        Ubuntu 24.04 LTS   6.17.2-1-pve     containerd://2.1.5-k3s1
+k3s-master-2   Ready    control-plane,etcd,master   137d   v1.34.2+k3s1   192.168.9.202   <none>        Ubuntu 24.04 LTS   6.17.2-1-pve     containerd://2.1.5-k3s1
+k3s-master-3   Ready    control-plane,etcd,master   137d   v1.34.2+k3s1   192.168.9.203   <none>        Ubuntu 24.04 LTS   6.17.2-1-pve     containerd://2.1.5-k3s1
+k3s-worker-1   Ready    <none>                      137d   v1.34.2+k3s1   192.168.9.204   <none>        Ubuntu 24.04 LTS   6.17.2-1-pve     containerd://2.1.5-k3s1
+k3s-worker-2   Ready    <none>                      137d   v1.34.2+k3s1   192.168.9.205   <none>        Ubuntu 24.04 LTS   6.17.2-1-pve     containerd://2.1.5-k3s1
+k3s-worker-3   Ready    <none>                      137d   v1.34.2+k3s1   192.168.9.206   <none>        Ubuntu 24.04 LTS   6.17.2-1-pve     containerd://2.1.5-k3s1
+```

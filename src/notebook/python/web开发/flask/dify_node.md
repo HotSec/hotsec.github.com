@@ -66,10 +66,14 @@ git clone https://github.com/langgenius/dify.git
 # 启动pg、redis、weaviate
 cd docker
 cp middleware.env.example middleware.env
-docker compose -f docker-compose.middleware.yaml up -d
+docker compose --env-file middleware.env -f docker-compose.middleware.yaml -p dify up -d
 
-pyenv install 3.12
-pyenv global 3.12
+# pyenv install 3.12
+# pyenv global 3.12
+# 或者
+# export UV_PYTHON_INSTALL_MIRROR="https://registry.npmmirror.com/-/binary/python-build-standalone/"
+# uv python install 3.12
+
 
 cd api
 cp .env.example .env
@@ -81,17 +85,22 @@ export UV_DEFAULT_INDEX="https://pypi.tuna.tsinghua.edu.cn/simple"
 
 uv sync
 
-.venv/bin/flask db upgrade
-.venv/bin/flask run --host 0.0.0.0 --port 5001 --debug
+uv run flask db upgrade
+uv run flask run --host 0.0.0.0 --port 5001 --debug
 
-.venv/bin/celery -A app.celery worker -P gevent -c 1 -Q dataset,generation,mail,ops_trace --loglevel INFO
+uv run celery -A app.celery worker -P gevent -c 1 -Q dataset,generation,mail,ops_trace --loglevel INFO
 
 
-cd web 
-npm install
+# cd web 
+# npm install
+# cp .env.example .env.local
+# npm run build
+# npm run start 
+
+npm -i -g pnpm 
+pnpm install
 cp .env.example .env.local
-npm run build
-npm run start 
+pnpm run dev
 ```
 
 ## 3. 连接ollama
