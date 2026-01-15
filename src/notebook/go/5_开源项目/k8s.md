@@ -372,7 +372,8 @@ Ingress 是对集群中服务的外部访问进行管理的 API 对象，典型�
 
 ### Deployment
 
-Deployment 的作用是管理和控制 Pod 和 ReplicaSet，管控它们运行在用户期望的状态中
+Deployment 的作用是管理和控制 Pod 和 
+，管控它们运行在用户期望的状态中
 
 * 部署无状态应用
 

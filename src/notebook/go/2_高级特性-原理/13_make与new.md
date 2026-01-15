@@ -12,4 +12,4 @@
 
 ## 总结
 
-- new主要用于分配任意类型的内存并返回指针，而make专门用于初始化和分配slice、map和chan的内存。
+- new主要用于分配任意类型的内存并返回指针，而make专门用于初始化和分配slice、map和channel的内存。
