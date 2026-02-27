@@ -1,9 +1,13 @@
 # redis
 
 - [1. 介绍](#1-介绍)
-  - [1.1. Memcache与Redis的区别都有哪些？](#11-memcache与redis的区别都有哪些)
-  - [1.2. Redis 常见的性能问题都有哪些？如何解决？](#12-redis-常见的性能问题都有哪些如何解决)
-  - [1.3. redis 最适合的场景](#13-redis-最适合的场景)
+  - [1.1. 使用Redis有哪些好处？](#11-使用redis有哪些好处)
+  - [1.2. redis相比memcached有哪些优势？](#12-redis相比memcached有哪些优势)
+  - [1.3. redis常见性能问题和解决方案：](#13-redis常见性能问题和解决方案)
+  - [1.4. MySQL里有2000w数据，redis中只存20w的数据，如何保证redis中的数据都是热点数据](#14-mysql里有2000w数据redis中只存20w的数据如何保证redis中的数据都是热点数据)
+  - [1.5. Memcache与Redis的区别都有哪些？](#15-memcache与redis的区别都有哪些)
+  - [1.6. Redis 常见的性能问题都有哪些？如何解决？](#16-redis-常见的性能问题都有哪些如何解决)
+  - [1.7. redis 最适合的场景](#17-redis-最适合的场景)
 - [2. 安装](#2-安装)
 - [3. 入门](#3-入门)
   - [3.1. 连接池](#31-连接池)
@@ -27,34 +31,39 @@
 
 ## 1. 介绍
 
-- 使用Redis有哪些好处？
-  - 速度快，因为数据存在内存中，类似于HashMap，HashMap的优势就是查找和操作的时间复杂度都是O(1)
-  - 支持丰富数据类型，支持string，list，set，sorted set，hash HyperLogLog、Geo、Pub/Sub、Bitmaps
-  - 支持事务，操作都是原子性，所谓的原子性就是对数据的更改要么全部执行，要么全部不执行
-  - 丰富的特性：可用于缓存，消息，按key设置过期时间，过期后将会自动删除
+### 1.1. 使用Redis有哪些好处？
 
-- redis相比memcached有哪些优势？
-  1. memcached所有的值均是简单的字符串，redis作为其替代者，支持更为丰富的数据类型
-  2. redis的速度比memcached快很多
-  3. redis可以持久化其数据
+- 速度快，因为数据存在内存中，类似于HashMap，HashMap的优势就是查找和操作的时间复杂度都是O(1)
+- 支持丰富数据类型，支持string，list，set，sorted set，hash HyperLogLog、Geo、Pub/Sub、Bitmaps
+- 支持事务，操作都是原子性，所谓的原子性就是对数据的更改要么全部执行，要么全部不执行
+- 丰富的特性：可用于缓存，消息，按key设置过期时间，过期后将会自动删除
 
-- redis常见性能问题和解决方案：
-  - Master最好不要做任何持久化工作，如RDB内存快照和AOF日志文件
-  - 如果数据比较重要，某个Slave开启AOF备份数据，策略设置为每秒同步一次
-  - 为了主从复制的速度和连接的稳定性，Master和Slave最好在同一个局域网内
-  - 尽量避免在压力很大的主库上增加从库
-  - 主从复制不要用图状结构，用单向链表结构更为稳定，即：Master <- Slave1 <- Slave2 <- Slave3... 这样的结构方便解决单点故障问题，实现Slave对Master的替换。如果Master挂了，可以立刻启用Slave1做Master，其他不变。
+### 1.2. redis相比memcached有哪些优势？
 
-- MySQL里有2000w数据，redis中只存20w的数据，如何保证redis中的数据都是热点数据
-  - 相关知识：redis 内存数据集大小上升到一定大小的时候，就会施行数据淘汰策略。redis 提供 6种数据淘汰策略：
-  - voltile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰
+1. memcached所有的值均是简单的字符串，redis作为其替代者，支持更为丰富的数据类型
+2. redis的速度比memcached快很多
+3. redis可以持久化其数据
+
+### 1.3. redis常见性能问题和解决方案：
+
+- Master最好不要做任何持久化工作，如RDB内存快照和AOF日志文件
+- 如果数据比较重要，某个Slave开启AOF备份数据，策略设置为每秒同步一次
+- 为了主从复制的速度和连接的稳定性，Master和Slave最好在同一个局域网内
+- 尽量避免在压力很大的主库上增加从库
+- 主从复制不要用图状结构，用单向链表结构更为稳定，即：Master <- Slave1 <- Slave2 <- Slave3... 这样的结构方便解决单点故障问题，实现Slave对Master的替换。如果Master挂了，可以立刻启用Slave1做Master，其他不变。
+
+### 1.4. MySQL里有2000w数据，redis中只存20w的数据，如何保证redis中的数据都是热点数据
+  
+- 相关知识：redis 内存数据集大小上升到一定大小的时候，就会施行数据淘汰策略。
+- redis 提供 6种数据淘汰策略：
+  - volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰
   - volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数据淘汰
   - volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据淘汰
   - allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
   - allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
   - no-enviction（驱逐）：禁止驱逐数据
 
-### 1.1. Memcache与Redis的区别都有哪些？
+### 1.5. Memcache与Redis的区别都有哪些？
 
 - 区别
   - 类型
@@ -93,14 +102,14 @@
     - redis: 发布订阅模式、事务、每个类型不同的crud、
     - memcached: crud 、少量的其它命令
 
-### 1.2. Redis 常见的性能问题都有哪些？如何解决？
+### 1.6. Redis 常见的性能问题都有哪些？如何解决？
 
 1. Master写内存快照，save命令调度rdb Save函数，会阻塞主线程的工作，当快照比较大时对性能影响是非常大的，会间断性暂停服务，所以Master最好不要写内存快照。
 2. Master AOF持久化，如果不重写AOF文件，这个持久化方式对性能的影响是最小的，但是AOF文件会不断增大，AOF文件过大会影响Master重启的恢复速度。Master最好不要做任何持久化工作，包括内存快照和AOF日志文件，特别是不要启用内存快照做持久化,如果数据比较关键，某个Slave开启AOF备份数据，策略为每秒同步一次。
 3. Master调用BGREWRITEAOF重写AOF文件，AOF在重写的时候会占大量的CPU和内存资源，导致服务load过高，出现短暂服务暂停现象。
 4. Redis主从复制的性能问题，为了主从复制的速度和连接的稳定性，Slave和Master最好在同一个局域网内
 
-### 1.3. redis 最适合的场景
+### 1.7. redis 最适合的场景
 
 Redis最适合所有数据in-momory的场景。
 
@@ -785,4 +794,7 @@ if identifier:
 
 37. redis常见性能问题和解决方案
     1.  Master最好不要写内存快照
-
+    2.  如果数据比较重要，某个slave开启AOF备份数据，策略设置为每秒同步一次
+    3.  为了主从复制的速度和连接的稳定性，slave和master最好在同一个局域网内
+    4.  尽量避免在压力很大的主库上增加从库
+    5.  主从复制不要用图状结构，用单向链表结构更为稳定，Master <- Slave1 < - Slave2 < - Slave3...
