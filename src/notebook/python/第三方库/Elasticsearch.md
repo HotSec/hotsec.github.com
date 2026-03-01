@@ -335,3 +335,37 @@ _cluster/health/ ：检查集群状态
     - sort：排序查询
       - asc：升序
       - desc：降序
+
+
+## 原理
+
+### 倒排索引
+
+- es中实现全文检索的核心技术
+- 将文档**分词**后建立**词项→文档ID列表**的映射，实现从词项直接快速定位相关文档的高效全文搜索。
+- 搜索时间从 O(n) 降至 O(1)
+
+## 插入速度优化
+
+增大批量大小 + 禁用刷新/副本 + 优化硬件配置
+
+- 批量大小：减少网络往返次数（每10000条 vs 1000条 → 10倍减少网络开销）
+- 禁用刷新：避免每秒刷盘（默认1s/次 → 禁用后批量导入完再刷）
+- 禁用副本：避免写入时同步到副本（减少50%+ I/O）
+- 预配置：避免动态映射和分片创建开销
+
+```bash
+# 1. 预配置索引（导入前）
+PUT /logs
+{ "settings": { "number_of_replicas": 0, "refresh_interval": "-1" } }
+
+# 2. 禁用集群刷新/副本
+PUT /_cluster/settings { "transient": { "indices.refresh_interval": "-1", "number_of_replicas": "0" } }
+
+# 3. 执行批量导入（5000-15000 docs/批）
+curl -XPOST 'localhost:9200/_bulk?pretty' -H 'Content-Type: application/x-ndjson' -d '@data.ndjson'
+
+# 4. 恢复配置
+PUT /_cluster/settings { "transient": { "indices.refresh_interval": "1s", "number_of_replicas": "1" } }
+POST /logs/_refresh
+```

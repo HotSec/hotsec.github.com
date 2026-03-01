@@ -22,6 +22,7 @@
   - [3.10. hyperloglog](#310-hyperloglog)
   - [3.11. bitmap](#311-bitmap)
   - [3.12. Pub/Sub](#312-pubsub)
+  - [stream](#stream)
   - [3.13. sentinel](#313-sentinel)
 - [4. 主从复制](#4-主从复制)
 - [5. 哨兵模式](#5-哨兵模式)
@@ -56,7 +57,8 @@
   
 - 相关知识：redis 内存数据集大小上升到一定大小的时候，就会施行数据淘汰策略。
 - redis 提供 6种数据淘汰策略：
-  - volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰
+  - volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最久未被访问的数据淘汰-- 最近最少使用
+  - volatile-lfu：从已设置过期时间的数据集（server.db[i].expires）中挑选使用频率最少的数据淘汰-- 使用频率最低
   - volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数据淘汰
   - volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据淘汰
   - allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
@@ -276,6 +278,16 @@ True
 >>> p.subscribe('my-first-channel', 'my-second-channel', ...)
 >>> p.get_message()
 {'pattern': None, 'type': 'subscribe', 'channel': b'my-second-channel', 'data': 1}
+```
+
+### stream
+
+```python
+>>> r = redis.Redis(...)
+>>> r.xadd('my-stream', mapping={'key': 'value'})
+'1654659205185-0'
+>>> r.xrange('my-stream', '-', '+')
+[(b'1654659205185-0', {b'key': b'value'})]
 ```
 
 ### 3.13. sentinel
@@ -682,10 +694,12 @@ if identifier:
     3. 缓存淘汰算法
        1. maxmemory
        2. volatile-lru
-       3. volatile-ttl
-       4. volatile-random
-       5. allkeys-lru
-       6. allkeys-random
+       3. volatile-lfu
+       4. volatile-ttl
+       5. volatile-random
+       6. allkeys-lru
+       7. allkeys-lfu
+       8. allkeys-random
 20. LRU算法
     1. 维护一个链表，元素按照一定顺序进行排列，满了就会删除尾部的元素，当元素被访问时，元素在链表的位置就会被移动到表头，元素排列的顺序就元素最近被访问的时间顺序
     2. redis的近似lru算法
