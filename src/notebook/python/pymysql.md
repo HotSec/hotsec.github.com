@@ -1,4 +1,115 @@
-# mysql
+# MYSQL
+
+## 安装
+
+```bash
+pip install pymysql
+```
+
+## 使用
+
+```python
+import pymysql
+
+# 创建连接
+conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', db='test')
+
+# 创建游标
+cursor = conn.cursor()
+
+# 执行SQL
+cursor.execute('select * from user')
+
+# 获取结果
+result = cursor.fetchall()
+
+# 关闭游标
+cursor.close()
+
+# 关闭连接
+conn.close()
+```
+
+## 事务
+
+```python
+import pymysql
+
+conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', db='test')
+
+try:
+    # 开启事务
+    conn.begin()
+
+    cursor = conn.cursor()
+    cursor.execute('update user set age=age+1 where id=1')
+
+    # 提交事务
+    conn.commit()
+except Exception as e:
+    # 回滚事务
+    conn.rollback()
+finally:
+    cursor.close()
+    conn.close()
+```
+
+## 连接池
+
+```python
+import pymysql
+from DBUtils.PooledDB import PooledDB
+
+```
+
+## 核心原理
+
+
+## 执行一条SQL语句的过程
+
+![1771809730197](image/pymysql/1771809730197.png)
+
+- server层
+  - 连接管理：处理客户端连接，认证，权限检查等
+  - SQL解析：将SQL语句解析成内部表示
+  - 查询优化：生成查询计划，选择合适的索引等
+  - 执行引擎：执行查询计划，调用存储引擎获取数据
+- 存储引擎层
+  - 负责数据的存储和检索
+  - InnoDB、MyISAM
+  - InnoDB支持事务、行锁和外键，MyISAM不支持事务、行锁和外键，但支持全文索引
+
+```bash
+mysql -h localhost -P 3306 -u root -p
+
+show processlist; # 查看当前连接
+```
+
+1. 创建连接：客户端通过TCP/IP连接到MySQL服务器，进行认证和权限检查
+2. 查询缓存：（8.0版本之后被废弃）如果查询缓存开启，MySQL会先检查查询缓存中是否有结果，如果有直接返回
+3. 解析SQL
+   1. 词法分析
+   2. 语法分析
+4. 执行SQL
+    1. 预处理阶段
+    2. 优化
+    3. 执行
+
+## MySQL一行记录如何存储
+
+- MySQL存储引擎：InnoDB
+- /var/lib/mysql/db_name
+  - db.opt 当前数据哭的默认字符集和字符校验规则
+  - table_name.frm 表结构文件，记录表的列信息、索引信息等
+  - table_name.ibd 表数据文件（独占表空间文件），记录表的行数据和索引数据
+    - row
+    - page
+    - extent
+    - segment
+    - tablespace
+
+
+## 基础知识
 
 1. 数据库三大范式
    1. 第一范式：列不可再分
