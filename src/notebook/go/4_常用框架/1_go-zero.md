@@ -10,7 +10,7 @@ export PATH=$PATH:/usr/local/go/bin:/root/go/bin
 go env -w GOPROXY=https://goproxy.cn,direct
 # 1. 安装goctl
 # goctl 是 go-zero 的内置脚手架，是提升开发效率的一大利器，可以一键生成代码、文档、部署 k8s yaml、dockerfile 等。
-GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools/goctl@latest
+go install github.com/zeromicro/go-zero/tools/goctl@latest
 # 2. goctl 可以一键安装 protoc，protoc-gen-go，protoc-gen-go-grpc 相关组件
 goctl env check -i -f --verbose
 ```
