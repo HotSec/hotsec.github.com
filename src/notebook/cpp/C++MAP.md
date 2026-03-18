@@ -262,22 +262,12 @@ int (*p)[5];      // 数组指针：指向包含5个int的数组的指针
 
 ### 1.7. 函数
 
-- 函数重载
-  1. 函数名相同
-  2. 参数个数不同，参数的类型不同，参数顺序不同
-  3. 返回值类型，不作为重载的标准
-  4. C++ 允许， int 到 long 和 double， double 到 int 和 float, int 到 short 和 char等隐式类型转换。遇到这种情型，则会引起二义性。
-- extern "C"
-- 默认参数
-- 内联函数
-
-### 1.8. 函数重载
-
-#### 1.8.1. 重载规则
+#### 1.7.1. 函数重载
 
 - 函数名相同，参数列表不同（参数个数、类型或顺序）
 - 返回值类型不参与重载判定
 - const 修饰参数可以构成重载
+- C++ 允许 int 到 long 和 double、double 到 int 和 float、int 到 short 和 char 等隐式类型转换，可能引起二义性
 
 ```cpp
 void print(int a);
@@ -291,7 +281,7 @@ void func(const int& a);   // 接受常量引用
 void func(int&& a);        // 接受右值（C++11）
 ```
 
-#### 1.8.2. 重载解析
+#### 1.7.2. 重载解析
 
 1. 精确匹配
 2. 类型提升（如 char → int）
@@ -299,7 +289,7 @@ void func(int&& a);        // 接受右值（C++11）
 4. 用户定义的转换
 5. 省略号匹配
 
-#### 1.8.3. 重载二义性
+#### 1.7.3. 重载二义性
 
 ```cpp
 void func(long a);
@@ -308,9 +298,9 @@ void func(double a);
 func(10);  // 错误：二义性，int可以同时转换为long和double
 ```
 
-### 1.9. 字符串
+### 1.8. 字符串
 
-#### 1.9.1. C风格字符串
+#### 1.8.1. C风格字符串
 
 - 以 `\0` 结尾的字符数组
 - 使用 `<cstring>` 提供的函数操作
@@ -325,7 +315,7 @@ strcat(str, "!");      // 拼接
 strcmp(str, "World!"); // 比较
 ```
 
-#### 1.9.2. std::string
+#### 1.8.2. std::string
 
 - C++ 标准库提供的字符串类，更安全方便
 - 自动管理内存
@@ -343,7 +333,7 @@ s3.find("World");  // 查找
 s3.replace(6, 5, "C++");  // 替换
 ```
 
-#### 1.9.3. Raw String (C++11)
+#### 1.8.3. Raw String (C++11)
 
 - 原始字符串，转义字符不生效
 - 格式：`R"(内容)"`
@@ -356,7 +346,7 @@ std::string path2 = R"(C:\Program Files\App)";  // 原始字符串
 std::string str = R"seq(内容可以包含()括号)seq";
 ```
 
-#### 1.9.4. 字符串转换 (C++11)
+#### 1.8.4. 字符串转换 (C++11)
 
 ```cpp
 // 数值转字符串
@@ -370,9 +360,9 @@ float f = std::stof("3.14");
 double d = std::stod("3.14159");
 ```
 
-### 1.10. 结构体
+### 1.9. 结构体
 
-#### 1.10.1. 基本用法
+#### 1.9.1. 基本用法
 
 ```cpp
 struct Person {
@@ -391,7 +381,7 @@ Person p2 = {"Bob", 30, 175.5};
 Person p3{"Charlie", 28};  // C++11 统一初始化
 ```
 
-#### 1.10.2. 结构体与类
+#### 1.9.2. 结构体与类
 
 - C++ 中 struct 和 class 唯一区别是默认访问权限
 - struct 默认 public，class 默认 private
@@ -409,7 +399,7 @@ struct Point {
 };
 ```
 
-#### 1.10.3. 结构体对齐
+#### 1.9.3. 结构体对齐
 
 - 结构体大小通常是最大成员大小的整数倍
 - 可以使用 `#pragma pack` 或 `alignas` 控制对齐
@@ -423,9 +413,9 @@ struct Packed {
 #pragma pack(pop)
 ```
 
-### 1.11. Union共用体
+### 1.10. Union共用体
 
-#### 1.11.1. 基本概念
+#### 1.10.1. 基本概念
 
 - 所有成员共享同一块内存
 - 大小等于最大成员的大小
@@ -445,7 +435,7 @@ d.f = 3.14f;       // 覆盖了i的值
 std::cout << d.i;  // 输出不确定的值
 ```
 
-#### 1.11.2. 用途
+#### 1.10.2. 用途
 
 - 节省内存
 - 实现类型转换
@@ -463,7 +453,7 @@ ip.addr = 0x01020304;
 // ip.bytes[0] = 1, ip.bytes[1] = 2, ...
 ```
 
-#### 1.11.3. C++11 改进
+#### 1.10.3. C++11 改进
 
 - C++11 允许 union 包含有构造/析构函数的类类型成员
 - 需要显式管理生命周期
@@ -478,9 +468,9 @@ union U {
 };
 ```
 
-### 1.12. Enum枚举
+### 1.11. Enum枚举
 
-#### 1.12.1. C风格枚举
+#### 1.11.1. C风格枚举
 
 ```cpp
 enum Color {
@@ -501,7 +491,7 @@ enum Color { RED };
 enum Fruit { RED };  // 错误：RED重定义
 ```
 
-#### 1.12.2. 强类型枚举 (C++11)
+#### 1.11.2. 强类型枚举 (C++11)
 
 - 使用 `enum class` 声明
 - 作用域限定，类型安全
@@ -526,7 +516,7 @@ c = static_cast<Color>(0); // 显式转换
 Fruit f = Fruit::APPLE;   // 可以有同名的枚举值
 ```
 
-#### 1.12.3. 指定底层类型
+#### 1.11.3. 指定底层类型
 
 ```cpp
 enum class Color : uint8_t {  // 指定底层类型
@@ -539,7 +529,7 @@ enum Size : int {  // C风格枚举也可以指定
 };
 ```
 
-#### 1.12.4. 枚举用法
+#### 1.11.4. 枚举用法
 
 ```cpp
 // 遍历枚举（需要自己实现）
@@ -561,7 +551,7 @@ switch (c) {
 }
 ```
 
-### 1.13. 类型转换
+### 1.12. 类型转换
 
 - static_cast
 - reinterpret_cast
@@ -572,9 +562,9 @@ switch (c) {
     - expression 必须是一个指针或引用类型，expression 的类型必须能转换成 type-id 的类型
   - const_cast 可以用来去掉 const 或 volatile 修饰符
 
-### 1.14. 命名空间
+### 1.13. 命名空间
 
-#### 1.14.1. 基本用法
+#### 1.13.1. 基本用法
 
 ```cpp
 namespace MyNamespace {
@@ -598,7 +588,7 @@ using namespace MyNamespace;  // 引入整个命名空间
 using MyNamespace::value;     // 引入特定成员
 ```
 
-#### 1.14.2. 命名空间特性
+#### 1.13.2. 命名空间特性
 
 - 可以分散定义：同一个命名空间可以在多个文件中定义
 - 可以嵌套
@@ -613,7 +603,7 @@ namespace Short = LongNamespace;  // 别名
 Short::x = 10;
 ```
 
-#### 1.14.3. 匿名命名空间
+#### 1.13.3. 匿名命名空间
 
 - 作用域仅限于当前文件
 - 替代 static 全局变量
@@ -624,7 +614,7 @@ namespace {
 }
 ```
 
-#### 1.14.4. using 声明与指令
+#### 1.13.4. using 声明与指令
 
 ```cpp
 // using 声明：引入单个名称
@@ -638,15 +628,15 @@ cout << "Hello";
 // 注意：不要在头文件中使用 using 指令
 ```
 
-### 1.15. 文件操作
+### 1.14. 文件操作
 
-#### 1.15.1. 文件流类
+#### 1.14.1. 文件流类
 
 - `std::ifstream`：输入文件流（读取）
 - `std::ofstream`：输出文件流（写入）
 - `std::fstream`：输入输出文件流
 
-#### 1.15.2. 文件读写
+#### 1.14.2. 文件读写
 
 ```cpp
 #include <fstream>
@@ -672,7 +662,7 @@ if (inFile.is_open()) {
 std::fstream file("data.txt", std::ios::in | std::ios::out);
 ```
 
-#### 1.15.3. 打开模式
+#### 1.14.3. 打开模式
 
 - `std::ios::in`：读模式
 - `std::ios::out`：写模式
@@ -685,7 +675,7 @@ std::fstream file("data.txt", std::ios::in | std::ios::out);
 std::ofstream file("log.txt", std::ios::app);  // 追加写入
 ```
 
-#### 1.15.4. 二进制文件
+#### 1.14.4. 二进制文件
 
 ```cpp
 // 写入二进制
@@ -699,7 +689,7 @@ int buffer[5];
 inFile.read(reinterpret_cast<char*>(buffer), sizeof(buffer));
 ```
 
-#### 1.15.5. 文件位置指针
+#### 1.14.5. 文件位置指针
 
 ```cpp
 std::fstream file("data.txt");
@@ -708,9 +698,9 @@ file.seekp(0, std::ios::beg);  // 移动写入指针到开头
 std::streampos pos = file.tellg();  // 获取当前位置
 ```
 
-### 1.16. 流
+### 1.15. 流
 
-#### 1.16.1. 标准流对象
+#### 1.15.1. 标准流对象
 
 - `std::cin`：标准输入流
 - `std::cout`：标准输出流
@@ -724,7 +714,7 @@ std::cout << "Value: " << x << std::endl;
 std::cerr << "Error message" << std::endl;
 ```
 
-#### 1.16.2. 流操纵符
+#### 1.15.2. 流操纵符
 
 ```cpp
 #include <iomanip>
@@ -751,7 +741,7 @@ std::cout << std::boolalpha << b << std::endl;  // true
 std::cout << std::noboolalpha << b << std::endl; // 1
 ```
 
-#### 1.16.3. 字符串流
+#### 1.15.3. 字符串流
 
 ```cpp
 #include <sstream>
@@ -766,7 +756,7 @@ int a, b, c;
 iss >> a >> b >> c;  // a=1, b=2, c=3
 ```
 
-#### 1.16.4. 流状态
+#### 1.15.4. 流状态
 
 - `good()`：正常状态
 - `eof()`：到达文件末尾
@@ -780,9 +770,9 @@ if (std::cin.fail()) {
 }
 ```
 
-### 1.17. 位运算
+### 1.16. 位运算
 
-#### 1.17.1. 位运算符
+#### 1.16.1. 位运算符
 
 - `&` 按位与：两位都为1则结果为1
 - `|` 按位或：有一位为1则结果为1
@@ -791,7 +781,7 @@ if (std::cin.fail()) {
 - `<<` 左移：高位丢弃，低位补0
 - `>>` 右移：低位丢弃，高位补符号位或0
 
-#### 1.17.2. 常用操作
+#### 1.16.2. 常用操作
 
 ```cpp
 int a = 5;  // 0101
@@ -821,7 +811,7 @@ y ^= x;
 x ^= y;
 ```
 
-#### 1.17.3. 位域（Bit Fields）
+#### 1.16.3. 位域（Bit Fields）
 
 ```cpp
 struct Flags {
@@ -836,7 +826,7 @@ f.b = 3;    // 0-3
 f.c = 5;    // 0-7
 ```
 
-#### 1.17.4. 位运算应用
+#### 1.16.4. 位运算应用
 
 ```cpp
 // 判断奇偶
@@ -859,9 +849,9 @@ int abs(int n) {
 }
 ```
 
-### 1.18. 异常处理
+### 1.17. 异常处理
 
-#### 1.18.1. 基本语法
+#### 1.17.1. 基本语法
 
 ```cpp
 try {
@@ -875,7 +865,7 @@ try {
 }
 ```
 
-#### 1.18.2. 标准异常类
+#### 1.17.2. 标准异常类
 
 ```cpp
 #include <stdexcept>
@@ -899,7 +889,7 @@ std::bad_cast              // dynamic_cast失败
 std::bad_typeid            // typeid错误
 ```
 
-#### 1.18.3. 自定义异常
+#### 1.17.3. 自定义异常
 
 ```cpp
 class MyException : public std::exception {
@@ -917,7 +907,7 @@ public:
 throw MyException("Custom error");
 ```
 
-#### 1.18.4. 异常规范
+#### 1.17.4. 异常规范
 
 ```cpp
 // C++11: noexcept 说明符
@@ -932,7 +922,7 @@ bool b = noexcept(func1());  // 编译期判断
 void oldFunc() throw(std::exception);  // 不推荐使用
 ```
 
-#### 1.18.5. RAII 与异常安全
+#### 1.17.5. RAII 与异常安全
 
 ```cpp
 class Resource {
@@ -947,7 +937,7 @@ void func() {
 }
 ```
 
-#### 1.18.6. 最佳实践
+#### 1.17.6. 最佳实践
 
 1. 按引用捕获异常：`catch (const std::exception& e)`
 2. 异常类型应继承自 `std::exception`
@@ -955,7 +945,7 @@ void func() {
 4. 使用 RAII 管理资源确保异常安全
 5. 避免使用 `catch (...)`，除非必要
 
-### 1.19. 预处理
+### 1.18. 预处理
 
 - 宏
 
@@ -998,9 +988,9 @@ void func() {
   - `__func__` 	当前函数名
   - `__PRETTY_FUNCTION__` 	当前函数的修饰名
 
-### 1.20. 动态库&&静态库
+### 1.19. 动态库&&静态库
 
-#### 1.20.1. 静态库（Static Library）
+#### 1.19.1. 静态库（Static Library）
 
 - 编译时代码被复制到可执行文件中
 - 文件扩展名：`.a` (Linux/Mac) 或 `.lib` (Windows)
@@ -1016,7 +1006,7 @@ ar rcs libmylib.a lib.o
 g++ main.cpp -L. -lmylib -o main
 ```
 
-#### 1.20.2. 动态库（Dynamic Library）
+#### 1.19.2. 动态库（Dynamic Library）
 
 - 运行时加载，多个程序可共享
 - 文件扩展名：`.so` (Linux)、`.dylib` (Mac) 或 `.dll` (Windows)
@@ -1032,7 +1022,7 @@ g++ main.cpp -L. -lmylib -o main
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH  # 运行时指定库路径
 ```
 
-#### 1.20.3. 编译选项
+#### 1.19.3. 编译选项
 
 - `-fPIC`：生成位置无关代码（Position Independent Code）
 - `-shared`：创建动态库
@@ -1040,7 +1030,7 @@ export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH  # 运行时指定库路径
 - `-l`：链接库名（去掉 `lib` 前缀和扩展名）
 - `-I`：指定头文件搜索路径
 
-#### 1.20.4. 动态加载
+#### 1.19.4. 动态加载
 
 ```cpp
 #include <dlfcn.h>
@@ -1056,7 +1046,7 @@ if (handle) {
 }
 ```
 
-### 1.21. 信号处理
+### 1.20. 信号处理
 
 ```C++
 #include <iostream>
@@ -1375,7 +1365,7 @@ wrapper(10);         // T = int, forward 转发为右值
 
 ### 5.6. 参考图
 
-![alt text](image/C++MAP/image.png)
+![左值与右值分类](image/C++MAP/image.png)
 
 ### 5.7. 临时对象生命周期
 
@@ -1441,9 +1431,83 @@ C++ 的规则是：一个临时对象会在包含这个临时对象的完整表�
 
 ## 8. 开发环境
 
-### 8.1. vs
+### 8.1. Visual Studio
 
-### 8.2. vsc
+微软的集成开发环境，Windows 平台首选。
+
+**常用快捷键：**
+- `F5`：启动调试
+- `F9`：设置/取消断点
+- `F10`：单步跳过
+- `F11`：单步进入
+- `Shift+F11`：单步跳出
+- `Ctrl+K, Ctrl+C`：注释代码
+- `Ctrl+K, Ctrl+U`：取消注释
+- `Ctrl+Shift+B`：生成解决方案
+
+**调试技巧：**
+- 条件断点：右键断点设置条件
+- 数据断点：调试 → 新建数据断点
+- 即时窗口：`Ctrl+Alt+I`
+- 监视窗口：`Ctrl+Alt+W`
+
+**C++ 配置：**
+- 项目属性 → C/C++ → 命令行：添加编译选项
+- 项目属性 → C/C++ → 预处理器：定义宏
+- 项目属性 → 链接器：配置库依赖
+
+### 8.2. VS Code
+
+轻量级跨平台编辑器，通过扩展支持 C++ 开发。
+
+**推荐扩展：**
+- C/C++（Microsoft）：语法高亮、智能提示
+- C/C++ Extension Pack：扩展包
+- CMake Tools：CMake 支持
+- CodeLLDB：LLDB 调试
+- clangd：Clang 语言服务器
+
+**launch.json 配置：**
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "g++ debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "g++ build",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}
+```
+
+**tasks.json 配置：**
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "g++ build",
+            "type": "shell",
+            "command": "g++",
+            "args": ["-g", "${file}", "-o", "${fileDirname}/${fileBasenameNoExtension}"],
+            "group": "build"
+        }
+    ]
+}
+```
+
+**常用快捷键：**
+- `F5`：启动调试
+- `F9`：切换断点
+- `Ctrl+P`：快速打开文件
+- `Ctrl+Shift+P`：命令面板
+- `Ctrl+``：打开终端
 
 ## 9. 类
 
@@ -1936,6 +2000,58 @@ public:
 
 ### 10.3. 编译期多态
 
+编译期多态通过模板实现，在编译时确定调用哪个函数。
+
+#### 10.3.1. 函数模板
+
+```cpp
+// 编译期多态：根据类型选择不同实现
+template<typename T>
+void process(T value) {
+    std::cout << "Generic: " << value << std::endl;
+}
+
+template<>
+void process<int>(int value) {
+    std::cout << "Int: " << value << std::endl;
+}
+
+process(3.14);   // Generic: 3.14
+process(42);     // Int: 42
+```
+
+#### 10.3.2. 运行期多态 vs 编译期多态
+
+| 特性 | 运行期多态（虚函数） | 编译期多态（模板） |
+|------|---------------------|-------------------|
+| 绑定时间 | 运行时 | 编译时 |
+| 性能 | 有虚函数表开销 | 无额外开销 |
+| 灵活性 | 可动态选择类型 | 类型编译时确定 |
+| 代码大小 | 较小 | 可能代码膨胀 |
+| 错误检测 | 运行时 | 编译时 |
+
+#### 10.3.3. CRTP（奇异递归模板模式）
+
+```cpp
+template<typename Derived>
+class Base {
+public:
+    void interface() {
+        static_cast<Derived*>(this)->implementation();
+    }
+};
+
+class Concrete : public Base<Concrete> {
+public:
+    void implementation() {
+        std::cout << "Concrete implementation" << std::endl;
+    }
+};
+
+Concrete c;
+c.interface();  // 调用 Concrete::implementation
+```
+
 ## 11. 委托构造
 
 ### 11.1. 基本概念
@@ -2308,8 +2424,6 @@ Pair<int, int> p2;       // Same type pair
 Pair<int, double*> p3;   // Pointer pair
 ```
 
-### 13.5. 模板特化
-
 ### 13.6. 应用可变模板
 
 - C++11 引入的一项新功能，使我们可以在模板参数里表达不定个数和类型的参数。
@@ -2386,6 +2500,53 @@ bool less = (t1 < t2);
 ## 15. 函数式编程
 
 ### 15.1. C++98的函数对象 functor
+
+函数对象（Functor）是重载了 `operator()` 的类实例，可以像函数一样调用。
+
+```cpp
+// 简单函数对象
+struct Adder {
+    int operator()(int a, int b) const {
+        return a + b;
+    }
+};
+
+Adder add;
+int result = add(1, 2);  // 3
+
+// 带状态的函数对象
+struct Counter {
+    int count = 0;
+    int operator()() { return ++count; }
+};
+
+Counter counter;
+counter();  // 1
+counter();  // 2
+
+// 标准库函数对象
+#include <functional>
+
+std::plus<int> add;          // 加法
+std::minus<int> sub;         // 减法
+std::multiplies<int> mul;    // 乘法
+std::divides<int> div;       // 除法
+std::modulus<int> mod;       // 取模
+std::negate<int> neg;        // 取反
+
+std::less<int> lt;           // 小于
+std::greater<int> gt;        // 大于
+std::equal_to<int> eq;       // 等于
+std::not_equal_to<int> ne;   // 不等于
+
+std::logical_and<bool> and;  // 逻辑与
+std::logical_or<bool> or;    // 逻辑或
+std::logical_not<bool> not;  // 逻辑非
+
+// 用于算法
+std::sort(v.begin(), v.end(), std::greater<int>());
+std::transform(v1.begin(), v1.end(), v2.begin(), result.begin(), std::plus<int>());
+```
 
 ### 15.2. lambda表达式
 
@@ -2551,8 +2712,6 @@ registerCallback([](int x) {
 // 注意：std::function 有开销，性能敏感场景考虑模板或函数指针
 ```
 
-### 15.5. function模板
-
 ### 15.6. 高阶函数
 
 - sort
@@ -2604,6 +2763,40 @@ int main() {
 ```
 
 #### 16.1.2. 线程所有权转移
+
+`std::thread` 是可移动但不可拷贝的，可以在线程间转移所有权。
+
+```cpp
+void threadFunc() { /* ... */ }
+
+// 所有权转移
+std::thread t1(threadFunc);
+std::thread t2 = std::move(t1);  // t1 不再持有线程
+
+// 转移到函数
+void registerThread(std::thread t) {
+    t.join();
+}
+registerThread(std::thread(threadFunc));
+
+// 从函数返回
+std::thread createThread() {
+    return std::thread(threadFunc);  // 隐式移动
+}
+
+// 容器管理多个线程
+std::vector<std::thread> threads;
+for (int i = 0; i < 10; ++i) {
+    threads.emplace_back(threadFunc, i);
+}
+for (auto& t : threads) {
+    t.join();
+}
+```
+
+**注意事项：**
+- `std::thread` 析构前必须 `join()` 或 `detach()`
+- 否则会调用 `std::terminate()` 终止程序
 
 #### 16.1.3. 线程管理
 
@@ -2699,11 +2892,9 @@ void writeFunction() {
 }
 ```
 
-#### 16.3.1. 原子操作（Atomic Operations）
+### 16.4. 原子操作（Atomic Operations）
 
-- 原子操作可以在不使用锁的情况下保证操作的原子性。
-- std::atomic：提供了原子类型，如 std::atomic `<int>`, std::atomic_flag。
-- 使用示例：
+原子操作可以在不使用锁的情况下保证操作的原子性。
 
 ```cpp
 #include <atomic>
@@ -2715,7 +2906,7 @@ void increment() {
 }
 ```
 
-#### 16.3.2. 屏障（Barriers）
+### 16.5. 屏障（Barriers）
 
 - 屏障用于同步多个线程，以便它们在某个点上一起继续执行。
 - std::barrier：C++20引入，允许线程在某个点同步。
@@ -2733,7 +2924,7 @@ void threadFunction() {
 }
 ```
 
-#### 16.3.3. std::latch
+### 16.6. std::latch
 
 - std::latch 允许线程等待直到计数器达到零。它是一种一次性同步机制，一旦计数器达到零，std::latch 就无法再次使用。
 - 常用成员函数
@@ -2776,26 +2967,26 @@ int main() {
 }
 ```
 
-#### 16.3.4. Futures和Promises
+### 16.7. Futures和Promises
 
 在 C++ 中，`std::future` 和 `std::promise` 是用于线程间通信的同步原语，它们通常一起使用来在单个或者多个线程之间传递结果或者异常。
 
-##### 16.3.4.1. std::promise
+#### 16.7.1. std::promise
 
 `std::promise` 对象可以存储一个值或者一个异常，这个值或异常可以在将来的某个时刻通过与之关联的 `std::future` 对象获取。当你想要设置一个值或异常，以便另一个线程可以稍后检索它时，`std::promise` 非常有用。
 
-##### 16.3.4.2. 主要成员函数：
+#### 16.7.2. 主要成员函数：
 
 * `get_future()`：返回一个与 `promise` 对象共享状态的 `future` 对象。
 * `set_value(T value)`：设置共享状态的值。
 * `set_exception(std::exception_ptr ex)`：设置共享状态的异常。
 * `set_value_at_thread_exit(T value)`：设置共享状态的值，但是直到线程退出时才进行实际的设置操作。
 
-##### 16.3.4.3. std::future
+#### 16.7.3. std::future
 
 `std::future` 提供了一种访问异步操作结果的机制。它可以用来获取与 `std::promise` 相关联的值或异常。
 
-###### 16.3.4.3.1. 主要成员函数：
+#### 16.7.3.1. 主要成员函数
 
 * `get()`：阻塞当前线程，直到共享状态的值或异常可用，然后返回设置的值或重新抛出异常。
 * `share()`：返回一个 `shared_future` 对象，它可以被多个线程共享。
@@ -2804,7 +2995,7 @@ int main() {
 * `wait_for(duration)`：阻塞当前线程，直到共享状态的值或异常可用，或者超时。
 * `wait_until(time_point)`：阻塞当前线程，直到共享状态的值或异常可用，或者到达指定的时间点。
 
-##### 16.3.4.4. 示例
+#### 16.7.4. 示例
 
 以下是一个使用 `std::promise` 和 `std::future` 的简单示例：
 
@@ -2841,9 +3032,9 @@ int main() {
 
 在这个例子中，我们创建了一个 `std::promise` 对象，并将其传递给一个新线程。该线程执行计算并将结果通过 `set_value` 方法存储在 `promise` 中。主线程通过与之关联的 `std::future` 对象调用 `get()` 方法来获取结果。
 
-### 16.4. 有锁的并发数据结构
+### 16.8. 有锁的并发数据结构
 
-#### 16.4.1. 选择合适的锁类型
+#### 16.8.1. 选择合适的锁类型
 
 C++ 提供了多种锁类型，包括：
 
@@ -2852,19 +3043,19 @@ C++ 提供了多种锁类型，包括：
 * `std::timed_mutex` 和 `std::recursive_timed_mutex`：提供超时锁定功能。
 * `std::shared_mutex`：允许多个读操作同时进行，但写操作需要独占访问。
 
-#### 16.4.2. 确定锁的作用域和粒度
+#### 16.8.2. 确定锁的作用域和粒度
 
 * **细粒度锁** ：每个数据元素都有自己的锁，可以提供更高的并发性，但可能导致复杂的锁管理。
 * **粗粒度锁** ：整个数据结构只有一个锁，管理简单，但并发性较低。
 
-#### 16.4.3. 设计原则
+#### 16.8.3. 设计原则
 
 * **最小化锁的持有时间** ：尽量减少锁的持有时间，以减少线程等待时间。
 * **避免死锁** ：确保锁的获取顺序一致，使用锁层次结构，或者使用 `std::lock` 来同时锁定多个锁。
 * **不要在锁内调用未知代码** ：避免在持有锁的情况下调用可能抛出异常或长时间阻塞的函数。
 * **提供无锁接口** ：如果可能，提供不需要锁的接口，例如只读操作。
 
-#### 16.4.4. 示例：基于锁的线程安全队列
+#### 16.8.4. 示例：基于锁的线程安全队列
 
 以下是一个简单的线程安全队列的实现，使用了 `std::mutex` 来保护数据结构：
 
@@ -2921,18 +3112,18 @@ public:
 
 在这个例子中，我们使用了 `std::mutex` 来保护队列的 `push`、`try_pop` 和 `empty` 操作。每个操作都在一个 `std::lock_guard` 的作用域内执行，这确保了在操作执行期间锁是被持有的，并且在作用域结束时自动释放锁。
 
-### 16.5. 无锁的并发数据结构
+### 16.9. 无锁的并发数据结构
 
 
 在 C++ 中实现无锁（lock-free）的并发数据结构是一种高级技术，它依赖于原子操作来确保线程安全，而不需要传统的锁机制。无锁数据结构可以提供更高的并发性能，因为它们减少了线程因等待锁而阻塞的情况。以下是一些实现无锁数据结构的关键概念和示例。
 
-#### 16.5.1. 关键概念
+#### 16.9.1. 关键概念
 
 1. **原子操作** ：C++11 及以上版本提供了 `<atomic>` 头文件，其中包含了原子类型和原子操作，如 `std::atomic`、`std::atomic_flag`、`std::atomic_load`、`std::atomic_store`、`std::atomic_exchange` 等。
 2. **内存模型** ：C++11 引入了内存模型，定义了多线程程序中的内存访问规则。了解数据依赖、内存顺序和同步操作对于实现无锁数据结构至关重要。
 3. **比较并交换（CAS）操作** ：这是实现无锁数据结构的关键操作，通常通过 `std::atomic::compare_exchange_weak` 或 `std::atomic::compare_exchange_strong` 来实现。
 
-#### 16.5.2. 示例：无锁栈
+#### 16.9.2. 示例：无锁栈
 
 以下是一个简单的无锁栈的实现：
 
@@ -2985,19 +3176,184 @@ public:
 
 在这个无锁栈的实现中，我们使用了 `std::atomic` 来存储栈顶指针。`push` 操作创建一个新节点，并尝试将其设置为新的栈顶，如果栈顶在尝试期间发生变化，它会重新尝试。`pop` 操作尝试移除栈顶节点，并返回其数据，如果栈为空或栈顶在尝试期间发生变化，它会重新尝试。
 
-### 16.6. 注意事项
+### 16.10. 注意事项
 
 * **ABA 问题** ：无锁数据结构可能会遇到 ABA 问题，即一个节点被一个线程删除后，另一个线程又创建了一个相同地址的新节点。解决这个问题通常需要使用带有标记的指针（如 `std::atomic<T*>`）。
 * **内存回收** ：在无锁数据结构中管理内存回收可能会很复杂，因为删除节点时不能简单地使用 `delete`，可能需要延迟删除或使用垃圾回收机制。
 * **性能和复杂性** ：无锁数据结构的实现通常比基于锁的更复杂，并且可能不会在所有情况下都提供更好的性能。正确的实现和测试无锁数据结构需要深入理解并发编程和内存模型。
 
-### 16.7. 并发设计
+### 16.11. 并发设计
 
-### 16.8. 线程池
+#### 16.11.1. 设计原则
 
-### 16.9. 并行算法
+- **避免共享状态**：尽量使用消息传递而非共享内存
+- **最小化锁的粒度**：减少锁的持有时间和范围
+- **避免嵌套锁**：防止死锁
+- **使用高级抽象**：优先使用 `std::future`、`std::async` 等
 
-### 16.10. 多线程调试
+#### 16.11.2. 线程安全策略
+
+1. **不可变数据**：只读数据天生线程安全
+2. **线程本地存储**：使用 `thread_local` 避免共享
+3. **消息队列**：通过队列传递数据而非共享
+4. **读写锁**：读多写少场景使用 `std::shared_mutex`
+5. **无锁数据结构**：使用原子操作实现高性能
+
+### 16.12. 线程池
+
+```cpp
+#include <vector>
+#include <queue>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
+#include <future>
+
+class ThreadPool {
+public:
+    ThreadPool(size_t threads) : stop(false) {
+        for (size_t i = 0; i < threads; ++i) {
+            workers.emplace_back([this] {
+                while (true) {
+                    std::function<void()> task;
+                    {
+                        std::unique_lock<std::mutex> lock(queue_mutex);
+                        condition.wait(lock, [this] {
+                            return stop || !tasks.empty();
+                        });
+                        if (stop && tasks.empty()) return;
+                        task = std::move(tasks.front());
+                        tasks.pop();
+                    }
+                    task();
+                }
+            });
+        }
+    }
+
+    template<typename F, typename... Args>
+    auto enqueue(F&& f, Args&&... args)
+        -> std::future<typename std::result_of<F(Args...)>::type> {
+        using return_type = typename std::result_of<F(Args...)>::type;
+        auto task = std::make_shared<std::packaged_task<return_type()>>(
+            std::bind(std::forward<F>(f), std::forward<Args>(args)...)
+        );
+        std::future<return_type> res = task->get_future();
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex);
+            if (stop) throw std::runtime_error("enqueue on stopped ThreadPool");
+            tasks.emplace([task](){ (*task)(); });
+        }
+        condition.notify_one();
+        return res;
+    }
+
+    ~ThreadPool() {
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex);
+            stop = true;
+        }
+        condition.notify_all();
+        for (std::thread& worker : workers) {
+            worker.join();
+        }
+    }
+
+private:
+    std::vector<std::thread> workers;
+    std::queue<std::function<void()>> tasks;
+    std::mutex queue_mutex;
+    std::condition_variable condition;
+    bool stop;
+};
+
+// 使用
+ThreadPool pool(4);
+auto result = pool.enqueue([](int a, int b) { return a + b; }, 2, 3);
+std::cout << result.get() << std::endl;  // 5
+```
+
+### 16.13. 并行算法
+
+C++17 引入并行算法，使用执行策略参数。
+
+```cpp
+#include <algorithm>
+#include <execution>
+
+std::vector<int> v = {3, 1, 4, 1, 5, 9, 2, 6};
+
+// 执行策略
+std::execution::seq       // 顺序执行
+std::execution::par       // 并行执行
+std::execution::par_unseq // 并行+向量化执行
+
+// 并行排序
+std::sort(std::execution::par, v.begin(), v.end());
+
+// 并行查找
+auto it = std::find(std::execution::par, v.begin(), v.end(), 5);
+
+// 并行遍历
+std::for_each(std::execution::par, v.begin(), v.end(), [](int& n) {
+    n *= 2;
+});
+
+// 并行计算
+int sum = std::reduce(std::execution::par, v.begin(), v.end(), 0);
+
+// 并行转换
+std::vector<int> result(v.size());
+std::transform(std::execution::par, v.begin(), v.end(), result.begin(),
+               [](int n) { return n * n; });
+```
+
+### 16.14. 多线程调试
+
+#### 16.14.1. 常见问题
+
+- **数据竞争**：多个线程同时访问共享数据，至少一个写入
+- **死锁**：多个线程互相等待对方释放锁
+- **活锁**：线程持续执行但无法前进
+- **虚假唤醒**：条件变量可能在条件未满足时被唤醒
+
+#### 16.14.2. 调试工具
+
+```bash
+# ThreadSanitizer（数据竞争检测）
+g++ -fsanitize=thread -g main.cpp -o main
+./main
+
+# Helgrind（Valgrind 线程检测工具）
+valgrind --tool=helgrind ./main
+
+# DRD（Valgrind 另一个线程检测工具）
+valgrind --tool=drd ./main
+
+# GDB 多线程调试
+gdb ./main
+(gdb) info threads        # 列出所有线程
+(gdb) thread 2            # 切换到线程2
+(gdb) bt                  # 查看调用栈
+(gdb) set scheduler-locking on  # 只运行当前线程
+```
+
+#### 16.14.3. 日志追踪
+
+```cpp
+#include <mutex>
+
+std::mutex log_mutex;
+
+#define LOG(msg) do { \
+    std::lock_guard<std::mutex> lock(log_mutex); \
+    std::cout << "[" << std::this_thread::get_id() << "] " << msg << std::endl; \
+} while(0)
+
+// 使用
+LOG("Processing item " << i);
+```
 
 ## 17. 内存模型和atomic
 
@@ -3478,11 +3834,49 @@ d.back();
 
 ### 21.3. list
 
-- 双向链表
+双向链表，支持常数时间的任意位置插入/删除。
+
+```cpp
+#include <list>
+
+std::list<int> lst{1, 2, 3};
+
+// 插入删除
+lst.push_back(4);      // 末尾添加
+lst.push_front(0);     // 开头添加
+lst.pop_back();        // 删除末尾
+lst.pop_front();       // 删除开头
+
+// 特有操作
+lst.sort();            // 排序（成员函数，非 std::sort）
+lst.unique();          // 去重
+lst.reverse();         // 反转
+lst.splice(it, other); // 拼接另一个链表
+lst.remove(2);         // 删除所有值为2的元素
+lst.remove_if(pred);   // 删除满足条件的元素
+
+// 性能：插入/删除 O(1)，随机访问 O(n)
+```
 
 ### 21.4. forward_list
 
-- 前向链表
+单向链表，比 list 更节省内存，但不支持反向遍历。
+
+```cpp
+#include <forward_list>
+
+std::forward_list<int> fl{1, 2, 3};
+
+fl.push_front(0);      // 只能在开头插入
+fl.pop_front();        // 删除开头
+
+// 插入到指定位置之后
+auto it = fl.begin();
+fl.insert_after(it, 10);
+fl.erase_after(it);
+
+// 性能：比 list 节省内存，单向遍历
+```
 
 ### 21.5. queue
 
@@ -3793,23 +4187,23 @@ arr.size();      // 5
 // 比 C 数组的优势：支持迭代器、大小已知、不会退化为指针
 // 性能与 C 数组相同
 
-## 22. 编码与字符集
+## 21.14. 编码与字符集
 
-### 22.1. 字符编码
+### 21.14.1. 字符编码
 
-#### 22.1.1. ASCII
+#### ASCII
 
 - 7位编码，128个字符
 - 包含英文字母、数字、控制字符
 
-#### 22.1.2. Unicode
+#### Unicode
 
 - 统一字符编码标准
 - UTF-8：变长编码（1-4字节），兼容 ASCII
 - UTF-16：变长编码（2或4字节）
 - UTF-32：定长编码（4字节）
 
-### 22.2. C++ 字符类型
+### 21.14.2. C++ 字符类型
 
 ```cpp
 // C++98
@@ -3831,7 +4225,7 @@ const char32_t* s4 = U"hello";      // UTF-32 字符串
 const char8_t* s5 = u8"hello";      // C++20: UTF-8 字符串
 ```
 
-### 22.3. 字符编码转换
+### 21.14.3. 字符编码转换
 
 ```cpp
 #include <codecvt>  // C++11，C++17 已弃用
@@ -3844,7 +4238,7 @@ std::u16string utf16 = converter.from_bytes("hello");
 // C++20 推荐：使用第三方库如 ICU 或系统 API
 ```
 
-### 22.4. 本地化
+### 21.14.4. 本地化
 
 ```cpp
 #include <locale>
@@ -3862,9 +4256,9 @@ std::locale china("zh_CN.UTF-8");
 std::collate<wchar_t> const& coll = std::use_facet<std::collate<wchar_t>>(china);
 ```
 
-## 23. 数据结构与算法
+## 22. 数据结构与算法
 
-### 23.1. 标准算法
+### 22.1. 标准算法
 
 ```cpp
 #include <algorithm>
@@ -3914,9 +4308,9 @@ int sum = std::accumulate(v.begin(), v.end(), 0);
 int product = std::accumulate(v.begin(), v.end(), 1, std::multiplies<int>());
 ```
 
-### 23.2. 常用数据结构
+### 22.2. 常用数据结构
 
-#### 23.2.1. 链表
+#### 22.2.1. 链表
 
 ```cpp
 struct ListNode {
@@ -3926,7 +4320,7 @@ struct ListNode {
 };
 ```
 
-#### 23.2.2. 二叉树
+#### 22.2.2. 二叉树
 
 ```cpp
 struct TreeNode {
@@ -3937,7 +4331,7 @@ struct TreeNode {
 };
 ```
 
-#### 23.2.3. 图
+#### 22.2.3. 图
 
 ```cpp
 // 邻接表
@@ -3947,7 +4341,7 @@ std::vector<std::vector<int>> adj(n);
 std::vector<std::vector<int>> matrix(n, std::vector<int>(n, 0));
 ```
 
-### 23.3. 复杂度分析
+### 22.3. 复杂度分析
 
 | 操作 | vector | list | set/map | unordered_set/map |
 |------|--------|------|---------|-------------------|
@@ -3957,9 +4351,9 @@ std::vector<std::vector<int>> matrix(n, std::vector<int>(n, 0));
 | 查找 | O(n) | O(n) | O(log n) | 平均 O(1) |
 | 删除 | O(n) | O(1) | O(log n) | 平均 O(1) |
 
-## 24. 常用库
+## 23. 常用库
 
-### 24.1. libevent
+### 23.1. libevent
 
 事件驱动网络库，高性能 I/O 多路复用。
 
@@ -3979,11 +4373,11 @@ event_free(ev);
 event_base_free(base);
 ```
 
-### 24.2. boost
+### 23.2. boost
 
 C++ 准标准库，涵盖各个领域。
 
-#### 24.2.1. 常用组件
+#### 23.2.1. 常用组件
 
 ```cpp
 // 智能指针（C++11 前使用）
@@ -4012,7 +4406,7 @@ bool match = boost::regex_match("123", expr);
 boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
 ```
 
-### 24.3. OpenCV
+### 23.3. OpenCV
 
 计算机视觉库。
 
@@ -4026,7 +4420,7 @@ cv::imshow("Gray", gray);
 cv::waitKey(0);
 ```
 
-### 24.4. OpenSSL
+### 23.4. OpenSSL
 
 加密与安全通信。
 
@@ -4040,7 +4434,7 @@ SHA256_Update(&sha256, data, len);
 SHA256_Final(hash, &sha256);
 ```
 
-### 24.5. nlohmann/json
+### 23.5. nlohmann/json
 
 现代 C++ JSON 库。
 
@@ -4057,7 +4451,7 @@ std::string s = j.dump();  // 序列化
 json j2 = json::parse(s);  // 反序列化
 ```
 
-### 24.6. gRPC
+### 23.6. gRPC
 
 高性能 RPC 框架。
 
@@ -4080,9 +4474,9 @@ class MyServiceImpl : public MyService::Service {
 };
 ```
 
-## 25. 日志库
+## 24. 日志库
 
-### 25.1. spdlog
+### 24.1. spdlog
 
 快速、仅头文件的 C++ 日志库。
 
@@ -4114,7 +4508,7 @@ auto async_logger = spdlog::async_logger_mt("async_logger",
     std::make_shared<spdlog::sinks::basic_file_sink_mt>("log.txt"));
 ```
 
-### 25.2. glog
+### 24.2. glog
 
 Google 日志库。
 
@@ -4137,7 +4531,7 @@ LOG_EVERY_N(INFO, 10) << "Logged every 10 calls";
 google::ShutdownGoogleLogging();
 ```
 
-### 25.3. log4cpp
+### 24.3. log4cpp
 
 类似 Java log4j 的日志库。
 
@@ -4156,9 +4550,9 @@ root.addAppender(appender);
 root.info("Info message");
 ```
 
-## 26. 数字计算
+## 25. 数字计算
 
-### 26.1. 数学函数
+### 25.1. 数学函数
 
 ```cpp
 #include <cmath>
@@ -4191,7 +4585,7 @@ std::fmod(10.5, 3.0); // 浮点取模
 std::hypot(3, 4);     // sqrt(x² + y²): 5
 ```
 
-### 26.2. 随机数
+### 25.2. 随机数
 
 ```cpp
 #include <random>
@@ -4216,7 +4610,7 @@ std::binomial_distribution<> binomial(10, 0.5);  // 二项分布
 std::poisson_distribution<> poisson(5.0);         // 泊松分布
 ```
 
-### 26.3. 复数
+### 25.3. 复数
 
 ```cpp
 #include <complex>
@@ -4240,7 +4634,7 @@ std::log(c1);       // 对数
 std::sqrt(c1);      // 平方根
 ```
 
-### 26.4. 数值数组
+### 25.4. 数值数组
 
 ```cpp
 #include <valarray>
@@ -4263,7 +4657,7 @@ va1.min();   // 1
 va1.max();   // 5
 ```
 
-### 26.5. C++ REST SDK (cpprestsdk)
+### 25.5. C++ REST SDK (cpprestsdk)
 
 微软开发的跨平台 REST 客户端/服务端库。
 
@@ -4301,9 +4695,9 @@ client.request(methods::POST, U("/users"), body)
     .wait();
 ```
 
-## 27. Concepts 模板约束
+## 26. Concepts 模板约束
 
-### 27.1. 基本概念
+### 26.1. 基本概念
 
 C++20 引入，用于约束模板参数，提供更好的错误信息和代码可读性。
 
@@ -4333,7 +4727,7 @@ auto add(Numeric auto a, Numeric auto b) {
 }
 ```
 
-### 27.2. 标准 Concepts
+### 26.2. 标准 Concepts
 
 ```cpp
 #include <concepts>
@@ -4360,7 +4754,7 @@ std::predicate         // 谓词（返回 bool）
 std::regular_invocable // 常规可调用
 ```
 
-### 27.3. 自定义 Concept
+### 26.3. 自定义 Concept
 
 ```cpp
 // 简单 concept
@@ -4380,7 +4774,7 @@ concept Container = requires(T c) {
 };
 ```
 
-### 27.4. requires 子句
+### 26.4. requires 子句
 
 ```cpp
 // requires requires（双重 requires）
@@ -4400,9 +4794,9 @@ void process(T container) requires requires(T t) {
 };
 ```
 
-## 28. Ranges
+## 27. Ranges
 
-### 28.1. 基本概念
+### 27.1. 基本概念
 
 C++20 引入 Ranges 库，提供更现代、更函数式的容器操作方式。
 
@@ -4430,12 +4824,9 @@ for (int n : even) {
 }
 ```
 
-### 28.2. Views（视图）
-
-Views 是惰性求值的，不会立即计算。
+### 27.2. 常用 Views
 
 ```cpp
-#include <ranges>
 
 std::vector<int> v = {1, 2, 3, 4, 5};
 
@@ -4455,7 +4846,7 @@ auto first_three_even = nums
                       | std::views::take(3);
 ```
 
-### 28.3. Range Adaptors（范围适配器）
+### 27.3. Range Adaptors（范围适配器）
 
 ```cpp
 // 所有视图工厂
@@ -4470,7 +4861,7 @@ for (int n : std::views::iota(1, 11)) {
 }
 ```
 
-### 28.4. Ranges 算法
+### 27.4. Ranges 算法
 
 ```cpp
 #include <algorithm>
@@ -4487,7 +4878,7 @@ std::ranges::transform(v, v.begin(), func);
 std::ranges::for_each(v, func);
 ```
 
-### 28.5. 投影（Projection）
+### 27.5. 投影（Projection）
 
 ```cpp
 struct Person {
@@ -4507,9 +4898,9 @@ std::ranges::sort(people, {}, &Person::name);
 auto names = people | std::views::transform(&Person::name);
 ```
 
-## 29. Coroutines 协程
+## 28. Coroutines 协程
 
-### 29.1. 基本概念
+### 28.1. 基本概念
 
 C++20 引入协程，支持可暂停和恢复的函数。
 
@@ -4536,7 +4927,7 @@ Generator<int> fibonacci(int n) {
 }
 ```
 
-### 29.2. 协程返回类型
+### 28.2. 协程返回类型
 
 协程的返回类型必须包含特定的嵌套类型：
 
@@ -4562,7 +4953,7 @@ public:
 };
 ```
 
-### 29.3. Awaitable 类型
+### 28.3. Awaitable 类型
 
 ```cpp
 // 标准库提供的 awaitable
@@ -4581,7 +4972,7 @@ struct MyAwaitable {
 };
 ```
 
-### 29.4. 简单生成器示例
+### 28.4. 简单生成器示例
 
 ```cpp
 #include <coroutine>
@@ -4644,16 +5035,16 @@ for (int n : range(1, 10)) {
 }
 ```
 
-### 29.5. 协程注意事项
+### 28.5. 协程注意事项
 
 1. C++20 只提供了协程的编译器支持，标准库支持有限
 2. 需要自己实现或使用第三方库（如 cppcoro）
 3. 协程是栈less的，状态保存在堆上
 4. 注意生命周期管理，避免悬空引用
 
-## 30. 虚拟内存
+## 29. 虚拟内存
 
-### 30.1. 基本概念
+### 29.1. 基本概念
 
 内存管理单元（MMU）和操作系统一起实现虚拟内存到物理内存之间的映射。
 
@@ -4664,7 +5055,7 @@ for (int n : range(1, 10)) {
 - 内存共享
 - 支持SWAP（使用磁盘作为扩展内存）
 
-### 30.2. 内存分页
+### 29.2. 内存分页
 
 将虚拟地址空间和物理地址空间划分为固定大小的页（通常4KB）。
 
@@ -4686,7 +5077,7 @@ void* aligned = aligned_alloc(page_size, size);
 free(aligned);
 ```
 
-### 30.3. 内存分段
+### 29.3. 内存分段
 
 将内存划分为逻辑段（代码段、数据段、栈段等）。
 
@@ -4696,7 +5087,7 @@ free(aligned);
 - 堆（heap）：动态分配的内存
 - 栈（stack）：局部变量、函数调用
 
-### 30.4. 虚拟内存区域
+### 29.4. 虚拟内存区域
 
 ```bash
 # Linux 查看进程内存映射
@@ -4704,12 +5095,12 @@ cat /proc/<pid>/maps
 
 # 示例输出
 # 地址范围              权限  偏移     设备   inode   路径
-# 00400000-00452000    r-xp 00000000 08:01 123456  /usr/bin/program
-# 00651000-00654000    r--p 00051000 08:01 123456  /usr/bin/program
-# 00654000-00657000    rw-p 00054000 08:01 123456  /usr/bin/program
+#    r-xp 00000000 08:01 123456  /usr/bin/program
+#    r--p 00051000 08:01 123456  /usr/bin/program
+#    rw-p 00054000 08:01 123456  /usr/bin/program
 ```
 
-### 30.5. 内存映射文件
+### 29.5. 内存映射文件
 
 ```cpp
 #include <sys/mman.h>
@@ -4726,9 +5117,9 @@ munmap(mapped, size);
 close(fd);
 ```
 
-## 31. 汇编
+## 30. 汇编
 
-### 31.1. 内联汇编
+### 30.1. 内联汇编
 
 ```cpp
 // GCC/Clang 内联汇编
@@ -4748,7 +5139,7 @@ __asm {
 }
 ```
 
-### 31.2. 常见汇编指令
+### 30.2. 常见汇编指令
 
 ```asm
 ; 数据传送
@@ -4782,7 +5173,7 @@ call func         ; 调用函数
 ret               ; 返回
 ```
 
-### 31.3. 调用约定
+### 30.3. 调用约定
 
 ```asm
 ; x86-64 System V (Linux/macOS)
@@ -4799,7 +5190,7 @@ add:
     ret
 ```
 
-### 31.4. 查看汇编代码
+### 30.4. 查看汇编代码
 
 ```bash
 # 生成汇编文件
@@ -4813,6 +5204,6 @@ gdb ./main
 (gdb) disassemble main
 ```
 
-## 32. 参考资料
+## 31. 参考资料
 
 > https://zh.cppreference.com/w/cpp
