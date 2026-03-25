@@ -531,5 +531,3 @@ runtime.NumGoroutine()      // goroutine 数量
 | Go 1.22 | for range 改进 |
 
 ---
-
-如需针对某个专题深入讲解，请告诉我！
