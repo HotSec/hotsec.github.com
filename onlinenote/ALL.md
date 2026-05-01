@@ -6,6 +6,8 @@
 
 ### 1.1 语言基础
 
+#### 基础语法
+
 <details>
 <summary>数据类型</summary>
 
@@ -42,6 +44,8 @@
 - nil 接口陷阱
 
 </details>
+
+#### 工程实践
 
 <details>
 <summary>包-模块-库</summary>
@@ -83,6 +87,8 @@
 
 </details>
 
+#### 进阶特性
+
 <details>
 <summary>泛型</summary>
 
@@ -121,6 +127,8 @@
 
 ### 1.2 核心概念
 
+#### 核心概念
+
 <details>
 <summary>Slice vs Array</summary>
 
@@ -149,6 +157,8 @@
 
 ### 1.3 并发编程（重点）
 
+#### 调度模型
+
 <details>
 <summary>GMP 调度模型</summary>
 
@@ -158,6 +168,8 @@
 - M 寻找 G 的流程
 
 </details>
+
+#### 并发原语
 
 <details>
 <summary>Goroutine & Channel</summary>
@@ -185,6 +197,8 @@
 - 原理与最佳实践
 
 </details>
+
+#### 并发模式
 
 <details>
 <summary>并发编程模式</summary>
@@ -224,6 +238,8 @@
 
 ### 1.4 内存管理（重点）
 
+#### 内存分配
+
 <details>
 <summary>内存模型与分配</summary>
 
@@ -240,6 +256,8 @@
 - 如何避免逃逸
 
 </details>
+
+#### 垃圾回收
 
 <details>
 <summary>垃圾回收（GC）</summary>
@@ -263,6 +281,8 @@
 </details>
 
 ### 1.5 常见陷阱
+
+#### 常见陷阱
 
 <details>
 <summary>循环与变量陷阱</summary>
@@ -301,6 +321,8 @@
 
 ### 1.6 常用标准库
 
+#### I/O与编码
+
 <details>
 <summary>网络与 I/O</summary>
 
@@ -315,6 +337,8 @@
 - encoding/json：Marshal / Unmarshal、自定义 JSON 标签、流式编解码
 
 </details>
+
+#### 并发与底层
 
 <details>
 <summary>并发与同步</summary>
@@ -341,6 +365,8 @@
 </details>
 
 ### 1.7 常用框架
+
+#### Web框架
 
 <details>
 <summary>Gin</summary>
@@ -397,6 +423,8 @@
 
 </details>
 
+#### RPC与网络
+
 <details>
 <summary>gRPC</summary>
 
@@ -420,6 +448,8 @@
 
 </details>
 
+#### 依赖注入
+
 <details>
 <summary>Wire & 依赖注入</summary>
 
@@ -430,6 +460,8 @@
 </details>
 
 ### 1.8 Web接口性能优化
+
+#### 编码优化
 
 <details>
 <summary>编码层面</summary>
@@ -449,6 +481,8 @@
 
 </details>
 
+#### HTTP与监控
+
 <details>
 <summary>HTTP & JSON & 监控</summary>
 
@@ -459,6 +493,8 @@
 </details>
 
 ### 1.9 安全专题
+
+#### 安全专题
 
 <details>
 <summary>SBOM</summary>
@@ -480,6 +516,8 @@
 
 ### 1.10 开源项目
 
+#### 开源项目
+
 <details>
 <summary>项目列表</summary>
 
@@ -494,6 +532,8 @@
 
 ### 1.11 工具 & 调试
 
+#### 工具调试
+
 <details>
 <summary>常用工具</summary>
 
@@ -504,6 +544,8 @@
 </details>
 
 ### 1.12 分布式基础
+
+#### 分布式基础
 
 <details>
 <summary>分布式理论 & 网络模型</summary>
@@ -522,6 +564,8 @@
 ## 二、C/C++
 
 ### 2.1 C语言教程
+
+#### 语言基础
 
 <details>
 <summary>语言基础</summary>
@@ -549,6 +593,8 @@
 
 </details>
 
+#### 标准库
+
 <details>
 <summary>标准库</summary>
 
@@ -562,6 +608,8 @@
 </details>
 
 ### 2.2 C++专题
+
+#### 基础语法
 
 <details>
 <summary>基础语法</summary>
@@ -578,6 +626,8 @@
 - 文件与流：文件流类/读写/打开模式/二进制文件/流操纵符/字符串流/流状态
 
 </details>
+
+#### 内存与模板
 
 <details>
 <summary>内存管理</summary>
@@ -597,6 +647,8 @@
 - 可变参数模板 / 模板元编程
 
 </details>
+
+#### 现代特性
 
 <details>
 <summary>现代C++特性</summary>
@@ -625,6 +677,8 @@
 
 </details>
 
+#### 并发与STL
+
 <details>
 <summary>并发编程</summary>
 
@@ -646,6 +700,8 @@
 - 函数对象：functor / lambda / std::function / std::bind
 
 </details>
+
+#### 工具与库
 
 <details>
 <summary>开发环境与工具</summary>
@@ -676,10 +732,12 @@
 
 </details>
 
+#### 底层与安全
+
 <details>
 <summary>未定义行为 & 内存安全</summary>
 
-- 常见 UB：悬空指针/越界访问/有符号溢出/空指针解引用/数据竞争/未初始化变量
+- 常见未定义行为：悬空指针/越界访问/有符号溢出/空指针解引用/数据竞争/未初始化变量
 - ASan（地址消毒器）/ MSan（内存消毒器）/ TSan（线程消毒器）/ UBSan
 - RAII 原则与所有权语义
 - 内存映射文件（mmap/CreateFileMapping）
@@ -701,6 +759,8 @@
 
 ### 3.1 语言基础
 
+#### 核心语法
+
 <details>
 <summary>核心语法</summary>
 
@@ -719,6 +779,8 @@
 
 </details>
 
+#### 风格指南
+
 <details>
 <summary>Python风格指南</summary>
 
@@ -729,6 +791,8 @@
 
 ### 3.2 Python工匠（最佳实践）
 
+#### 变量与数据
+
 <details>
 <summary>善用变量</summary>
 
@@ -738,6 +802,8 @@
 - 合理使用 namedtuple/dict 返回多个值
 
 </details>
+
+#### 控制流与函数
 
 <details>
 <summary>数值与字符串技巧</summary>
@@ -787,6 +853,8 @@
 
 </details>
 
+#### 面向对象与设计
+
 <details>
 <summary>SOLID 原则</summary>
 
@@ -816,6 +884,8 @@
 
 </details>
 
+#### 文件与工程
+
 <details>
 <summary>路径与文件操作</summary>
 
@@ -834,6 +904,8 @@
 
 ### 3.3 Python版本演进
 
+#### 版本演进
+
 <details>
 <summary>3.6 → 3.14 新特性</summary>
 
@@ -850,6 +922,8 @@
 
 ### 3.4 标准库
 
+#### 内置类型与异常
+
 <details>
 <summary>内置类型与异常</summary>
 
@@ -858,6 +932,8 @@
 - 内置函数与常量
 
 </details>
+
+#### 数据处理
 
 <details>
 <summary>文本与数据处理</summary>
@@ -868,6 +944,8 @@
 
 </details>
 
+#### 垃圾回收
+
 <details>
 <summary>垃圾回收</summary>
 
@@ -875,6 +953,8 @@
 - 环状双向链表 refchain / 池化技术（int/small string）
 
 </details>
+
+#### 并发与网络
 
 <details>
 <summary>并发执行</summary>
@@ -899,6 +979,8 @@
 
 ### 3.5 常用库
 
+#### 核心库
+
 <details>
 <summary>核心</summary>
 
@@ -909,6 +991,8 @@
 
 </details>
 
+#### 网络爬虫
+
 <details>
 <summary>网络/爬虫</summary>
 
@@ -918,6 +1002,8 @@
 
 </details>
 
+#### 协程性能
+
 <details>
 <summary>协程 & 性能</summary>
 
@@ -926,6 +1012,8 @@
 - **Trio**：友好的异步并发库，结构化并发模型
 
 </details>
+
+#### 安全包管理
 
 <details>
 <summary>安全 & 包管理</summary>
@@ -939,6 +1027,8 @@
 
 </details>
 
+#### 数据科学
+
 <details>
 <summary>数据处理 & 科学计算</summary>
 
@@ -949,6 +1039,8 @@
 - **SciPy**：科学计算（优化/插值/积分/信号处理）
 
 </details>
+
+#### 包分发
 
 <details>
 <summary>包分发 & C扩展</summary>
@@ -961,6 +1053,8 @@
 </details>
 
 ### 3.6 Web开发
+
+#### Django
 
 <details>
 <summary>Django</summary>
@@ -986,6 +1080,8 @@
 
 </details>
 
+#### Flask
+
 <details>
 <summary>Flask</summary>
 
@@ -1005,6 +1101,8 @@
 
 </details>
 
+#### FastAPI等
+
 <details>
 <summary>FastAPI / Tornado / Bottle / Quart / Sanic</summary>
 
@@ -1015,6 +1113,8 @@
 - **Sanic**：高性能异步 Web 框架
 
 </details>
+
+#### 微服务
 
 <details>
 <summary>微服务</summary>
@@ -1029,6 +1129,8 @@
 
 </details>
 
+#### 反爬安全
+
 <details>
 <summary>反爬与安全</summary>
 
@@ -1040,6 +1142,8 @@
 
 ### 3.7 第三方库
 
+#### 数据库驱动
+
 <details>
 <summary>数据库驱动</summary>
 
@@ -1049,6 +1153,8 @@
 
 </details>
 
+#### 消息队列与搜索
+
 <details>
 <summary>消息队列 & 搜索</summary>
 
@@ -1057,6 +1163,8 @@
 - **Elasticsearch**：倒排索引/分词器/映射（Mapping）；插入速度优化（bulk/refresh_interval/副本延迟）；聚合查询/向量搜索/ILM 生命周期
 
 </details>
+
+#### LLM与AI
 
 <details>
 <summary>LLM & AI</summary>
@@ -1072,6 +1180,8 @@
 
 </details>
 
+#### 自动化部署
+
 <details>
 <summary>自动化 & 部署</summary>
 
@@ -1085,6 +1195,8 @@
 
 ### 3.8 高并发设计
 
+#### 架构
+
 <details>
 <summary>基础架构</summary>
 
@@ -1096,6 +1208,8 @@
 - **LSM Tree**：写入优化数据结构；MemTable → SSTable → Compaction；适用于写密集场景
 
 </details>
+
+#### 高可用
 
 <details>
 <summary>高可用</summary>
@@ -1109,6 +1223,8 @@
 
 </details>
 
+#### 高并发
+
 <details>
 <summary>高并发</summary>
 
@@ -1120,6 +1236,8 @@
 - 高并发写：分库分表 / 异步写与写聚合 / Kafka多Partition
 
 </details>
+
+#### 分库分表与ID
 
 <details>
 <summary>分库分表</summary>
@@ -1139,6 +1257,8 @@
 
 </details>
 
+#### 缓存
+
 <details>
 <summary>缓存</summary>
 
@@ -1150,6 +1270,8 @@
 - 缓存预热 / 缓存更新策略（LRU/LFU/FIFO）
 
 </details>
+
+#### 可观测性
 
 <details>
 <summary>可观测性</summary>
@@ -1163,6 +1285,8 @@
 - **Loki**：轻量日志聚合系统，Grafana 生态，仅索引标签
 
 </details>
+
+#### 业务场景
 
 <details>
 <summary>海量推送系统</summary>
@@ -1190,6 +1314,8 @@
 
 ### 3.9 面试题
 
+#### 面试题
+
 <details>
 <summary>Python面试题</summary>
 
@@ -1210,6 +1336,8 @@
 
 ### 4.1 语言基础
 
+#### 基础语法
+
 <details>
 <summary>数据类型与变量</summary>
 
@@ -1218,12 +1346,7 @@
 
 </details>
 
-<details>
-<summary>函数</summary>
-
-- 定义与调用 / 函数变量 / 可变参数 / 闭包
-
-</details>
+#### 面向对象
 
 <details>
 <summary>面向对象 & 环境</summary>
@@ -1233,6 +1356,15 @@
 - 继承：通过 `__index` 元方法实现单继承/多继承
 - `_G` 全局环境表 / `_ENV`（Lua 5.2+）局部环境
 - 模块与包：require 机制 / module 函数 / package.path/cpath
+
+</details>
+
+#### 协程
+
+<details>
+<summary>函数</summary>
+
+- 定义与调用 / 函数变量 / 可变参数 / 闭包
 
 </details>
 
@@ -1250,6 +1382,8 @@
 
 </details>
 
+#### 错误处理
+
 <details>
 <summary>错误处理 & 模式匹配</summary>
 
@@ -1259,6 +1393,8 @@
 - 与正则的区别：无交替符(|)/无量词{m,n}/无反向引用/更轻量更快
 
 </details>
+
+#### GC与性能
 
 <details>
 <summary>GC & 性能</summary>
@@ -1270,6 +1406,8 @@
 - 性能优化：局部变量优先/减少全局访问/预分配 table/避免频繁字符串拼接
 
 </details>
+
+#### 标准库
 
 <details>
 <summary>标准库</summary>
@@ -1287,6 +1425,8 @@
 
 ### 4.2 高级主题
 
+#### LuaJIT
+
 <details>
 <summary>LuaJIT & FFI</summary>
 
@@ -1298,6 +1438,8 @@
 - `ffi.new` / `ffi.cast` / `ffi.string` 等 FFI 辅助函数
 
 </details>
+
+#### OpenResty
 
 <details>
 <summary>OpenResty</summary>
@@ -1313,6 +1455,8 @@
 
 </details>
 
+#### Lua与C++
+
 <details>
 <summary>Lua与C++</summary>
 
@@ -1325,6 +1469,8 @@
 - Userdata：light userdata（指针）/ full userdata（带 GC 和元表）
 
 </details>
+
+#### 生态
 
 <details>
 <summary>LuaGo</summary>
@@ -1346,6 +1492,10 @@
 
 ## 五、Web（前端）
 
+### 5.1 前端基础
+
+#### HTML与CSS
+
 <details>
 <summary>HTML & CSS</summary>
 
@@ -1358,6 +1508,8 @@
 - CSS 预处理器：Sass / Less / PostCSS
 
 </details>
+
+#### JavaScript
 
 <details>
 <summary>JavaScript 核心</summary>
@@ -1387,6 +1539,10 @@
 
 </details>
 
+### 5.2 前端框架
+
+#### React
+
 <details>
 <summary>React</summary>
 
@@ -1401,6 +1557,8 @@
 
 </details>
 
+#### Vue
+
 <details>
 <summary>Vue</summary>
 
@@ -1414,6 +1572,10 @@
 
 </details>
 
+### 5.3 后端与协议
+
+#### Node.js
+
 <details>
 <summary>Node.js</summary>
 
@@ -1425,6 +1587,8 @@
 - 进程管理：PM2 / Docker / systemd
 
 </details>
+
+#### 网络与浏览器
 
 <details>
 <summary>HTTP 协议</summary>
@@ -1453,6 +1617,10 @@
 
 </details>
 
+### 5.4 工程化与工具
+
+#### 构建与样式
+
 <details>
 <summary>Tailwind CSS</summary>
 
@@ -1479,6 +1647,8 @@
 - 框架支持：Vue / React / Svelte / Lit 等模板一键创建
 
 </details>
+
+#### 文档与插件
 
 <details>
 <summary>Vuepress</summary>
@@ -1513,6 +1683,10 @@
 
 ## 六、安全
 
+### 6.1 Web安全
+
+#### 漏洞与攻击
+
 <details>
 <summary>OWASP Top 10</summary>
 
@@ -1545,16 +1719,40 @@
 
 </details>
 
-<details>
-<summary>容器 & 云安全</summary>
+#### 认证与逻辑
 
-- 容器逃逸：特权容器/Cgroup逃逸/dirty cow/内核漏洞/挂载逃逸
-- K8s 安全：RBAC/Pod Security Standards/NetworkPolicy/Secret 加密/etcd 安全
-- 镜像安全：基础镜像选择/最小权限/镜像签名/漏洞扫描（Trivy/Snyk）
-- 云安全：IAM 最小权限/VPC 隔离/安全组/密钥管理（KMS）
-- 供应链安全：SBOM/软件签名/SLSA 框架/依赖锁定
+<details>
+<summary>常见认证方式</summary>
+
+- **API Key**：在请求头/查询参数/Body 中携带密钥认证；简单但不安全，无法区分用户身份
+- **Basic Auth**：`Authorization: Basic base64(user:pass)`；HTTP 明文传输不安全，需配合 HTTPS
+- **Cookie**：服务端生成，客户端存储；Key-Value 形式，Value 最大 4KB；基于域名安全
+- **Session**：服务端存储会话数据，客户端仅存 SessionID（通常在 Cookie 中）；支持多后端（数据库/缓存/Redis）
+- **JWT（JSON Web Token）**：Header.Payload.Signature 三段式结构；无状态、跨域友好；默认不加密，不可存储敏感信息；无法主动废止 Token（需黑名单机制）；应使用 HTTPS 传输
+  - Payload 标准字段：iss/exp/sub/aud/nbf/iat/jti
+- **OAuth 2.0**：开放授权标准；四种授权模式：授权码（最安全）/隐式/密码/客户端凭证；通过 Access Token + Refresh Token 访问资源
+- **SSO（单点登录）**：一次登录访问多个应用；CAS / SAML / OIDC 等协议；认证中心统一签发与验证令牌
 
 </details>
+
+<details>
+<summary>逻辑漏洞</summary>
+
+- **认证流程漏洞**：
+  - 登录：验证码爆破/验证码返回异常/短信验证码与用户未绑定/前端验证/授权劫持/万能验证码/万能密码
+  - 找回密码：任意用户密码重置/重置链接未绑定用户/重置凭证泄露
+  - 注册流程：用户名枚举/批量注册
+- **业务流程漏洞**：
+  - 支付：零元购/刷虚拟币/优惠券属性篡改/无限领券/积分篡改
+  - 权限绕过：水平越权/垂直越权/未授权访问
+  - 拒绝服务：科学记数法攻击/资源耗尽
+  - 关键信息泄漏
+
+</details>
+
+### 6.2 安全工具与方法
+
+#### 渗透测试
 
 <details>
 <summary>渗透测试方法论</summary>
@@ -1582,33 +1780,7 @@
 
 </details>
 
-<details>
-<summary>容器内信息收集</summary>
-
-- 基础系统信息：/etc/os-release / hostname / 进程列表 / 网络配置
-- 磁盘及挂载：df -h / mount / 存储卷类型
-- 特权容器判断：是否为 PID 1 / Capabilities 完整性 / Seccomp 状态
-- Capabilities：capsh --print / 常见危险 cap（CAP_SYS_ADMIN/CAP_NET_RAW/CAP_SYS_PTRACE）
-- NetNamespace：ip addr / iptables / 网络隔离判断
-- 本地敏感文件：/etc/shadow / .env / kubeconfig / SSH 密钥 / 云厂商凭证
-- 集群信息：命名空间 / Service Account / Master IP / 内网探测 / API Server 连通性
-- 判断是否为容器环境：/.dockerenv / cgroup 信息 / proc/1/cgroup
-
-</details>
-
-<details>
-<summary>常见认证方式</summary>
-
-- **API Key**：在请求头/查询参数/Body 中携带密钥认证；简单但不安全，无法区分用户身份
-- **Basic Auth**：`Authorization: Basic base64(user:pass)`；HTTP 明文传输不安全，需配合 HTTPS
-- **Cookie**：服务端生成，客户端存储；Key-Value 形式，Value 最大 4KB；基于域名安全
-- **Session**：服务端存储会话数据，客户端仅存 SessionID（通常在 Cookie 中）；支持多后端（数据库/缓存/Redis）
-- **JWT（JSON Web Token）**：Header.Payload.Signature 三段式结构；无状态、跨域友好；默认不加密，不可存储敏感信息；无法主动废止 Token（需黑名单机制）；应使用 HTTPS 传输
-  - Payload 标准字段：iss/exp/sub/aud/nbf/iat/jti
-- **OAuth 2.0**：开放授权标准；四种授权模式：授权码（最安全）/隐式/密码/客户端凭证；通过 Access Token + Refresh Token 访问资源
-- **SSO（单点登录）**：一次登录访问多个应用；CAS / SAML / OIDC 等协议；认证中心统一签发与验证令牌
-
-</details>
+#### 漏扫与信息收集
 
 <details>
 <summary>漏扫爬虫</summary>
@@ -1624,17 +1796,29 @@
 </details>
 
 <details>
-<summary>逻辑漏洞</summary>
+<summary>容器内信息收集</summary>
 
-- **认证流程漏洞**：
-  - 登录：验证码爆破/验证码返回异常/短信验证码与用户未绑定/前端验证/授权劫持/万能验证码/万能密码
-  - 找回密码：任意用户密码重置/重置链接未绑定用户/重置凭证泄露
-  - 注册流程：用户名枚举/批量注册
-- **业务流程漏洞**：
-  - 支付：零元购/刷虚拟币/优惠券属性篡改/无限领券/积分篡改
-  - 权限绕过：水平越权/垂直越权/未授权访问
-  - 拒绝服务：科学记数法攻击/资源耗尽
-  - 关键信息泄漏
+- 基础系统信息：/etc/os-release / hostname / 进程列表 / 网络配置
+- 磁盘及挂载：df -h / mount / 存储卷类型
+- 特权容器判断：是否为 PID 1 / Capabilities 完整性 / Seccomp 状态
+- Capabilities：capsh --print / 常见危险 cap（CAP_SYS_ADMIN/CAP_NET_RAW/CAP_SYS_PTRACE）
+- NetNamespace：ip addr / iptables / 网络隔离判断
+- 本地敏感文件：/etc/shadow / .env / kubeconfig / SSH 密钥 / 云厂商凭证
+- 集群信息：命名空间 / Service Account / Master IP / 内网探测 / API Server 连通性
+- 判断是否为容器环境：/.dockerenv / cgroup 信息 / proc/1/cgroup
+
+</details>
+
+### 6.3 云与容器安全
+
+<details>
+<summary>容器 & 云安全</summary>
+
+- 容器逃逸：特权容器/Cgroup逃逸/dirty cow/内核漏洞/挂载逃逸
+- K8s 安全：RBAC/Pod Security Standards/NetworkPolicy/Secret 加密/etcd 安全
+- 镜像安全：基础镜像选择/最小权限/镜像签名/漏洞扫描（Trivy/Snyk）
+- 云安全：IAM 最小权限/VPC 隔离/安全组/密钥管理（KMS）
+- 供应链安全：SBOM/软件签名/SLSA 框架/依赖锁定
 
 </details>
 
@@ -1643,6 +1827,8 @@
 ## 七、通用基础
 
 ### 7.1 数据结构与算法
+
+#### 基础数据结构
 
 <details>
 <summary>数据结构</summary>
@@ -1653,6 +1839,8 @@
 - 图（邻接矩阵/邻接表/遍历）
 
 </details>
+
+#### 算法设计与分析
 
 <details>
 <summary>算法设计</summary>
@@ -1681,6 +1869,8 @@
 
 </details>
 
+#### 理论与刷题
+
 <details>
 <summary>基础理论</summary>
 
@@ -1703,6 +1893,8 @@
 
 ### 7.2 操作系统 & Linux
 
+#### 操作系统
+
 <details>
 <summary>操作系统基础</summary>
 
@@ -1714,6 +1906,8 @@
 - 死锁：条件（互斥/持有并等待/不可抢占/循环等待）/预防/检测/恢复
 
 </details>
+
+#### Linux与工具
 
 <details>
 <summary>Linux 核心</summary>
@@ -1759,6 +1953,8 @@
 
 ### 7.3 架构设计
 
+#### 系统架构
+
 <details>
 <summary>系统架构</summary>
 
@@ -1768,6 +1964,8 @@
 - 软件架构风格 / 架构复用 / DSSA
 
 </details>
+
+#### 数据库
 
 <details>
 <summary>数据库</summary>
@@ -1780,6 +1978,8 @@
 - Redis 分布式缓存：数据类型/持久化/集群模式/缓存策略
 
 </details>
+
+#### 信息系统与安全
 
 <details>
 <summary>信息系统架构</summary>
@@ -1808,7 +2008,9 @@
 
 </details>
 
-### 7.3 DevOps & 基础设施
+### 7.4 DevOps & 基础设施
+
+#### 容器与编排
 
 <details>
 <summary>Kubernetes 核心概念</summary>
@@ -1823,6 +2025,16 @@
 - 运维：kubectl / 滚动更新 / 回滚 / HPA / VPA / 资源限制
 
 </details>
+
+<details>
+<summary>Docker Swarm</summary>
+
+- 集群部署 / 节点管理 / 服务部署与扩缩容
+- 存储卷挂载 / 可视化面板 / 容器网络
+
+</details>
+
+#### CI/CD与API
 
 <details>
 <summary>CI/CD</summary>
@@ -1847,13 +2059,7 @@
 
 </details>
 
-<details>
-<summary>Docker Swarm</summary>
-
-- 集群部署 / 节点管理 / 服务部署与扩缩容
-- 存储卷挂载 / 可视化面板 / 容器网络
-
-</details>
+#### 基础设施
 
 <details>
 <summary>ES集群 / Redis / 监控</summary>
@@ -1897,7 +2103,9 @@
 
 </details>
 
-### 7.4 智能体开发
+### 7.5 智能体开发
+
+#### 框架
 
 <details>
 <summary>框架</summary>
@@ -1912,6 +2120,8 @@
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
 
 </details>
+
+#### AI Coding 实践
 
 <details>
 <summary>AI Coding 实践</summary>
@@ -1941,7 +2151,9 @@
 
 </details>
 
-### 7.5 其它
+### 7.6 其它
+
+#### 大模型
 
 <details>
 <summary>大模型</summary>
@@ -1958,6 +2170,8 @@
 - **评估体系**：RAGAS / LLM-as-Judge / 人工评估；准确性/相关性/幻觉率
 
 </details>
+
+#### 研发效能
 
 <details>
 <summary>提高研发效能</summary>
@@ -1976,6 +2190,8 @@
   - AGENTS.md 维护本身就是知识沉淀：编码规范从 Wiki/口头约定 → 结构化文档
 
 </details>
+
+#### 杂项
 
 <details>
 <summary>大厂技术文章</summary>
