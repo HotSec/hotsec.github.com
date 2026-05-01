@@ -1924,6 +1924,83 @@
 </details>
 
 <details>
+<summary>iptables 与 netfilter</summary>
+
+- **netfilter 架构**：5 个钩子点（PREROUTING/INPUT/FORWARD/OUTPUT/POSTROUTING）
+- **四表五链**：filter（INPUT/FORWARD/OUTPUT）/nat（PREROUTING/OUTPUT/POSTROUTING）/mangle/raw
+- **iptables 语法**：规则/链/表/匹配条件/动作（ACCEPT/DROP/REJECT/DNAT/SNAT/MASQUERADE）
+- **常用规则**：放行 SSH/HTTP、NAT 转发、端口映射、IP 伪装
+- **持久化**：iptables-save/iptables-restore/iptables-persistent
+- **iptables vs nftables**：语法简化/集合/字典/兼容性
+
+</details>
+
+<details>
+<summary>Firewalld</summary>
+
+- **概述**：动态防火墙管理工具，iptables/nftables 前端
+- **zone 概念**：public/trusted/home/internal/dmz/work/external/block/drop
+- **服务与端口管理**：firewall-cmd 常用命令（--add-service/--add-port/--reload）
+- **富规则（Rich Rules）**：复杂规则配置（source/destination/port/action/log）
+- **直接规则**：--direct 选项直接操作 iptables
+- **与 Docker/K8s 兼容性**：Docker 操作 iptables 导致冲突/解决方案
+
+</details>
+
+<details>
+<summary>DenyHosts 与 SSH 安全</summary>
+
+- **SSH 暴力破解**：原理与危害/常见攻击方式
+- **DenyHosts**：安装配置/工作原理（分析日志→写入 hosts.deny）/同步服务器
+- **Fail2Ban**：更强大的替代方案/正则匹配/jail 配置/action 配置
+- **SSH 安全加固**：密钥认证/禁用 root/修改端口/白名单/MaxAuthTries
+- **与 iptables/Firewalld 联动**：自动封禁 IP
+
+</details>
+
+<details>
+<summary>Linux 性能优化</summary>
+
+- **方法论**：USE 方法（Utilization/Saturation/Errors）
+- **CPU 优化**：top/vmstat/mpstat/perf/火焰图/上下文切换/运行队列
+- **内存优化**：free/vmstat/sar/swap/页面缓存/大页内存（HugePages）/OOM Killer
+- **磁盘 I/O 优化**：iostat/iotop/调度器（cfq/deadline/noop/mq-deadline）/RAID/SSD 优化
+- **网络优化**：ss/netstat/tcpdump/连接数调优/内核参数（sysctl）/TCP 调优
+- **系统级调优**：ulimit/cgroup/NUMA/IRQ 亲和性/IRQ balance
+- **常用内核参数**：net.core.somaxconn/net.ipv4.tcp_tw_reuse/vm.swappiness 等
+- **性能优化清单与排查流程**
+
+</details>
+
+<details>
+<summary>Linux 网络工具</summary>
+
+- **网络诊断**：ip/ss/ping/traceroute/mtr/nslookup/dig
+- **流量分析**：tcpdump/wireshark/nethogs/iftop/nload
+- **连接管理**：nc/curl/telnet/ssh
+- **网络配置**：ip route/bridge/vlan/bonding/team
+- **DNS 工具**：dig/host/nslookup/resolvectl/systemd-resolved
+
+</details>
+
+<details>
+<summary>Shell 编程</summary>
+
+- **Shell 基础**：变量/字符串/数组/特殊变量（$?/$!/$$/$#/$@/$0）
+- **条件判断**：test/[/[[/case
+- **循环**：for/while/until/select/break/continue
+- **函数**：定义/参数/返回值/局部变量/递归
+- **文本处理三剑客**：grep（模式匹配/正则）/sed（流编辑/替换/删除/插入）/awk（字段处理/报表生成）
+- **重定向与管道**：stdin/stdout/stderr/here document/进程替换
+- **正则表达式**：BRE/ERE/常用模式/零宽断言
+- **脚本调试**：set -x/-e/-u/-o pipefail、trap 信号处理
+- **高级技巧**：并发执行（xargs/GNU parallel）/临时文件/安全编程
+- **Shell 编程风格与最佳实践**
+- **常用脚本模板**：日志轮转/备份/健康检查/批量部署
+
+</details>
+
+<details>
 <summary>网络协议</summary>
 
 - **TCP**：三次握手/四次挥手/滑动窗口/拥塞控制（慢启动/拥塞避免/快重传/快恢复）/流量控制
@@ -2027,6 +2104,55 @@
 </details>
 
 <details>
+<summary>K8s 核心组件详解</summary>
+
+- **API Server**：REST API 入口/认证（X509/Bearer Token/OIDC/Webhook）/授权（RBAC/ABAC/Node/Webhook）/准入控制（Admission Controller）/etcd 交互/高可用部署
+- **etcd**：分布式 KV 存储/RAFT 一致性协议/数据模型（revision/key-value）/备份恢复（etcdctl snapshot）/性能调优/集群运维（扩缩容/迁移）
+- **Scheduler**：调度流程（过滤→打分→绑定）/调度策略（NodeSelector/NodeAffinity/PodAffinity/Taint&Toleration/Priority&Preemption）/自定义调度器/调度框架（Scheduling Framework）
+- **Controller Manager**：控制器模式（Informer/Reflector/Indexer）/Deployment Controller/ReplicaSet Controller/Node Controller 工作原理
+- **kubelet**：Pod 生命周期管理/CRI 容器运行时接口/PLEG（Pod Lifecycle Event Generator）/探针（Liveness/Readiness/Startup）/资源上报/静态 Pod
+- **kube-proxy**：iptables 模式/IPVS 模式/userspace 模式/Service 发现与负载均衡/conntrack 表
+- **CoreDNS**：集群内 DNS 解析/Service 发现/自定义 DNS 配置/StubDomain/Upstream
+
+</details>
+
+<details>
+<summary>K8s 持久化存储</summary>
+
+- **Volume 类型**：emptyDir/hostPath/nfs/configMap/secret/downwardAPI
+- **PV 与 PVC**：生命周期（Available→Bound→Released）/回收策略（Retain/Delete/Recycle）/容量/访问模式（RWO/ROX/RWX）
+- **StorageClass**：动态供给/默认 StorageClass/参数配置/卷扩展（AllowVolumeExpansion）
+- **CSI（Container Storage Interface）**：架构设计（Node Plugin/Controller Plugin）/外部 Provisioner/Attacher/Resizer/常用 CSI 驱动
+- **常见存储方案**：
+  - 本地存储：local-path-provisioner/openebs-local
+  - 网络存储：NFS/Ceph RBD/CephFS/GlusterFS
+  - 云存储：AWS EBS/Azure Disk/GCE PD/阿里云云盘
+  - 分布式存储：Rook-Ceph/Longhorn/Vitastor
+- **持久化最佳实践**：StatefulSet + PVC/数据备份策略/存储选型/性能优化
+
+</details>
+
+<details>
+<summary>Prometheus 监控 K8s</summary>
+
+- **Prometheus 架构**：Server/Pushgateway/AlertManager/Exporters/Service Discovery
+- **K8s 集成方案**：
+  - Prometheus Operator：CRD（Prometheus/ServiceMonitor/PodMonitor/Alertmanager/PrometheusRule）
+  - kube-prometheus-stack：完整监控栈部署（Prometheus+Grafana+AlertManager+Node Exporter+kube-state-metrics）
+- **监控指标**：
+  - 节点指标：CPU/内存/磁盘/网络（node_exporter）
+  - Pod 指标：cAdvisor（容器 CPU/内存/网络/文件系统）
+  - 集群指标：kube-state-metrics（Deployment 状态/Pod 状态/资源请求与限制）
+  - etcd 指标：leader 变更/慢查询/磁盘性能
+  - API Server 指标：请求延迟/错误率/etcd 延迟
+- **告警规则**：节点宕机/Pod CrashLoopBackOff/资源超限/磁盘满/PVC 即将用尽
+- **Grafana 仪表盘**：集群概览/节点详情/Pod 详情/网络/存储
+- **自定义监控**：应用埋点（Prometheus client 库）/ServiceMonitor 配置
+- **长期存储**：Thanos/VictoriaMetrics/Cortex 远程写入方案
+
+</details>
+
+<details>
 <summary>Docker Swarm</summary>
 
 - 集群部署 / 节点管理 / 服务部署与扩缩容
@@ -2059,6 +2185,56 @@
 
 </details>
 
+#### 自动化运维
+
+<details>
+<summary>Puppet</summary>
+
+- **概述**：声明式配置管理/Agent-Master 架构/编译型（Catalog 预编译）
+- **安装部署**：Puppet Server/Puppet Agent/PuppetDB
+- **核心概念**：Manifest/Module/Class/Resource/Node/Facter（系统事实）
+- **资源类型**：file/package/service/user/cron/exec/notify/file_line
+- **模块开发**：目录结构（manifests/files/templates/lib/spec）/init.pp/params.pp
+- **Hiera 数据分离**：层次化数据/环境配置/加密数据（eyaml）/数据绑定
+- **Puppet DSL**：变量/条件/循环/模板（ERB/EPP）
+- **PuppetDB**：存储 Catalog/报告/事实/查询 API
+- **Puppet vs Ansible vs SaltStack 对比**
+
+</details>
+
+<details>
+<summary>Ansible</summary>
+
+- **概述**：无 Agent/SSH 推送/声明式 YAML/幂等性
+- **安装与配置**：pip/apt/yum/ansible.cfg/hosts 清单
+- **核心**：Inventory（静态/动态/Group/Host vars）/Module/Playbook/Role
+- **常用模块**：ping/shell/command/copy/template/file/yum/apt/service/systemd/user/git/docker_container
+- **Playbook**：任务/变量/条件（when）/循环（loop）/错误处理（block/rescue）/标签/触发器（handler）
+- **变量与模板**：Jinja2 模板/变量优先级/facts/注册变量/过滤器
+- **Role**：目录结构（tasks/handlers/templates/files/vars/defaults/meta）/依赖/ansible-galaxy
+- **高级**：Vault 加密/异步任务/策略（strategy）/回调插件/自定义模块
+- **AWX/Tower**：Web 管理界面/作业模板/工作流/RBAC
+- **实战**：批量部署 Web 服务/滚动更新/配置漂移检测
+
+</details>
+
+<details>
+<summary>SaltStack</summary>
+
+- **概述**：Agent（Minion）+ Master 架构/ZeroMQ 通信/高速执行
+- **安装部署**：salt-master/salt-minion/salt-syndic/多 Master
+- **核心概念**：State/Module/Pillar/Grains/Mine/Runner/Orchestrate
+- **目标匹配**：glob/PCRE/list/grain/pillar/compound/nodegroup
+- **State 系统**：SLS 文件/require/watch/onchanges/onfail/命名空间
+- **Pillar 数据**：加密变量/环境分离/数据渲染
+- **Grains**：系统信息采集/自定义 Grains
+- **Jinja 模板**：变量/条件/循环/宏/过滤器
+- **Salt SSH**：无 Agent 模式/roster 文件
+- **Salt API**：REST 推送/外部集成
+- **SaltStack vs Ansible vs Puppet 对比**
+
+</details>
+
 #### 基础设施
 
 <details>
@@ -2067,6 +2243,22 @@
 - **ES 集群**：节点角色（Master/Data/Coordinating）/分片与副本/集群健康状态/索引模板/ILM 生命周期管理
 - **Redis 运维**：主从复制/哨兵模式/Cluster 模式/内存优化/持久化（RDB/AOF）/慢查询监控/大 Key 治理
 - **监控系统集成**：Prometheus + Grafana + AlertManager 全链路监控
+
+</details>
+
+<details>
+<summary>ELK Stack</summary>
+
+- **Logstash**：安装配置/管道架构（input→filter→output）/Grok 模式/性能优化（pipeline.workers/batch.size）/多管道配置
+- **Kibana**：安装配置/Discover（日志搜索与过滤）/Visualize（图表创建）/Dashboard（仪表盘）/Dev Tools（ES 查询调试）/KQL 查询语法
+- **Filebeat**：轻量日志采集器/模块化配置（nginx/redis/mysql）/multiline 多行日志/与 Logstash/ES 直连/processors 处理器
+- **ELK 架构实践**：
+  - 方案1（标准）：Filebeat → Logstash → Elasticsearch → Kibana
+  - 方案2（轻量）：Filebeat → Elasticsearch → Kibana
+  - 方案3（缓冲）：Filebeat → Kafka → Logstash → Elasticsearch → Kibana
+- **索引生命周期管理（ILM）**：hot（rollover）→ warm（forcemerge/shrink）→ cold → delete
+- **集群规划**：Master/Data Hot/Data Warm/Data Cold/Coordinating 节点角色与规格
+- **替代方案**：EFK（Fluentd，K8s 生态常用）/Loki + Grafana（仅索引标签，存储成本低）
 
 </details>
 
@@ -2086,6 +2278,53 @@
 - **OVN**：OVS 集中式控制器；逻辑交换机（L2）/逻辑路由器（L3）/L2-L4 ACL/多种隧道封装（Geneve/STT/VXLAN）/Kube-OVN
 - **ovs-dpdk**：OVS + DPDK 用户态网络，绕过内核协议栈，极低延迟；编译 DPDK/大页内存配置/VFIO 设备绑定
 - **负载均衡**：四层（LVS/NAT/DR/TUN）/七层（Nginx Ingress Controller/HAProxy）；健康检查/会话保持/权重分配
+
+</details>
+
+<details>
+<summary>LVS（Linux Virtual Server）</summary>
+
+- **三种模式**：NAT（请求响应都经 Director）/DR（Direct Routing，响应直接返回）/TUN（IP 隧道封装，跨网段）
+- **IPVS 配置**：ipvsadm 命令（创建虚拟服务/添加 RS/查看规则/统计）
+- **调度算法**：rr/wrr/lc/wlc（推荐）/sh/dh/lblc/sed
+- **LVS + Keepalived 高可用**：Keepalived 管理 IPVS 规则/健康检查/主备切换
+
+</details>
+
+<details>
+<summary>HAProxy</summary>
+
+- **安装配置**：global/defaults/frontend/backend/listen 五段配置
+- **四层/七层代理**：TCP 模式（mysql/redis 代理）/HTTP 模式（Web 反向代理）
+- **ACL 规则**：path_beg/path_end/hdr/host/源 IP 匹配/use_backend 条件路由
+- **负载均衡算法**：roundrobin/static-rr/leastconn/source/uri
+- **健康检查**：option httpchk/TCP_CHECK/自定义检查脚本
+- **统计页面**：listen stats/stats enable/stats uri
+- **SSL 终结**：bind *:443 ssl crt/crl-file
+
+</details>
+
+<details>
+<summary>Nginx（负载均衡与反向代理）</summary>
+
+- **反向代理**：proxy_pass/proxy_set_header/proxy_buffering/proxy_connect_timeout
+- **负载均衡**：upstream/权重/backup/max_fails/fail_timeout/keepalive
+- **负载均衡算法**：轮询（默认）/least_conn/ip_hash/hash
+- **性能调优**：worker_processes/worker_connections/sendfile/tcp_nopush/gzip/open_file_cache
+- **安全配置**：SSL/TLS/限流（limit_req）/安全头部（X-Frame-Options/HSTS）
+- **平滑升级**：kill -USR2/kill -WINCH/回滚
+
+</details>
+
+<details>
+<summary>Keepalived</summary>
+
+- **VRRP 协议**：虚拟路由冗余协议/Master-Backup 选举/VIP 漂移
+- **配置**：global_defs/vrrp_instance/vrrp_script/virtual_ipaddress
+- **健康检查脚本**：track_script/weight/fall/rise
+- **与 LVS 集成**：virtual_server/real_server/TCP_CHECK
+- **与 HAProxy/Nginx 集成**：vrrp_script 检测进程状态/自动故障切换
+- **架构选型对比**：LVS（四层极高并发）vs HAProxy（四七层混合）vs Nginx（七层 HTTP 代理）
 
 </details>
 

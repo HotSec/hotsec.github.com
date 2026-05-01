@@ -20,6 +20,7 @@
   --h4-color:#ff9e64;--h5-color:#bb9af7;--h6-color:#7dcfff;
   --modal-overlay:rgba(0,0,0,0.6);
   --link-color:rgba(108,180,238,0.25);
+  --bubble-fill-opacity:0.15;
 }
 [data-theme="light"]{
   --bg:#f5f7fb;--bg-secondary:#ffffff;--bg-tertiary:#eef1f6;
@@ -31,6 +32,7 @@
   --h4-color:#e07830;--h5-color:#8b6cc0;--h6-color:#2ba8c9;
   --modal-overlay:rgba(255,255,255,0.75);
   --link-color:rgba(74,124,247,0.2);
+  --bubble-fill-opacity:0.12;
 }
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);overflow:hidden;transition:background .3s,color .3s}
 ::-webkit-scrollbar{width:6px;height:6px}
@@ -58,13 +60,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 #mindmap-svg:active{cursor:grabbing}
 .mindmap-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:14px}
 
-.node-circle{cursor:pointer;transition:r .2s,fill .2s,stroke .2s}
-.node-group:hover .node-circle{filter:brightness(1.3) drop-shadow(0 0 6px currentColor)}
-.node-text{fill:var(--text);pointer-events:none;transition:fill .3s;paint-order:stroke;stroke:var(--bg);stroke-width:3px;stroke-linejoin:round}
-.link-path{fill:none;stroke-width:1.5;transition:stroke .3s}
-.root-pulse{animation:pulse 2.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{r:14;opacity:1}50%{r:17;opacity:0.7}}
-.fold-count{fill:var(--text-bright);font-size:8px;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.node-group{cursor:pointer}
+.node-group:hover .node-bubble{filter:brightness(1.2)}
+.node-bubble{transition:filter .2s}
+.node-bubble-text{fill:var(--text-bright);pointer-events:none;dominant-baseline:central;transition:fill .3s}
+.fold-badge{fill:var(--text-dim);font-size:8px;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:central}
+.link-path{fill:none;stroke-width:1.5;pointer-events:none}
 
 .modal-overlay{position:fixed;inset:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade-in .2s ease}
 .modal-overlay.active{display:flex}
@@ -156,7 +157,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   <div class="mindmap-wrap">
     <svg id="mindmap-svg"></svg>
     <div class="mindmap-loading" id="loading">加载中...</div>
-    <div class="hint" id="hint">点击节点查看详情，点击圆圈展开/折叠</div>
+    <div class="hint" id="hint">点击气泡查看详情或展开/折叠</div>
   </div>
 
   <div class="statusbar">
@@ -349,13 +350,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     return [(y = +y) * Math.cos(x -= Math.PI / 2), y * Math.sin(x)];
   }
 
-  function getTextOffset(d){
-    if(d.depth === 0) return 0;
-    return Math.max(14, 22 - d.depth * 3);
-  }
-
   function truncateText(name, depth){
-    var maxLen = depth <= 1 ? 14 : 10;
+    var maxLen = depth <= 0 ? 20 : depth === 1 ? 12 : 8;
     return name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
   }
 
@@ -368,16 +364,23 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     return count;
   }
 
+  function hexToRgba(hex, alpha){
+    var r = parseInt(hex.slice(1,3), 16);
+    var g = parseInt(hex.slice(3,5), 16);
+    var b = parseInt(hex.slice(5,7), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
   function update(source){
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
     var nodeCount = rootHierarchy.descendants().length;
-    var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 3.5);
+    var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 5);
 
     var treeLayout = d3.tree()
       .size([2 * Math.PI, radius])
       .separation(function(a, b){
-        return (a.parent === b.parent ? 1.5 : 3) / Math.max(a.depth, 1);
+        return (a.parent === b.parent ? 2 : 4) / Math.max(a.depth, 1);
       });
 
     var root = treeLayout(rootHierarchy);
@@ -390,113 +393,138 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       d.py = p[1];
     });
 
+    var sourceP = radialPoint(source.x, source.y);
+
     var linkSel = gEl.selectAll('.link-path')
       .data(links, function(d){ return d.target.data.name + d.target.depth; });
 
-    linkSel.exit().transition().duration(duration)
-      .attr('opacity', 0).remove();
+    linkSel.exit().transition().duration(duration * 0.6)
+      .ease(d3.easeBackIn)
+      .attr('d', function(d){
+        return d3.linkRadial().angle(function(dd){ return dd.x; }).radius(function(dd){ return dd.y; })({
+          source: d.source, target: d.source
+        });
+      })
+      .attr('opacity', 0)
+      .remove();
 
     var linkEnter = linkSel.enter().append('path')
       .attr('class', 'link-path')
       .attr('opacity', 0)
       .attr('d', function(d){
-        var sp = radialPoint(source.x0 || 0, source.y0 || 0);
         return d3.linkRadial().angle(function(dd){ return dd.x; }).radius(function(dd){ return dd.y; })({
-          source: {x: source.x0 || 0, y: source.y0 || 0},
-          target: {x: source.x0 || 0, y: source.y0 || 0}
+          source: d.source, target: d.source
         });
       });
 
     linkEnter.merge(linkSel)
       .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
       .attr('opacity', 1)
       .attr('d', d3.linkRadial().angle(function(d){ return d.x; }).radius(function(d){ return d.y; }))
       .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.35);
+      .attr('stroke-opacity', 0.3);
 
     var nodeSel = gEl.selectAll('.node-group')
       .data(nodes, function(d){ return d.data.name + d.depth; });
 
-    nodeSel.exit().transition().duration(duration)
-      .attr('transform', function(){
-        var p = radialPoint(source.x, source.y);
-        return 'translate(' + p[0] + ',' + p[1] + ')';
-      })
-      .attr('opacity', 0).remove();
+    nodeSel.exit().transition().duration(duration * 0.6)
+      .ease(d3.easeBackIn)
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0)
+      .remove();
 
     var nodeEnter = nodeSel.enter().append('g')
       .attr('class', 'node-group')
-      .attr('transform', function(){
-        var p = radialPoint(source.x0 || 0, source.y0 || 0);
-        return 'translate(' + p[0] + ',' + p[1] + ')';
-      })
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
       .attr('opacity', 0);
 
-    nodeEnter.append('circle').attr('class', 'node-circle');
-    nodeEnter.append('text').attr('class', 'node-text');
-    nodeEnter.append('text').attr('class', 'fold-count');
+    nodeEnter.append('rect').attr('class', 'node-bubble');
+    nodeEnter.append('text').attr('class', 'node-bubble-text');
+    nodeEnter.append('text').attr('class', 'fold-badge');
 
-    var nodeUpdate = nodeEnter.merge(nodeSel);
-
-    nodeUpdate.transition().duration(duration)
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ')'; })
+    nodeEnter.transition().duration(duration)
+      .ease(d3.easeBackOut)
+      .delay(function(d){ return d.depth * 60; })
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
       .attr('opacity', 1);
 
-    nodeUpdate.select('.node-circle')
-      .attr('class', function(d){
-        return 'node-circle' + (d.depth === 0 ? ' root-pulse' : '');
-      })
-      .transition().duration(duration)
-      .attr('r', function(d){
-        if(d.depth === 0) return 14;
-        if(d._children) return 8;
-        if(d.children) return 7;
-        return 4;
-      })
-      .attr('fill', function(d){
-        if(d._children) return 'var(--bg-secondary)';
-        return getNodeColor(d);
-      })
-      .attr('stroke', function(d){ return getNodeColor(d); })
-      .attr('stroke-width', function(d){
-        if(d.depth === 0) return 3;
-        if(d._children) return 2.5;
-        return 2;
-      });
+    var nodeUpdate = nodeSel;
 
-    nodeUpdate.select('.node-text')
-      .attr('dy', function(d){ return d.depth === 0 ? '-22px' : '0.35em'; })
-      .attr('x', function(d){
-        if(d.depth === 0) return 0;
-        var angle = (d.x * 180 / Math.PI) % 360;
-        var offset = getTextOffset(d);
-        return angle > 90 && angle < 270 ? -offset : offset;
-      })
-      .attr('text-anchor', function(d){
-        if(d.depth === 0) return 'middle';
-        var angle = (d.x * 180 / Math.PI) % 360;
-        return angle > 90 && angle < 270 ? 'end' : 'start';
-      })
-      .attr('font-size', function(d){
-        if(d.depth === 0) return '16px';
-        if(d.depth === 1) return '13px';
-        if(d.depth === 2) return '11px';
-        return '10px';
-      })
-      .attr('font-weight', function(d){
-        return d.depth <= 1 ? '700' : '400';
-      })
-      .text(function(d){ return truncateText(d.data.name, d.depth); });
+    nodeUpdate.transition().duration(duration)
+      .ease(d3.easeCubicOut)
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
 
-    nodeUpdate.select('.fold-count')
-      .attr('dy', '0.35em')
-      .attr('font-size', function(d){ return d.depth === 0 ? '10px' : '8px'; })
-      .text(function(d){
-        if(!d._children) return '';
-        return countDescendants(d._children);
-      });
+    var allNodes = nodeEnter.merge(nodeUpdate);
 
-    nodeUpdate.on('click', function(e, d){
+    allNodes.each(function(d){
+      var g = d3.select(this);
+      var colorHex = getNodeColorHex(d);
+      var isFolded = !!d._children;
+      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 12 : d.depth === 2 ? 11 : 10;
+      var text = truncateText(d.data.name, d.depth);
+      var paddingH = d.depth === 0 ? 14 : 10;
+      var paddingV = d.depth === 0 ? 8 : 5;
+      var rx = d.depth === 0 ? 10 : 6;
+      var angle = (d.x * 180 / Math.PI) % 360;
+      var isRight = !(angle > 90 && angle < 270);
+      var anchor = d.depth === 0 ? 'middle' : (isRight ? 'start' : 'end');
+
+      var textEl = g.select('.node-bubble-text');
+      textEl
+        .attr('font-size', fontSize + 'px')
+        .attr('font-weight', d.depth <= 1 ? '700' : '400')
+        .attr('text-anchor', anchor)
+        .text(text);
+
+      var bbox;
+      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {width: text.length * fontSize * 0.6, height: fontSize}; }
+
+      var bw = bbox.width + paddingH * 2;
+      var bh = bbox.height + paddingV * 2;
+      var rectX, textX;
+
+      if(d.depth === 0){
+        rectX = -bw / 2;
+        textX = 0;
+      } else if(isRight){
+        rectX = -paddingH;
+        textX = -paddingH + paddingH / 2;
+      } else {
+        rectX = -bw + paddingH;
+        textX = bw - paddingH - paddingH / 2;
+      }
+
+      g.select('.node-bubble')
+        .attr('x', rectX)
+        .attr('y', -bh / 2)
+        .attr('width', bw)
+        .attr('height', bh)
+        .attr('rx', rx)
+        .attr('ry', rx)
+        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : 0.15))
+        .attr('stroke', colorHex)
+        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
+        .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
+
+      textEl.attr('x', textX).attr('y', 0);
+
+      var badge = g.select('.fold-badge');
+      if(isFolded){
+        var count = countDescendants(d._children);
+        var badgeX = isRight ? rectX + bw - 10 : rectX + 10;
+        badge
+          .attr('x', badgeX)
+          .attr('y', -bh / 2 + 8)
+          .attr('text-anchor', isRight ? 'end' : 'start')
+          .text(count);
+      } else {
+        badge.text('');
+      }
+    });
+
+    allNodes.on('click', function(e, d){
       e.stopPropagation();
       if(d.children || d._children){
         toggleNode(d);
@@ -518,8 +546,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
     var nodeCount = rootHierarchy.descendants().length;
-    var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 3.5);
-    var scale = Math.min(width, height) / 2 / (radius + 80);
+    var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 5);
+    var scale = Math.min(width, height) / 2 / (radius + 100);
     scale = Math.min(scale, 1.5);
     svg.transition().duration(500).call(
       zoom.transform,
