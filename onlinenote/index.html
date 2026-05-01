@@ -55,8 +55,21 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 [data-theme="light"] .btn .icon-sun{display:block}
 [data-theme="light"] .btn .icon-moon{display:none}
 
-.layout-switcher{display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary)}
-.layout-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:none;border-radius:6px;background:transparent;color:var(--text-dim);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.search-wrap{position:relative;display:flex;align-items:center}
+.search-input{width:180px;padding:5px 10px 5px 28px;border:1px solid var(--border);border-radius:6px;background:var(--bg-tertiary);color:var(--text);font-size:12px;outline:none;transition:all .2s}
+.search-input:focus{border-color:var(--accent);background:var(--bg-secondary);width:240px}
+.search-input::placeholder{color:var(--text-dim)}
+.search-icon{position:absolute;left:8px;width:14px;height:14px;fill:var(--text-dim);pointer-events:none}
+.search-dropdown{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;max-height:300px;overflow-y:auto;display:none;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.search-dropdown.show{display:block}
+.search-item{padding:8px 12px;cursor:pointer;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px;transition:background .15s}
+.search-item:hover{background:var(--highlight-bg);color:var(--accent)}
+.search-item-level{font-size:10px;padding:1px 6px;border-radius:4px;background:var(--bg-tertiary);color:var(--text-dim);flex-shrink:0}
+.search-item-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.search-empty{padding:12px;text-align:center;color:var(--text-dim);font-size:12px}
+
+.layout-switcher{display:flex;align-items:center;gap:1px;padding:2px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary)}
+.layout-btn{display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border:none;border-radius:6px;background:transparent;color:var(--text-dim);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
 .layout-btn:hover{color:var(--text);background:var(--highlight-bg)}
 .layout-btn.active{background:var(--accent);color:#fff;font-weight:600}
 .layout-btn svg{width:14px;height:14px;fill:currentColor}
@@ -68,17 +81,21 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
 .node-group{cursor:pointer}
 .node-group:hover .node-bubble{filter:brightness(1.2)}
+.node-group.search-highlight .node-bubble{stroke-width:3;filter:drop-shadow(0 0 6px var(--accent))}
 .node-bubble{transition:filter .2s}
 .node-bubble-text{fill:var(--text-bright);pointer-events:none;dominant-baseline:central;transition:fill .3s}
 .fold-badge{fill:var(--text-dim);font-size:8px;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:central}
 .link-path{fill:none;stroke-width:1.5;pointer-events:none}
 .bracket-path{fill:none;stroke-width:2;pointer-events:none;stroke-linecap:round}
+.sketch-path{fill:none;stroke-width:2;pointer-events:none;stroke-linecap:round;stroke-linejoin:round}
+.sketch-bubble{transition:filter .2s}
 
 .modal-overlay{position:fixed;inset:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade-in .2s ease}
 .modal-overlay.active{display:flex}
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
 
-.modal{width:90%;max-width:860px;max-height:85vh;background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modal-in .25s ease;transition:background .3s}
+.modal{width:90%;max-width:860px;max-height:85vh;background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modal-in .25s ease;transition:background .3s,width .3s,height .3s,max-width .3s,max-height .3s,border-radius .3s}
+.modal.fullscreen{width:100%;max-width:100%;max-height:100vh;height:100vh;border-radius:0}
 @keyframes modal-in{from{opacity:0;transform:translateY(20px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 .modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -87,10 +104,16 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .modal-breadcrumb-item:hover{color:var(--accent)}
 .modal-breadcrumb-sep{color:var(--border);margin:0 2px}
 .modal-breadcrumb-current{color:var(--accent);font-weight:500}
-.modal-close{width:32px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--bg-tertiary);color:var(--text-dim);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;margin-left:12px}
+.modal-actions{display:flex;align-items:center;gap:4px;margin-left:12px;flex-shrink:0}
+.modal-action-btn{width:32px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--bg-tertiary);color:var(--text-dim);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-action-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--highlight-bg)}
+.modal-action-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-close{width:32px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--bg-tertiary);color:var(--text-dim);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;margin-left:4px}
 .modal-close:hover{border-color:var(--accent);color:var(--accent);background:var(--highlight-bg)}
 
-.modal-body{flex:1;overflow-y:auto;padding:20px 24px}
+.modal-body{flex:1;overflow-y:auto;padding:20px 24px;position:relative}
+.modal-edit-area{width:100%;height:100%;min-height:400px;background:var(--bg-tertiary);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:"SF Mono","Fira Code","Cascadia Code",monospace;font-size:13px;line-height:1.6;resize:none;outline:none;tab-size:2}
+.modal-edit-area:focus{border-color:var(--accent)}
 
 .markdown-body{max-width:780px}
 .markdown-body h1{color:var(--h1-color);font-size:1.8em;border-bottom:1px solid var(--border);padding-bottom:8px;margin:20px 0 12px}
@@ -118,6 +141,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .markdown-body details[open] summary{border-bottom:1px solid var(--border)}
 .markdown-body details>div,.markdown-body details>p{padding:8px 12px}
 
+.save-toast{position:absolute;top:12px;right:12px;background:var(--h3-color);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none}
+.save-toast.show{opacity:1}
+
 .statusbar{display:flex;align-items:center;padding:4px 16px;background:var(--bg-secondary);border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);flex-shrink:0;min-height:28px;gap:16px;transition:background .3s}
 .statusbar-item{display:flex;align-items:center;gap:4px}
 .statusbar-dot{width:6px;height:6px;border-radius:50%;background:var(--h3-color)}
@@ -129,6 +155,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   .modal{width:96%;max-height:90vh;border-radius:8px}
   .toolbar-right .btn span{display:none}
   .layout-btn span{display:none}
+  .search-input{width:120px}
+  .search-input:focus{width:160px}
 }
 </style>
 </head>
@@ -137,6 +165,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   <div class="toolbar">
     <div class="toolbar-left">
       <div class="toolbar-title"><span>◉</span> 知识图谱</div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input class="search-input" id="search-input" placeholder="搜索标题..." />
+        <div class="search-dropdown" id="search-dropdown"></div>
+      </div>
     </div>
     <div class="toolbar-right">
       <div class="layout-switcher" id="layout-switcher">
@@ -144,13 +177,17 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           <svg viewBox="0 0 24 24"><path d="M3 3h4v2H5v14h2v2H3V3zm14 0h4v18h-4v-2h2V5h-2V3zM8 8h2v8H8V8zm3 0h2v8h-2V8zm3 0h2v8h-2V8z"/></svg>
           <span>括号</span>
         </button>
-        <button class="layout-btn" data-layout="tree" title="树形图">
-          <svg viewBox="0 0 24 24"><path d="M22 11V3h-7v3H9V3H2v8h7V8h2v10h2v6h7v-8h-7v2h-2V8h2v3h7z"/></svg>
-          <span>树形</span>
+        <button class="layout-btn" data-layout="tree" title="鱼骨图">
+          <svg viewBox="0 0 24 24"><path d="M12 2v20M7 7l-4 5 4 5M17 7l4 5-4 5M7 12h10M3 12H1M23 12h-2M7 7V5M7 17v2M17 7V5M17 17v2"/></svg>
+          <span>鱼骨</span>
         </button>
         <button class="layout-btn" data-layout="bubble" title="气泡图">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
           <span>气泡</span>
+        </button>
+        <button class="layout-btn" data-layout="sketch" title="手绘风格">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          <span>手绘</span>
         </button>
       </div>
       <button class="btn" id="btn-theme" title="切换主题">
@@ -179,7 +216,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   <div class="mindmap-wrap">
     <svg id="mindmap-svg"></svg>
     <div class="mindmap-loading" id="loading">加载中...</div>
-    <div class="hint" id="hint">点击节点查看详情或展开/折叠</div>
+    <div class="hint" id="hint">单击展开/折叠，双击查看详情</div>
   </div>
 
   <div class="statusbar">
@@ -189,13 +226,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 </div>
 
 <div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
+  <div class="modal" id="modal">
     <div class="modal-header">
       <div class="modal-breadcrumb" id="modal-breadcrumb"></div>
+      <div class="modal-actions">
+        <button class="modal-action-btn" id="btn-fullscreen" title="全屏">⛶</button>
+        <button class="modal-action-btn" id="btn-edit" title="编辑">✎</button>
+      </div>
       <button class="modal-close" id="modal-close" title="关闭">✕</button>
     </div>
     <div class="modal-body" id="modal-body">
       <div class="markdown-body" id="markdown-body"></div>
+      <textarea class="modal-edit-area" id="modal-edit-area" style="display:none"></textarea>
+      <div class="save-toast" id="save-toast">已保存</div>
     </div>
   </div>
 </div>
@@ -207,6 +250,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   var svgEl, gEl, zoom, rootHierarchy, treeData;
   var duration = 500;
   var currentLayout = localStorage.getItem('mindmap-layout') || 'bracket';
+  var isEditing = false;
+  var currentEditSlug = '';
+  var highlightedSlug = null;
+  var clickTimers = {};
 
   var branchColors = ['#e0af68','#6cb4ee','#9ece6a','#ff9e64','#bb9af7','#7dcfff','#f7768e','#73daca'];
 
@@ -235,11 +282,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
   function buildHeadingTree(hdgs){
     var rootName = '知识点总结';
+    var rootSlug = 'root';
     if(hdgs.length > 0 && hdgs[0].level === 1){
       rootName = hdgs[0].text;
+      rootSlug = hdgs[0].slug;
       hdgs = hdgs.slice(1);
     }
-    var root = {name: rootName, slug: '', level: 0, children: []};
+    var root = {name: rootName, slug: rootSlug, level: 0, children: []};
     var stack = [root];
     hdgs.forEach(function(h){
       var node = {name: h.text, slug: h.slug, level: h.level, children: []};
@@ -253,6 +302,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function getSectionContent(slug){
+    if(slug === treeData.slug){
+      return markdownText;
+    }
     var heading = headings.find(function(h){ return h.slug === slug; });
     if(!heading) return '';
     var startLine = heading.line;
@@ -277,21 +329,39 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     return marked.parse(section);
   }
 
+  function getSectionMarkdown(slug){
+    if(slug === treeData.slug){
+      return markdownText;
+    }
+    var heading = headings.find(function(h){ return h.slug === slug; });
+    if(!heading) return '';
+    var startLine = heading.line;
+    var endLine = markdownText.split('\n').length;
+    for(var i = 0; i < headings.length; i++){
+      if(headings[i].line > startLine && headings[i].level <= heading.level){
+        endLine = headings[i].line;
+        break;
+      }
+    }
+    return markdownText.split('\n').slice(startLine, endLine).join('\n');
+  }
+
   function findPathToSlug(targetSlug){
     var path = [];
-    function find(nodes, current){
-      for(var i = 0; i < nodes.length; i++){
-        var n = nodes[i];
-        var newPath = current.concat([{text: n.name, slug: n.slug}]);
-        if(n.slug === targetSlug){
-          path = newPath;
-          return true;
+    function find(node, current){
+      var newPath = current.concat([{text: node.name, slug: node.slug}]);
+      if(node.slug === targetSlug){
+        path = newPath;
+        return true;
+      }
+      if(node.children){
+        for(var i = 0; i < node.children.length; i++){
+          if(find(node.children[i], newPath)) return true;
         }
-        if(n.children && find(n.children, newPath)) return true;
       }
       return false;
     }
-    find(treeData.children, []);
+    find(treeData, []);
     return path;
   }
 
@@ -301,6 +371,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var bc = document.getElementById('modal-breadcrumb');
     var content = getSectionContent(slug);
     body.querySelector('.markdown-body').innerHTML = content;
+    body.querySelector('.markdown-body').style.display = '';
+    body.querySelector('.modal-edit-area').style.display = 'none';
+    isEditing = false;
+    currentEditSlug = slug;
+    document.getElementById('btn-edit').classList.remove('active');
+    document.getElementById('btn-edit').innerHTML = '✎';
     var path = findPathToSlug(slug);
     var bcHTML = '';
     path.forEach(function(p, i){
@@ -317,10 +393,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     body.scrollTop = 0;
     var heading = headings.find(function(h){ return h.slug === slug; });
     if(heading) document.getElementById('status-path').textContent = heading.text;
+    else if(slug === treeData.slug) document.getElementById('status-path').textContent = treeData.name;
   }
 
   function hideModal(){
     document.getElementById('modal-overlay').classList.remove('active');
+    var modal = document.getElementById('modal');
+    modal.classList.remove('fullscreen');
+    document.getElementById('btn-fullscreen').innerHTML = '⛶';
+    if(isEditing){
+      isEditing = false;
+      document.getElementById('btn-edit').classList.remove('active');
+      document.getElementById('btn-edit').innerHTML = '✎';
+    }
   }
 
   function getNodeColor(d){
@@ -374,6 +459,25 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     update(d);
   }
 
+  function expandPathToNode(targetSlug){
+    function expand(node){
+      if(node.data.slug === targetSlug) return true;
+      var kids = node.children || node._children;
+      if(!kids) return false;
+      for(var i = 0; i < kids.length; i++){
+        if(expand(kids[i])){
+          if(node._children){
+            node.children = node._children;
+            node._children = null;
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+    expand(rootHierarchy);
+  }
+
   function radialPoint(x, y){
     return [(y = +y) * Math.cos(x -= Math.PI / 2), y * Math.sin(x)];
   }
@@ -399,10 +503,79 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   }
 
+  function jitter(val, amount){
+    return val + (Math.random() - 0.5) * amount;
+  }
+
+  function sketchRect(x, y, w, h, rx){
+    var pts = [
+      [jitter(x, 1.5), jitter(y, 1.5)],
+      [jitter(x + w, 1.5), jitter(y, 1.5)],
+      [jitter(x + w, 1.5), jitter(y + h, 1.5)],
+      [jitter(x, 1.5), jitter(y + h, 1.5)]
+    ];
+    var d = 'M' + pts[0][0] + ',' + pts[0][1];
+    for(var i = 1; i <= 4; i++){
+      var curr = pts[i % 4];
+      var next = pts[(i + 1) % 4];
+      var cpx = (curr[0] + next[0]) / 2 + (Math.random() - 0.5) * 2;
+      var cpy = (curr[1] + next[1]) / 2 + (Math.random() - 0.5) * 2;
+      d += ' Q' + jitter(curr[0], 1) + ',' + jitter(curr[1], 1) + ' ' + cpx + ',' + cpy;
+    }
+    d += ' Q' + jitter(pts[0][0], 1) + ',' + jitter(pts[0][1], 1) + ' ' + pts[0][0] + ',' + pts[0][1];
+    return d;
+  }
+
+  function sketchLine(x1, y1, x2, y2, segments){
+    segments = segments || 3;
+    var d = 'M' + jitter(x1, 1) + ',' + jitter(y1, 1);
+    for(var i = 1; i <= segments; i++){
+      var t = i / segments;
+      var px = x1 + (x2 - x1) * t;
+      var py = y1 + (y2 - y1) * t;
+      d += ' L' + jitter(px, 1.5) + ',' + jitter(py, 1.5);
+    }
+    return d;
+  }
+
   function update(source){
     if(currentLayout === 'bracket') updateBracket(source);
     else if(currentLayout === 'tree') updateTree(source);
+    else if(currentLayout === 'sketch') updateSketch(source);
     else updateBubble(source);
+  }
+
+  function bindNodeEvents(allNodes){
+    allNodes.on('click', function(e, d){
+      e.stopPropagation();
+      var id = d.data.slug || d.data.name;
+      if(clickTimers[id]){
+        clearTimeout(clickTimers[id]);
+        delete clickTimers[id];
+        return;
+      }
+      clickTimers[id] = setTimeout(function(){
+        delete clickTimers[id];
+        if(d.children || d._children){
+          toggleNode(d);
+        } else if(d.data.slug){
+          showModal(d.data.slug);
+        }
+      }, 250);
+    });
+
+    allNodes.on('dblclick', function(e, d){
+      e.stopPropagation();
+      e.preventDefault();
+      var id = d.data.slug || d.data.name;
+      if(clickTimers[id]){
+        clearTimeout(clickTimers[id]);
+        delete clickTimers[id];
+      }
+      if(d.data.slug){
+        showModal(d.data.slug);
+      }
+    });
   }
 
   function updateBracket(source){
@@ -426,39 +599,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
     gEl.selectAll('.link-path').remove();
     gEl.selectAll('.bracket-path').remove();
-
-    var bracketSel = gEl.selectAll('.bracket-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
-
-    bracketSel.exit().transition().duration(duration * 0.6)
-      .attr('opacity', 0)
-      .remove();
-
-    var bracketEnter = bracketSel.enter().append('path')
-      .attr('class', 'bracket-path')
-      .attr('opacity', 0);
-
-    bracketEnter.merge(bracketSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', function(d){
-        var sx = d.source.px, sy = d.source.py;
-        var tx = d.target.px, ty = d.target.py;
-        var jx = sx + 40;
-        var r = 6;
-        var dy = ty - sy;
-        if(Math.abs(dy) < r * 2) r = Math.max(Math.abs(dy) / 2, 0);
-        var dir = dy >= 0 ? 1 : -1;
-        return 'M' + sx + ',' + sy
-          + ' H' + (jx - r)
-          + ' Q' + jx + ',' + sy + ' ' + jx + ',' + (sy + r * dir)
-          + ' V' + (ty - r * dir)
-          + ' Q' + jx + ',' + ty + ' ' + (jx + r) + ',' + ty
-          + ' H' + tx;
-      })
-      .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.5);
+    gEl.selectAll('.sketch-path').remove();
 
     var nodeSel = gEl.selectAll('.node-group')
       .data(nodes, function(d){ return d.data.name + d.depth; });
@@ -503,6 +644,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var paddingV = d.depth === 0 ? 8 : 5;
       var rx = d.depth === 0 ? 10 : 6;
 
+      g.classed('search-highlight', d.data.slug === highlightedSlug);
+
       var textEl = g.select('.node-bubble-text');
       textEl
         .attr('font-size', fontSize + 'px')
@@ -517,6 +660,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
       var bw = bbox.width + paddingH * 2;
       var bh = bbox.height + paddingV * 2;
+
+      d._bracketBubbleW = bw;
+      d._bracketBubbleH = bh;
+      d._bracketBubbleX = bbox.x - paddingH;
 
       g.select('.node-bubble')
         .attr('x', bbox.x - paddingH)
@@ -545,14 +692,42 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       }
     });
 
-    allNodes.on('click', function(e, d){
-      e.stopPropagation();
-      if(d.children || d._children){
-        toggleNode(d);
-      } else if(d.data.slug){
-        showModal(d.data.slug);
-      }
-    });
+    bindNodeEvents(allNodes);
+
+    var bracketSel = gEl.selectAll('.bracket-path')
+      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+
+    bracketSel.exit().transition().duration(duration * 0.6)
+      .attr('opacity', 0)
+      .remove();
+
+    var bracketEnter = bracketSel.enter().append('path')
+      .attr('class', 'bracket-path')
+      .attr('opacity', 0);
+
+    bracketEnter.merge(bracketSel)
+      .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
+      .attr('opacity', 1)
+      .attr('d', function(d){
+        var sx = d.source.px, sy = d.source.py;
+        var tx = d.target.px, ty = d.target.py;
+        var srcRight = sx + (d.source._bracketBubbleX || 0) + (d.source._bracketBubbleW || 60) + 4;
+        var tgtLeft = tx + (d.target._bracketBubbleX || 0) - 4;
+        var jx = (srcRight + tgtLeft) / 2;
+        var r = 6;
+        var dy = ty - sy;
+        if(Math.abs(dy) < r * 2) r = Math.max(Math.abs(dy) / 2, 0);
+        var dir = dy >= 0 ? 1 : -1;
+        return 'M' + srcRight + ',' + sy
+          + ' H' + (jx - r)
+          + ' Q' + jx + ',' + sy + ' ' + jx + ',' + (sy + r * dir)
+          + ' V' + (ty - r * dir)
+          + ' Q' + jx + ',' + ty + ' ' + (jx + r) + ',' + ty
+          + ' H' + tgtLeft;
+      })
+      .attr('stroke', function(d){ return getNodeColor(d.source); })
+      .attr('stroke-opacity', 0.5);
 
     nodes.forEach(function(d){
       d.x0 = d.x;
@@ -566,54 +741,72 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
 
-    var nodeSizeH = 36;
-    var nodeSizeW = 200;
+    var levelGap = 100;
+    var leafGap = 36;
 
-    var treeLayout = d3.tree().nodeSize([nodeSizeH, nodeSizeW]);
-    var root = treeLayout(rootHierarchy);
+    var root = rootHierarchy;
     var nodes = root.descendants();
     var links = root.links();
 
     nodes.forEach(function(d){
-      d.px = d.y;
-      d.py = d.x;
+      d._fishSide = null;
+      d._fishLeafIdx = 0;
     });
 
-    var sourceP = [source.y0 || 0, source.x0 || 0];
+    var leftLeaves = [];
+    var rightLeaves = [];
+
+    function assignFishLayout(node, side, depth){
+      if(depth === 0){
+        node.px = 0;
+        node.py = 0;
+        if(node.children){
+          var half = Math.ceil(node.children.length / 2);
+          node.children.forEach(function(child, i){
+            var s = i < half ? 'left' : 'right';
+            assignFishLayout(child, s, depth + 1);
+          });
+        }
+      } else {
+        node._fishSide = side;
+        if(!node.children || node.children.length === 0){
+          var arr = side === 'left' ? leftLeaves : rightLeaves;
+          node._fishLeafIdx = arr.length;
+          arr.push(node);
+        } else {
+          node.children.forEach(function(child){
+            assignFishLayout(child, side, depth + 1);
+          });
+        }
+        node.px = (side === 'left' ? -1 : 1) * depth * levelGap;
+        node.py = 0;
+      }
+    }
+
+    assignFishLayout(root, null, 0);
+
+    var maxLeaves = Math.max(leftLeaves.length, rightLeaves.length, 1);
+    leftLeaves.forEach(function(leaf, i){
+      leaf.py = -(maxLeaves - 1) * leafGap / 2 + i * leafGap;
+    });
+    rightLeaves.forEach(function(leaf, i){
+      leaf.py = -(maxLeaves - 1) * leafGap / 2 + i * leafGap;
+    });
+
+    function propagateY(node){
+      if(node.children && node.children.length > 0){
+        node.children.forEach(propagateY);
+        var ys = node.children.map(function(c){ return c.py; });
+        node.py = (d3.min(ys) + d3.max(ys)) / 2;
+      }
+    }
+    if(root.children) root.children.forEach(propagateY);
+
+    var sourceP = [source.px0 || 0, source.py0 || 0];
 
     gEl.selectAll('.bracket-path').remove();
-
-    var linkSel = gEl.selectAll('.link-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
-
-    linkSel.exit().transition().duration(duration * 0.6)
-      .ease(d3.easeBackIn)
-      .attr('d', function(d){
-        return 'M' + d.source.px + ',' + d.source.py + 'L' + d.source.px + ',' + d.source.py;
-      })
-      .attr('opacity', 0)
-      .remove();
-
-    var linkEnter = linkSel.enter().append('path')
-      .attr('class', 'link-path')
-      .attr('opacity', 0)
-      .attr('d', function(d){
-        return 'M' + d.source.px + ',' + d.source.py + 'L' + d.source.px + ',' + d.source.py;
-      });
-
-    linkEnter.merge(linkSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', function(d){
-        var sx = d.source.px, sy = d.source.py;
-        var tx = d.target.px, ty = d.target.py;
-        var midX = (sx + tx) / 2;
-        return 'M' + sx + ',' + sy
-          + ' C' + midX + ',' + sy + ' ' + midX + ',' + ty + ' ' + tx + ',' + ty;
-      })
-      .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.35);
+    gEl.selectAll('.sketch-path').remove();
+    gEl.selectAll('.link-path').remove();
 
     var nodeSel = gEl.selectAll('.node-group')
       .data(nodes, function(d){ return d.data.name + d.depth; });
@@ -629,7 +822,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
       .attr('opacity', 0);
 
-    nodeEnter.append('circle').attr('class', 'node-bubble');
+    nodeEnter.append('rect').attr('class', 'node-bubble');
     nodeEnter.append('text').attr('class', 'node-bubble-text');
     nodeEnter.append('text').attr('class', 'fold-badge');
 
@@ -654,46 +847,302 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var isFolded = !!d._children;
       var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : 11;
       var text = truncateText(d.data.name, d.depth);
-      var circleR = d.depth === 0 ? 8 : d.depth === 1 ? 6 : 4;
+      var paddingH = d.depth === 0 ? 14 : 10;
+      var paddingV = d.depth === 0 ? 8 : 5;
+      var rx = d.depth === 0 ? 10 : 6;
+      var side = d._fishSide;
+      var anchor = d.depth === 0 ? 'middle' : (side === 'left' ? 'end' : 'start');
 
-      g.select('.node-bubble')
-        .attr('r', circleR)
-        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.4 : 0.25))
-        .attr('stroke', colorHex)
-        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
-        .attr('stroke-dasharray', isFolded ? '3,2' : 'none');
+      g.classed('search-highlight', d.data.slug === highlightedSlug);
 
       var textEl = g.select('.node-bubble-text');
       textEl
         .attr('font-size', fontSize + 'px')
         .attr('font-weight', d.depth <= 1 ? '700' : '400')
-        .attr('text-anchor', 'start')
-        .attr('x', circleR + 6)
-        .attr('y', 1)
+        .attr('text-anchor', anchor)
+        .attr('x', 0)
+        .attr('y', 0)
         .text(text);
+
+      var bbox;
+      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
+
+      var bw = bbox.width + paddingH * 2;
+      var bh = bbox.height + paddingV * 2;
+
+      d._fishBubbleW = bw;
+      d._fishBubbleH = bh;
+      d._fishBubbleX = bbox.x - paddingH;
+
+      g.select('.node-bubble')
+        .attr('x', bbox.x - paddingH)
+        .attr('y', bbox.y - paddingV)
+        .attr('width', bw)
+        .attr('height', bh)
+        .attr('rx', rx)
+        .attr('ry', rx)
+        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : 0.15))
+        .attr('stroke', colorHex)
+        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
+        .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
+
+      textEl.attr('x', 0).attr('y', 0);
 
       var badge = g.select('.fold-badge');
       if(isFolded){
         var count = countDescendants(d._children);
         badge
-          .attr('x', circleR + 6)
-          .attr('y', -circleR - 2)
-          .attr('text-anchor', 'start')
-          .attr('font-size', '8px')
-          .text('+' + count);
+          .attr('x', side === 'left' ? bbox.x - paddingH + 6 : bbox.x - paddingH + bw - 6)
+          .attr('y', bbox.y - paddingV + 8)
+          .attr('text-anchor', side === 'left' ? 'start' : 'end')
+          .text(count);
       } else {
         badge.text('');
       }
     });
 
-    allNodes.on('click', function(e, d){
-      e.stopPropagation();
-      if(d.children || d._children){
-        toggleNode(d);
-      } else if(d.data.slug){
-        showModal(d.data.slug);
+    bindNodeEvents(allNodes);
+
+    var linkSel = gEl.selectAll('.link-path')
+      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+
+    linkSel.exit().transition().duration(duration * 0.6)
+      .attr('opacity', 0)
+      .remove();
+
+    var linkEnter = linkSel.enter().append('path')
+      .attr('class', 'link-path')
+      .attr('opacity', 0);
+
+    linkEnter.merge(linkSel)
+      .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
+      .attr('opacity', 1)
+      .attr('d', function(d){
+        var sx = d.source.px, sy = d.source.py;
+        var tx = d.target.px, ty = d.target.py;
+        var side = d.target._fishSide;
+        var srcW = d.source._fishBubbleW || 60;
+        var srcH = d.source._fishBubbleH || 20;
+        var srcRX = d.source._fishBubbleX || 0;
+        var tgtW = d.target._fishBubbleW || 60;
+        var tgtH = d.target._fishBubbleH || 20;
+        var tgtRX = d.target._fishBubbleX || 0;
+
+        var srcEdge, tgtEdge;
+        if(side === 'left'){
+          srcEdge = sx + srcRX - 4;
+          tgtEdge = tx + tgtRX + tgtW + 4;
+        } else {
+          srcEdge = sx + srcRX + srcW + 4;
+          tgtEdge = tx + tgtRX - 4;
+        }
+
+        if(d.source.depth === 0){
+          var r = 8;
+          var dir = side === 'left' ? -1 : 1;
+          var midX = (srcEdge + tgtEdge) / 2;
+          var dy = ty - sy;
+          var absDy = Math.abs(dy);
+          if(absDy < r * 2) r = Math.max(absDy / 2, 0);
+          var ydir = dy >= 0 ? 1 : -1;
+          return 'M' + srcEdge + ',' + sy
+            + ' H' + (midX - r * dir)
+            + ' Q' + midX + ',' + sy + ' ' + midX + ',' + (sy + r * ydir)
+            + ' V' + (ty - r * ydir)
+            + ' Q' + midX + ',' + ty + ' ' + (midX + r * dir) + ',' + ty
+            + ' H' + tgtEdge;
+        } else {
+          var midX2 = (srcEdge + tgtEdge) / 2;
+          return 'M' + srcEdge + ',' + sy
+            + ' H' + midX2
+            + ' V' + ty
+            + ' H' + tgtEdge;
+        }
+      })
+      .attr('stroke', function(d){ return getNodeColor(d.target); })
+      .attr('stroke-opacity', 0.4);
+
+    nodes.forEach(function(d){
+      d.px0 = d.px;
+      d.py0 = d.py;
+    });
+
+    document.getElementById('status-info').textContent = nodes.length + ' 个节点';
+  }
+
+  function updateSketch(source){
+    var width = svgEl.clientWidth;
+    var height = svgEl.clientHeight;
+
+    var nodeSizeH = 38;
+    var nodeSizeW = 220;
+
+    var treeLayout = d3.tree().nodeSize([nodeSizeH, nodeSizeW]);
+    var root = treeLayout(rootHierarchy);
+    var nodes = root.descendants();
+    var links = root.links();
+
+    nodes.forEach(function(d){
+      d.px = d.y;
+      d.py = d.x;
+    });
+
+    var sourceP = [source.y0 || 0, source.x0 || 0];
+
+    gEl.selectAll('.link-path').remove();
+    gEl.selectAll('.bracket-path').remove();
+
+    var nodeSel = gEl.selectAll('.node-group')
+      .data(nodes, function(d){ return d.data.name + d.depth; });
+
+    nodeSel.exit().transition().duration(duration * 0.6)
+      .ease(d3.easeBackIn)
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0)
+      .remove();
+
+    var nodeEnter = nodeSel.enter().append('g')
+      .attr('class', 'node-group')
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0);
+
+    nodeEnter.append('path').attr('class', 'node-bubble sketch-bubble');
+    nodeEnter.append('text').attr('class', 'node-bubble-text');
+    nodeEnter.append('text').attr('class', 'fold-badge');
+
+    nodeEnter.transition().duration(duration)
+      .ease(d3.easeBackOut)
+      .delay(function(d){ return d.depth * 60; })
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
+
+    var nodeUpdate = nodeSel;
+
+    nodeUpdate.transition().duration(duration)
+      .ease(d3.easeCubicOut)
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
+
+    var allNodes = nodeEnter.merge(nodeUpdate);
+
+    allNodes.each(function(d){
+      var g = d3.select(this);
+      var colorHex = getNodeColorHex(d);
+      var isFolded = !!d._children;
+      var fontSize = d.depth === 0 ? 16 : d.depth === 1 ? 14 : d.depth === 2 ? 12 : 11;
+      var text = truncateText(d.data.name, d.depth);
+      var paddingH = d.depth === 0 ? 16 : 12;
+      var paddingV = d.depth === 0 ? 10 : 6;
+
+      g.classed('search-highlight', d.data.slug === highlightedSlug);
+
+      var textEl = g.select('.node-bubble-text');
+      textEl
+        .attr('font-size', fontSize + 'px')
+        .attr('font-weight', d.depth <= 1 ? '700' : '400')
+        .attr('font-style', 'italic')
+        .attr('text-anchor', 'start')
+        .attr('x', 0)
+        .attr('y', 0)
+        .text(text);
+
+      var bbox;
+      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
+
+      var bw = bbox.width + paddingH * 2;
+      var bh = bbox.height + paddingV * 2;
+
+      d._sketchBubbleX = bbox.x - paddingH;
+      d._sketchBubbleW = bw;
+      d._sketchBubbleH = bh;
+
+      g.select('.node-bubble')
+        .attr('d', sketchRect(bbox.x - paddingH, bbox.y - paddingV, bw, bh, 8))
+        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.2 : 0.1))
+        .attr('stroke', colorHex)
+        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.8)
+        .attr('stroke-dasharray', isFolded ? '6,4' : 'none');
+
+      textEl.attr('x', 0).attr('y', 0);
+
+      var badge = g.select('.fold-badge');
+      if(isFolded){
+        var count = countDescendants(d._children);
+        badge
+          .attr('x', bbox.x - paddingH + bw - 6)
+          .attr('y', bbox.y - paddingV + 8)
+          .attr('text-anchor', 'end')
+          .attr('font-style', 'italic')
+          .text(count);
+      } else {
+        badge.text('');
       }
     });
+
+    bindNodeEvents(allNodes);
+
+    var sketchSel = gEl.selectAll('.sketch-path')
+      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+
+    sketchSel.exit().transition().duration(duration * 0.6)
+      .attr('opacity', 0)
+      .remove();
+
+    var sketchEnter = sketchSel.enter().append('path')
+      .attr('class', 'sketch-path')
+      .attr('opacity', 0);
+
+    sketchEnter.merge(sketchSel)
+      .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
+      .attr('opacity', 1)
+      .attr('d', function(d){
+        var sx = d.source.px, sy = d.source.py;
+        var tx = d.target.px, ty = d.target.py;
+        var srcW = d.source._sketchBubbleW || 60;
+        var tgtW = d.target._sketchBubbleW || 60;
+        var srcH = d.source._sketchBubbleH || 20;
+        var tgtH = d.target._sketchBubbleH || 20;
+        var srcRight = sx + (d.source._sketchBubbleX || 0) + srcW;
+        var srcLeft = sx + (d.source._sketchBubbleX || 0);
+        var tgtLeft = tx + (d.target._sketchBubbleX || 0);
+        var tgtRight = tgtLeft + tgtW;
+        var srcTop = sy - srcH / 2;
+        var srcBottom = sy + srcH / 2;
+        var tgtTop = ty - tgtH / 2;
+        var tgtBottom = ty + tgtH / 2;
+
+        var x1, y1, x2, y2;
+
+        if(tx > sx){
+          x1 = srcRight + 2;
+          y1 = sy;
+          x2 = tgtLeft - 2;
+          y2 = ty;
+        } else if(tx < sx){
+          x1 = srcLeft - 2;
+          y1 = sy;
+          x2 = tgtRight + 2;
+          y2 = ty;
+        } else {
+          if(ty > sy){
+            x1 = sx;
+            y1 = srcBottom + 2;
+            x2 = tx;
+            y2 = tgtTop - 2;
+          } else {
+            x1 = sx;
+            y1 = srcTop - 2;
+            x2 = tx;
+            y2 = tgtBottom + 2;
+          }
+        }
+
+        return sketchLine(x1, y1, x2, y2, 4);
+      })
+      .attr('stroke', function(d){ return getNodeColor(d.source); })
+      .attr('stroke-opacity', 0.6);
 
     nodes.forEach(function(d){
       d.x0 = d.x;
@@ -728,36 +1177,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var sourceP = radialPoint(source.x0 || 0, source.y0 || 0);
 
     gEl.selectAll('.bracket-path').remove();
-
-    var linkSel = gEl.selectAll('.link-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
-
-    linkSel.exit().transition().duration(duration * 0.6)
-      .ease(d3.easeBackIn)
-      .attr('d', function(d){
-        return d3.linkRadial().angle(function(dd){ return dd.x; }).radius(function(dd){ return dd.y; })({
-          source: d.source, target: d.source
-        });
-      })
-      .attr('opacity', 0)
-      .remove();
-
-    var linkEnter = linkSel.enter().append('path')
-      .attr('class', 'link-path')
-      .attr('opacity', 0)
-      .attr('d', function(d){
-        return d3.linkRadial().angle(function(dd){ return dd.x; }).radius(function(dd){ return dd.y; })({
-          source: d.source, target: d.source
-        });
-      });
-
-    linkEnter.merge(linkSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', d3.linkRadial().angle(function(d){ return d.x; }).radius(function(d){ return d.y; }))
-      .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.3);
+    gEl.selectAll('.sketch-path').remove();
+    gEl.selectAll('.link-path').remove();
 
     var nodeSel = gEl.selectAll('.node-group')
       .data(nodes, function(d){ return d.data.name + d.depth; });
@@ -805,6 +1226,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var isRight = !(angle > 90 && angle < 270);
       var anchor = d.depth === 0 ? 'middle' : (isRight ? 'start' : 'end');
 
+      g.classed('search-highlight', d.data.slug === highlightedSlug);
+
       var textEl = g.select('.node-bubble-text');
       textEl
         .attr('font-size', fontSize + 'px')
@@ -819,18 +1242,18 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
       var bw = bbox.width + paddingH * 2;
       var bh = bbox.height + paddingV * 2;
-      var rectX, textX;
+      var rectX;
 
       if(d.depth === 0){
         rectX = -bw / 2;
-        textX = 0;
-      } else if(isRight){
-        rectX = bbox.x - paddingH;
-        textX = 0;
       } else {
         rectX = bbox.x - paddingH;
-        textX = 0;
       }
+
+      d._bubbleRectX = rectX;
+      d._bubbleW = bw;
+      d._bubbleH = bh;
+      d._bubbleIsRight = isRight;
 
       g.select('.node-bubble')
         .attr('x', rectX)
@@ -844,7 +1267,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
         .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
 
-      textEl.attr('x', textX).attr('y', 0);
+      textEl.attr('x', 0).attr('y', 0);
 
       var badge = g.select('.fold-badge');
       if(isFolded){
@@ -852,7 +1275,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         var badgeX = isRight ? rectX + bw - 6 : rectX + 6;
         badge
           .attr('x', badgeX)
-          .attr('y', rectX !== -bw / 2 ? bbox.y - paddingV + 8 : -bh / 2 + 8)
+          .attr('y', bbox.y - paddingV + 8)
           .attr('text-anchor', isRight ? 'end' : 'start')
           .text(count);
       } else {
@@ -860,14 +1283,64 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       }
     });
 
-    allNodes.on('click', function(e, d){
-      e.stopPropagation();
-      if(d.children || d._children){
-        toggleNode(d);
-      } else if(d.data.slug){
-        showModal(d.data.slug);
-      }
-    });
+    bindNodeEvents(allNodes);
+
+    var linkSel = gEl.selectAll('.link-path')
+      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+
+    linkSel.exit().transition().duration(duration * 0.6)
+      .attr('opacity', 0)
+      .remove();
+
+    var linkEnter = linkSel.enter().append('path')
+      .attr('class', 'link-path')
+      .attr('opacity', 0);
+
+    linkEnter.merge(linkSel)
+      .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
+      .attr('opacity', 1)
+      .attr('d', function(d){
+        var sx = d.source.px, sy = d.source.py;
+        var tx = d.target.px, ty = d.target.py;
+        var srcW = d.source._bubbleW || 60;
+        var srcH = d.source._bubbleH || 20;
+        var srcRX = d.source._bubbleRectX || 0;
+        var tgtW = d.target._bubbleW || 60;
+        var tgtH = d.target._bubbleH || 20;
+        var tgtRX = d.target._bubbleRectX || 0;
+
+        var dx = tx - sx;
+        var dy = ty - sy;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / dist;
+        var uy = dy / dist;
+
+        var srcHalfW = srcW / 2;
+        var srcHalfH = srcH / 2;
+        var srcOffset = Math.abs(ux) * srcHalfW + Math.abs(uy) * srcHalfH + 3;
+        srcOffset = Math.min(srcOffset, dist * 0.4);
+
+        var tgtHalfW = tgtW / 2;
+        var tgtHalfH = tgtH / 2;
+        var tgtOffset = Math.abs(ux) * tgtHalfW + Math.abs(uy) * tgtHalfH + 3;
+        tgtOffset = Math.min(tgtOffset, dist * 0.4);
+
+        var x1 = sx + ux * srcOffset;
+        var y1 = sy + uy * srcOffset;
+        var x2 = tx - ux * tgtOffset;
+        var y2 = ty - uy * tgtOffset;
+
+        var midX = (x1 + x2) / 2;
+        var midY = (y1 + y2) / 2;
+        var cpx = midX + (y2 - y1) * 0.15;
+        var cpy = midY - (x2 - x1) * 0.15;
+
+        return 'M' + x1 + ',' + y1
+          + ' Q' + cpx + ',' + cpy + ' ' + x2 + ',' + y2;
+      })
+      .attr('stroke', function(d){ return getNodeColor(d.source); })
+      .attr('stroke-opacity', 0.3);
 
     nodes.forEach(function(d){
       d.x0 = d.x;
@@ -897,8 +1370,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var ys = nodes.map(function(d){ return d.py || 0; });
       var minX = d3.min(xs), maxX = d3.max(xs);
       var minY = d3.min(ys), maxY = d3.max(ys);
-      var contentW = maxX - minX + 300;
-      var contentH = maxY - minY + 60;
+      var contentW = maxX - minX + 400;
+      var contentH = maxY - minY + 80;
       var midX = (minX + maxX) / 2;
       var midY = (minY + maxY) / 2;
       var scale = Math.min(width / contentW, height / contentH, 1.5);
@@ -910,6 +1383,22 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         d3.zoomIdentity.translate(tx, ty).scale(scale)
       );
     }
+  }
+
+  function focusNode(slug){
+    var nodes = rootHierarchy.descendants();
+    var target = nodes.find(function(d){ return d.data.slug === slug; });
+    if(!target) return;
+    var svg = d3.select('#mindmap-svg');
+    var width = svgEl.clientWidth;
+    var height = svgEl.clientHeight;
+    var scale = 1.2;
+    var tx = width / 2 - (target.px || 0) * scale;
+    var ty = height / 2 - (target.py || 0) * scale;
+    svg.transition().duration(600).call(
+      zoom.transform,
+      d3.zoomIdentity.translate(tx, ty).scale(scale)
+    );
   }
 
   function switchLayout(layout){
@@ -924,6 +1413,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     gEl.selectAll('.node-group').remove();
     gEl.selectAll('.link-path').remove();
     gEl.selectAll('.bracket-path').remove();
+    gEl.selectAll('.sketch-path').remove();
 
     update(rootHierarchy);
     setTimeout(fitToScreen, duration + 50);
@@ -966,6 +1456,70 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var hint = document.getElementById('hint');
     hint.classList.add('show');
     setTimeout(function(){ hint.classList.remove('show'); }, 5000);
+  }
+
+  function setupSearch(){
+    var input = document.getElementById('search-input');
+    var dropdown = document.getElementById('search-dropdown');
+
+    input.addEventListener('input', function(){
+      var query = input.value.trim().toLowerCase();
+      if(!query){
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        highlightedSlug = null;
+        update(rootHierarchy);
+        return;
+      }
+      var matches = headings.filter(function(h){
+        return h.text.toLowerCase().indexOf(query) !== -1;
+      });
+      if(matches.length === 0){
+        dropdown.innerHTML = '<div class="search-empty">未找到匹配项</div>';
+        dropdown.classList.add('show');
+        return;
+      }
+      var html = '';
+      matches.slice(0, 20).forEach(function(h){
+        html += '<div class="search-item" data-slug="' + h.slug + '">'
+          + '<span class="search-item-level">H' + h.level + '</span>'
+          + '<span class="search-item-text">' + h.text + '</span>'
+          + '</div>';
+      });
+      dropdown.innerHTML = html;
+      dropdown.classList.add('show');
+
+      dropdown.querySelectorAll('.search-item').forEach(function(el){
+        el.addEventListener('click', function(){
+          var slug = el.dataset.slug;
+          input.value = el.querySelector('.search-item-text').textContent;
+          dropdown.classList.remove('show');
+          highlightedSlug = slug;
+          expandPathToNode(slug);
+          update(rootHierarchy);
+          setTimeout(function(){
+            focusNode(slug);
+          }, duration + 50);
+        });
+      });
+    });
+
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        input.value = '';
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        highlightedSlug = null;
+        update(rootHierarchy);
+        input.blur();
+      }
+    });
+
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.search-wrap')){
+        dropdown.classList.remove('show');
+      }
+    });
   }
 
   function setupToolbar(){
@@ -1011,6 +1565,76 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     document.addEventListener('keydown', function(e){
       if(e.key === 'Escape') hideModal();
     });
+
+    document.getElementById('btn-fullscreen').addEventListener('click', function(){
+      var modal = document.getElementById('modal');
+      modal.classList.toggle('fullscreen');
+      this.innerHTML = modal.classList.contains('fullscreen') ? '⊡' : '⛶';
+    });
+
+    document.getElementById('btn-edit').addEventListener('click', function(){
+      var body = document.getElementById('modal-body');
+      var mdBody = body.querySelector('.markdown-body');
+      var editArea = body.querySelector('.modal-edit-area');
+
+      if(!isEditing){
+        isEditing = true;
+        this.classList.add('active');
+        this.innerHTML = '👁';
+        this.title = '预览';
+        var rawMd = getSectionMarkdown(currentEditSlug);
+        editArea.value = rawMd;
+        editArea.style.display = '';
+        mdBody.style.display = 'none';
+      } else {
+        var newContent = editArea.value;
+        if(newContent !== getSectionMarkdown(currentEditSlug)){
+          updateMarkdownContent(currentEditSlug, newContent);
+          var toast = document.getElementById('save-toast');
+          toast.classList.add('show');
+          setTimeout(function(){ toast.classList.remove('show'); }, 1500);
+        }
+        isEditing = false;
+        this.classList.remove('active');
+        this.innerHTML = '✎';
+        this.title = '编辑';
+        mdBody.innerHTML = getSectionContent(currentEditSlug);
+        editArea.style.display = 'none';
+        mdBody.style.display = '';
+      }
+    });
+  }
+
+  function updateMarkdownContent(slug, newContent){
+    if(slug === treeData.slug){
+      markdownText = newContent;
+    } else {
+      var heading = headings.find(function(h){ return h.slug === slug; });
+      if(!heading) return;
+      var startLine = heading.line;
+      var endLine = markdownText.split('\n').length;
+      for(var i = 0; i < headings.length; i++){
+        if(headings[i].line > startLine && headings[i].level <= heading.level){
+          endLine = headings[i].line;
+          break;
+        }
+      }
+      var lines = markdownText.split('\n');
+      lines.splice(startLine, endLine - startLine, newContent);
+      markdownText = lines.join('\n');
+    }
+    headings = parseHeadings(markdownText);
+    treeData = buildHeadingTree(headings);
+    rootHierarchy = d3.hierarchy(treeData);
+    expandAll(rootHierarchy);
+    rootHierarchy.children.forEach(function(child){
+      if(child.children){
+        child.children.forEach(collapseAll);
+      }
+    });
+    rootHierarchy.x0 = 0;
+    rootHierarchy.y0 = 0;
+    update(rootHierarchy);
   }
 
   function setupTheme(){
@@ -1059,6 +1683,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       initMindmap();
       setupToolbar();
       setupModal();
+      setupSearch();
     } catch(err){
       document.getElementById('loading').textContent = '加载失败: ' + err.message;
       document.getElementById('status-info').textContent = '错误';

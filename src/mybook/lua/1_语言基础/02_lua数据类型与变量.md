@@ -30,7 +30,7 @@ print(type(360.0))
 print(type(nil))
 ```
 
-![](./img/datatype.png)
+![Lua数据类型概览](./img/datatype.png)
 
 ### 1.1. nil 空
 
@@ -45,7 +45,7 @@ num = 100
 print(num)
 ```
 
-![](./img/nilpng.png)
+![nil类型示例](./img/nilpng.png)
 
 ### 1.2. boolean 布尔
 
@@ -53,7 +53,7 @@ print(num)
 
 **注意：真假判断与C++的真假判断有出入**
 
-![](./img/lua_bool.png)
+![布尔类型真假判断](./img/lua_bool.png)
 
 ### 1.3. number 数值类型
 
@@ -68,7 +68,7 @@ print(math.floor(pi_num))
 print(math.ceil(pi_num))
 ```
 
-![](./img/lua_number.png)
+![数值类型示例](./img/lua_number.png)
 
 一般的，lua的number类型就是C/C++中的long long int或double类型来实现的。
 
@@ -89,7 +89,7 @@ local str4 = [=[string have a [[]].]=]  -- [=[]=]等号两侧不可以有空格�
 print(str1,str2,str3,str4)
 ```
 
-![](./img/string4.png)
+![字符串操作示例](./img/string4.png)
 
 ### 1.5. function 函数
 
@@ -117,7 +117,7 @@ func(foo)
 
 ```
 
-![](./img/function.png)
+![函数类型示例](./img/function.png)
 
 有名函数的定义本质上是匿名函数对变量的赋值。
 
@@ -204,7 +204,7 @@ end
 
 ```
 
-![](./img/table_lua.png)
+![表类型示例](./img/table_lua.png)
 
 在内部实现上，table通常实现为一个哈希表和一个数组、或两者的混合。具体的实现为何种形式，动态依赖于具体的table的键的分布特点。
 

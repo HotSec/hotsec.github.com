@@ -244,7 +244,7 @@ page.get_by_text(str(select_text)).click()
 page.get_by_role("tab", name=re.compile("风险信息", re.IGNORECASE)).click()
 ```
 
-![](https://pic1.zhimg.com/80/v2-56336a3fa6293b8235b2bdc663030f0a_720w.webp?source=1def8aca)
+![Playwright选择器方法](https://pic1.zhimg.com/80/v2-56336a3fa6293b8235b2bdc663030f0a_720w.webp?source=1def8aca)
 
 **[循环遍历](https://www.zhihu.com/search?q=%E5%BE%AA%E7%8E%AF%E9%81%8D%E5%8E%86&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A3269710925%7D)**ul: query_selector_all()
 
