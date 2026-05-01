@@ -11,27 +11,38 @@
 <details>
 <summary>数据类型</summary>
 
-- 基本类型：int, float, string, bool, byte, rune
-- 复合类型：array, slice, map, struct, pointer, channel, interface
-- 类型转换（强制显式转换）
+- 基本类型：int8~int64/uint8~uint64/float32/float64/complex64/complex128/bool/string/byte/rune
+- 类型转换（强制显式转换）/ strconv 系列
+- 数组：定义/初始化/遍历/多维数组/值类型特性
+- 切片详解：定义/长度容量/切片表达式/make/本质(SliceHeader)/append/copy/删除元素/避免内存泄漏
+- 映射详解：定义/基本操作/判断键/遍历/delete/有序遍历/元素为map的切片/值为切片的map/并发安全(sync.Map)
+- 类型别名：type NewType OldType vs type Alias = OldType
 
 </details>
 
 <details>
 <summary>变量声明与控制结构</summary>
 
-- var / := 短变量声明
-- if / for / switch / select
+- var / := 短变量声明 / 批量声明 / 匿名变量 _
+- 常量与 iota：枚举/跳过值/中间插队/数量级定义
+- 运算符：算术/关系/逻辑/位(&|^&^<</>>)/赋值/优先级
+- if / for / switch（默认不穿透/fallthrough）/ select
 - defer / panic / recover
+- goto / break(标签) / continue
 
 </details>
 
 <details>
 <summary>函数与方法</summary>
 
-- 多返回值、命名返回值、可变参数
-- 闭包
+- 多返回值、命名返回值、可变参数(...语法)
+- 高阶函数：函数作为参数/返回值
+- 匿名函数与闭包（捕获变量引用）
+- defer 详解：LIFO/参数确定时机/执行时机/修改返回值
+- 内置函数：len/cap/append/copy/delete/new/make/close/panic/recover
+- 递归：阶乘/斐波那契/分金币问题
 - 方法接收者选择（值接收者 vs 指针接收者）
+- 结构体详解：自定义类型/实例化/构造函数/匿名字段(嵌入)/嵌套/JSON序列化Tag/方法继承与重写
 
 </details>
 
@@ -50,22 +61,30 @@
 <details>
 <summary>包-模块-库</summary>
 
+- 包定义/标识符可见性(大写导出/小写私有)/包引入/别名导入/空白导入
+- init 函数：执行顺序/多个 init/注册驱动
 - go mod 包管理
 - 常用命令：go mod init/tidy/download/vendor/graph/why
 - GOPROXY 模块代理（goproxy.cn/goproxy.io/athens）
 - go.sum 校验与模块完整性
 - replace / exclude / retract 指令
 - 私有仓库配置（GOPRIVATE/GONOSUMCHECK）
+- Go Workspace（go.work）：多模块开发
+- 版本号规则：语义化版本/v2+ 路径后缀/伪版本
 
 </details>
 
 <details>
 <summary>测试</summary>
 
-- 单元测试（go test）
+- 单元测试（go test）/ 子测试(t.Run) / 表驱动测试
+- 覆盖率：-cover/-covermode/-coverprofile
 - 性能/基准测试（Benchmark）
 - 模糊测试（Fuzzing）
-- 集成测试
+- Mock 接口：手动 Mock / gomock
+- monkey 打桩：gomonkey
+- goconvey：BDD 风格/Web 界面
+- 测试 MySQL（sqlmock）/ Redis（redismock）
 
 </details>
 
@@ -90,6 +109,18 @@
 #### 进阶特性
 
 <details>
+<summary>设计模式</summary>
+
+- 函数选项模式（Functional Options）：解决多参数构造问题
+- 单例模式：sync.Once 保证只执行一次
+- 工厂模式：根据类型创建不同实例
+- 策略模式：接口+组合实现算法切换
+- 装饰器模式：中间件链式调用
+- 构建者模式：链式调用构建复杂对象
+
+</details>
+
+<details>
 <summary>泛型</summary>
 
 - 泛型函数与泛型类型
@@ -109,6 +140,8 @@
 - **Go 1.22**：range over integer/循环变量语义修复（每次迭代新变量）/net/http 路由增强
 - **Go 1.23**：iterator 支持（range over func）/unique 包/osroot
 - **Go 1.24**：弱指针（weak pointer）/finalizer 改进/工具链管理 go version
+- **Go 1.25**：Container-aware GOMAXPROCS（cgroup CPU 配额自动适配）/实验性 GreenTea GC/实验性 encoding/json v2/testing/synctest 并发测试/sync.WaitGroup.Go()/Core Types 移除/go doc -http/go vet 新分析器（waitgroup/hostport）
+- **Go 1.26**：new(expr) 表达式初始化/泛型类型自引用/GreenTea GC 默认启用/SIMD 加速扫描/实验性 simd/archsimd 包/实验性 runtime/secret 包/crypto/hpke/errors.AsType/go fix 现代化修复器/实验性 goroutine leak profile/cgo 调用开销降低 ~30%/堆基地址随机化
 
 </details>
 
@@ -150,8 +183,11 @@
 <summary>指针 & make vs new</summary>
 
 - & / * 操作，Go 指针不能运算
+- 指针传值：值传递 vs 指针传递
+- 指针使用场景：修改外部变量/避免大结构体拷贝/修改接收者
 - new：分配零值返回指针
 - make：只用于 slice/map/chan，返回初始化后的引用
+- make vs new 对比
 
 </details>
 
@@ -233,6 +269,7 @@
 <summary>并发安全退出</summary>
 
 - Context 取消 / Channel 通知 / errgroup 错误处理
+- conc 并发库：pool(并发池)/stream(流式)/iter(迭代器)/泛型支持/对比errgroup
 
 </details>
 
@@ -265,7 +302,7 @@
 - 三色并发标记算法
 - 混合写屏障（Hybrid Write Barrier）— 1.8+ 默认
 - 触发时机（内存翻倍 / 定时 / 手动 runtime.GC()）
-- Go 1.19+ 分代扫描（实验性）/ Go 1.26 新特性
+- Go 1.19+ 分代扫描（实验性）/ Go 1.25 实验性 GreenTea GC / Go 1.26 GreenTea GC 默认启用（10-40% GC 开销降低）
 - GC 优化策略
 
 </details>
@@ -321,46 +358,256 @@
 
 ### 1.6 常用标准库
 
-#### I/O与编码
+#### 格式化与时间
 
 <details>
-<summary>网络与 I/O</summary>
+<summary>fmt 格式化</summary>
 
-- net/http：HTTP 客户端/服务端、Handler/HandlerFunc、中间件模式
-- io / bufio / os：文件读写、缓冲 I/O、路径操作
+- Printf 占位符：%v/%+v/%#v/%T/%%
+- 整数：%d/%b/%o/%x/%X/%c/%U
+- 浮点：%f/%.2f/%e/%E/%g
+- 字符串：%s/%q/%x
+- 宽度精度：%5d/%-5d/%05d/%8.2f
+- Sprint/Sprintf/Fprint/Fprintf
 
 </details>
 
 <details>
-<summary>编码与序列化</summary>
+<summary>time 时间包</summary>
 
-- encoding/json：Marshal / Unmarshal、自定义 JSON 标签、流式编解码
+- 时间获取：Now()/Year()/Month()/Unix()/UnixMilli()
+- 格式化：Format("2006-01-02 15:04:05")/Parse()
+- 时间计算：Add/Sub/Before/After/Equal
+- 定时器：Timer/Ticker/Sleep/After
+- Duration：常量(Nanosecond~Hour)/方法(Seconds/Milliseconds)
+
+</details>
+
+<details>
+<summary>strconv / flag</summary>
+
+- strconv：Atoi/Itoa/ParseBool/ParseInt/ParseFloat/FormatBool/FormatInt/FormatFloat
+- flag：StringVar/IntVar/BoolVar/Parse/子命令(NewFlagSet)
+
+</details>
+
+#### I/O与编码
+
+<details>
+<summary>文件操作（os/io）</summary>
+
+- 读取：Open/Read/ReadFile/bufio.Scanner
+- 写入：Create/Write/WriteFile/OpenFile(追加)
+- 文件信息：Stat/Name/Size/IsDir/Mode/ModTime
+- 目录：Mkdir/MkdirAll/Remove/RemoveAll/ReadDir/Walk
+- 临时文件：MkdirTemp/CreateTemp
+- io 工具：ReadAll/Copy
+
+</details>
+
+<details>
+<summary>html/template 模板</summary>
+
+- 基本语法：{{.}}/{{.Field}}/管道
+- 条件：if/else/end
+- 循环：range/else
+- with：切换上下文
+- 自定义变量：{{$x := .Name}}
+- 比较函数：eq/ne/lt/le/gt/ge
+- 自定义函数：FuncMap
+- 模板嵌套：define/template
+- 从文件加载：ParseGlob/ParseFiles
+- 安全处理：自动转义/template.HTML
+
+</details>
+
+<details>
+<summary>encoding/json 详解</summary>
+
+- Marshal/Unmarshal
+- Tag 选项：json:"name"/omitempty/-/-,
+- 自定义 JSON：MarshalJSON/UnmarshalJSON
+- json.RawMessage：延迟解析
+- 流式编解码：Encoder/Decoder
+- map 与 slice 的 JSON 处理
+- 数字精度：UseNumber
+- 空切片 vs nil 的 JSON 差异
+
+</details>
+
+<details>
+<summary>reflect 反射</summary>
+
+- TypeOf/ValueOf/Kind
+- 结构体反射：NumField/Field/Tag.Get/NumMethod
+- 修改值：Elem/Set/CanSet
+- 动态调用方法：MethodByName/Call
+- 应用场景：ORM/配置解析/验证/序列化
+- 注意事项：性能/类型安全/可维护性
 
 </details>
 
 #### 并发与底层
 
 <details>
+<summary>context 详解</summary>
+
+- 设计理念：取消信号/超时控制/值传递
+- 创建：Background/TODO/WithCancel/WithTimeout/WithDeadline/WithValue
+- 传播规则：子取消不影响父/父取消级联子
+- 最佳实践：第一个参数/不传nil/不存结构体/defer cancel
+- 常见模式：HTTP请求超时/数据库查询超时/优雅关闭
+
+</details>
+
+<details>
 <summary>并发与同步</summary>
 
 - sync / sync/atomic：Mutex / RWMutex / WaitGroup / Once / Map / Pool / Cond
-- context：超时控制、取消传播、值传递
+- singleflight：防缓存击穿/Do/DoChan/Forget
 
 </details>
 
 <details>
-<summary>字符串与格式化</summary>
+<summary>网络与 I/O</summary>
 
-- fmt / strings / strconv：格式化输出、字符串操作、类型转换
+- net/http：HTTP 客户端/服务端、Handler/HandlerFunc、中间件模式、文件服务、优雅关闭
+- io / bufio / os：文件读写、缓冲 I/O、路径操作
+
+</details>
+
+#### 第三方库
+
+<details>
+<summary>日志</summary>
+
+- 标准库 log
+- slog（Go 1.21+）：结构化日志/JSONHandler
+- Zap：Logger/SugaredLogger/自定义配置/Gin集成
+- lumberjack：日志轮转(MaxSize/MaxBackups/MaxAge/Compress)
 
 </details>
 
 <details>
-<summary>反射与底层</summary>
+<summary>Viper 配置管理</summary>
 
-- reflect：类型反射、值反射、结构体字段遍历
-- unsafe：指针操作、内存布局
-- log / flag：日志记录、命令行参数解析
+- 读取配置文件：SetConfigName/AddConfigPath/ReadInConfig
+- 读取配置值：Get/GetString/GetInt/嵌套key
+- 默认值：SetDefault
+- 绑定结构体：Unmarshal + mapstructure tag
+- 环境变量：AutomaticEnv/SetEnvPrefix/BindEnv
+- 命令行参数：BindPFlag
+- 热更新：WatchConfig/OnConfigChange
+- 写入配置：WriteConfig/SafeWriteConfig
+
+</details>
+
+<details>
+<summary>validator 参数校验</summary>
+
+- 常用标签：required/omitempty/min/max/len/gte/lte/email/url/ip/oneof
+- 跨字段验证：eqfield/nefield/gtfield
+- 自定义验证器：RegisterValidation
+- 中文错误信息：locales/ut/translations
+- Gin 集成：binding tag
+
+</details>
+
+<details>
+<summary>sqlx 数据库操作</summary>
+
+- 连接：sqlx.Connect/Connect设置
+- 查询：Get/Select/Queryx/StructScan/MapScan
+- 增删改：Exec/NamedExec/批量插入
+- 事务：Beginx/Commit/Rollback/BeginTxFunc
+- 结构体映射：db tag
+
+</details>
+
+<details>
+<summary>Cobra CLI 开发</summary>
+
+- 命令结构：Command/Use/Short/Long/Run
+- 子命令：AddCommand
+- 标志：PersistentFlags/Flags/IntP/StringP
+- 必填标志：MarkFlagRequired
+- 生命周期：PreRun/Run/PostRun
+- 脚手架：cobra-cli
+
+</details>
+
+<details>
+<summary>Swagger / Air</summary>
+
+- **Swagger**：swag init/主入口注解/接口注解(@Summary/@Param/@Success/@Router)/Gin集成
+- **Air**：热重载/air init/.air.toml配置/Docker中使用
+
+</details>
+
+#### 数据库操作
+
+<details>
+<summary>GORM</summary>
+
+- 安装连接/连接池配置
+- 模型定义：gorm tag(primarykey/type/not null/index/uniqueIndex/default)
+- 自动迁移：AutoMigrate
+- CRUD：Create/First/Find/Where/Update/Updates/Delete
+- 关联：Preload/Joins/foreignKey
+- 事务：Transaction
+- GORM Gen：类型安全ORM/代码生成
+
+</details>
+
+<details>
+<summary>Go 操作 Redis</summary>
+
+- go-redis 连接/配置
+- 5大类型：String(SET/GET/INCR)/Hash(HSET/HGET/HGETALL)/List(LPush/RPush/LPop)/Set(SAdd/SMembers)/SortedSet(ZAdd/ZRange/ZScore)
+- Pipeline：批量操作
+- Lua 脚本：NewScript/Run
+- 分布式锁：SetNX + Lua 释放
+- 发布订阅：Subscribe/Publish
+
+</details>
+
+<details>
+<summary>Go 操作 MongoDB</summary>
+
+- mongo-driver 连接
+- CRUD：InsertOne/InsertMany/FindOne/Find/UpdateOne/UpdateMany/DeleteOne/DeleteMany
+- 聚合管道：Aggregate/$match/$group/$sort/$limit
+- 索引：Indexes().CreateOne/CreateMany
+
+</details>
+
+<details>
+<summary>Go 操作 Kafka / NSQ / RabbitMQ</summary>
+
+- **Kafka**：kafka-go/Writer(生产)/Reader(消费)/ConsumerGroup/管理操作
+- **NSQ**：go-nsq/Producer(Publish)/Consumer(AddHandler)/nsqlookupd发现
+- **RabbitMQ**：amqp091-go/工作队列/发布订阅(Fanout)/路由(Direct)/主题(Topic)
+
+</details>
+
+#### 可观测性
+
+<details>
+<summary>OpenTelemetry / Jaeger / Prometheus</summary>
+
+- **OpenTelemetry**：TracerProvider/Span/属性/事件/错误记录/HTTP(gin)集成/gRPC集成
+- **Jaeger**：部署(all-in-one)/Go集成/采样策略(AlwaysSample/TraceIDRatioBased)/Web UI
+- **Prometheus Go**：Counter/Gauge/Histogram/Summary/Gin中间件/PromQL查询
+
+</details>
+
+<details>
+<summary>优雅关机与部署</summary>
+
+- **优雅关机**：signal.Notify/srv.Shutdown/超时控制
+- **优雅重启**：SIGHUP 信号处理
+- **部署方式**：二进制/Systemd/Docker/K8s
+- **编译优化**：-ldflags="-s -w"/版本信息注入(-X)
 
 </details>
 
@@ -459,6 +706,28 @@
 
 </details>
 
+#### 微服务
+
+<details>
+<summary>Go kit 微服务</summary>
+
+- 代码分层：Service(业务逻辑)/Endpoint(端点)/Transport(传输)
+- 中间件模式：日志/指标/链路追踪
+- 支持 HTTP/gRPC 传输
+
+</details>
+
+<details>
+<summary>Consul 服务注册与发现</summary>
+
+- 服务注册：AgentServiceRegistration/健康检查
+- 服务发现：Health().Service()
+- KV 存储：Put/Get
+- 健康检查：HTTP/TCP/gRPC
+- 注销服务：ServiceDeregister
+
+</details>
+
 ### 1.8 Web接口性能优化
 
 #### 编码优化
@@ -540,6 +809,7 @@
 - go build / fmt / vet / test / doc / generate / embed / race
 - golangci-lint（多 Linter 聚合）/ gomvpkg（包迁移）/ Docker 多阶段构建
 - 性能调试：pprof（CPU/Mem/Goroutine/Block）/ 火焰图 / go test -bench / trace
+- 部署：二进制/Systemd/Docker(docker-compose)/K8s/编译优化(-ldflags)
 
 </details>
 
@@ -1924,6 +2194,83 @@
 </details>
 
 <details>
+<summary>iptables 与 netfilter</summary>
+
+- **netfilter 架构**：5 个钩子点（PREROUTING/INPUT/FORWARD/OUTPUT/POSTROUTING）
+- **四表五链**：filter（INPUT/FORWARD/OUTPUT）/nat（PREROUTING/OUTPUT/POSTROUTING）/mangle/raw
+- **iptables 语法**：规则/链/表/匹配条件/动作（ACCEPT/DROP/REJECT/DNAT/SNAT/MASQUERADE）
+- **常用规则**：放行 SSH/HTTP、NAT 转发、端口映射、IP 伪装
+- **持久化**：iptables-save/iptables-restore/iptables-persistent
+- **iptables vs nftables**：语法简化/集合/字典/兼容性
+
+</details>
+
+<details>
+<summary>Firewalld</summary>
+
+- **概述**：动态防火墙管理工具，iptables/nftables 前端
+- **zone 概念**：public/trusted/home/internal/dmz/work/external/block/drop
+- **服务与端口管理**：firewall-cmd 常用命令（--add-service/--add-port/--reload）
+- **富规则（Rich Rules）**：复杂规则配置（source/destination/port/action/log）
+- **直接规则**：--direct 选项直接操作 iptables
+- **与 Docker/K8s 兼容性**：Docker 操作 iptables 导致冲突/解决方案
+
+</details>
+
+<details>
+<summary>DenyHosts 与 SSH 安全</summary>
+
+- **SSH 暴力破解**：原理与危害/常见攻击方式
+- **DenyHosts**：安装配置/工作原理（分析日志→写入 hosts.deny）/同步服务器
+- **Fail2Ban**：更强大的替代方案/正则匹配/jail 配置/action 配置
+- **SSH 安全加固**：密钥认证/禁用 root/修改端口/白名单/MaxAuthTries
+- **与 iptables/Firewalld 联动**：自动封禁 IP
+
+</details>
+
+<details>
+<summary>Linux 性能优化</summary>
+
+- **方法论**：USE 方法（Utilization/Saturation/Errors）
+- **CPU 优化**：top/vmstat/mpstat/perf/火焰图/上下文切换/运行队列
+- **内存优化**：free/vmstat/sar/swap/页面缓存/大页内存（HugePages）/OOM Killer
+- **磁盘 I/O 优化**：iostat/iotop/调度器（cfq/deadline/noop/mq-deadline）/RAID/SSD 优化
+- **网络优化**：ss/netstat/tcpdump/连接数调优/内核参数（sysctl）/TCP 调优
+- **系统级调优**：ulimit/cgroup/NUMA/IRQ 亲和性/IRQ balance
+- **常用内核参数**：net.core.somaxconn/net.ipv4.tcp_tw_reuse/vm.swappiness 等
+- **性能优化清单与排查流程**
+
+</details>
+
+<details>
+<summary>Linux 网络工具</summary>
+
+- **网络诊断**：ip/ss/ping/traceroute/mtr/nslookup/dig
+- **流量分析**：tcpdump/wireshark/nethogs/iftop/nload
+- **连接管理**：nc/curl/telnet/ssh
+- **网络配置**：ip route/bridge/vlan/bonding/team
+- **DNS 工具**：dig/host/nslookup/resolvectl/systemd-resolved
+
+</details>
+
+<details>
+<summary>Shell 编程</summary>
+
+- **Shell 基础**：变量/字符串/数组/特殊变量（$?/$!/$$/$#/$@/$0）
+- **条件判断**：test/[/[[/case
+- **循环**：for/while/until/select/break/continue
+- **函数**：定义/参数/返回值/局部变量/递归
+- **文本处理三剑客**：grep（模式匹配/正则）/sed（流编辑/替换/删除/插入）/awk（字段处理/报表生成）
+- **重定向与管道**：stdin/stdout/stderr/here document/进程替换
+- **正则表达式**：BRE/ERE/常用模式/零宽断言
+- **脚本调试**：set -x/-e/-u/-o pipefail、trap 信号处理
+- **高级技巧**：并发执行（xargs/GNU parallel）/临时文件/安全编程
+- **Shell 编程风格与最佳实践**
+- **常用脚本模板**：日志轮转/备份/健康检查/批量部署
+
+</details>
+
+<details>
 <summary>网络协议</summary>
 
 - **TCP**：三次握手/四次挥手/滑动窗口/拥塞控制（慢启动/拥塞避免/快重传/快恢复）/流量控制
@@ -2027,6 +2374,55 @@
 </details>
 
 <details>
+<summary>K8s 核心组件详解</summary>
+
+- **API Server**：REST API 入口/认证（X509/Bearer Token/OIDC/Webhook）/授权（RBAC/ABAC/Node/Webhook）/准入控制（Admission Controller）/etcd 交互/高可用部署
+- **etcd**：分布式 KV 存储/RAFT 一致性协议/数据模型（revision/key-value）/备份恢复（etcdctl snapshot）/性能调优/集群运维（扩缩容/迁移）
+- **Scheduler**：调度流程（过滤→打分→绑定）/调度策略（NodeSelector/NodeAffinity/PodAffinity/Taint&Toleration/Priority&Preemption）/自定义调度器/调度框架（Scheduling Framework）
+- **Controller Manager**：控制器模式（Informer/Reflector/Indexer）/Deployment Controller/ReplicaSet Controller/Node Controller 工作原理
+- **kubelet**：Pod 生命周期管理/CRI 容器运行时接口/PLEG（Pod Lifecycle Event Generator）/探针（Liveness/Readiness/Startup）/资源上报/静态 Pod
+- **kube-proxy**：iptables 模式/IPVS 模式/userspace 模式/Service 发现与负载均衡/conntrack 表
+- **CoreDNS**：集群内 DNS 解析/Service 发现/自定义 DNS 配置/StubDomain/Upstream
+
+</details>
+
+<details>
+<summary>K8s 持久化存储</summary>
+
+- **Volume 类型**：emptyDir/hostPath/nfs/configMap/secret/downwardAPI
+- **PV 与 PVC**：生命周期（Available→Bound→Released）/回收策略（Retain/Delete/Recycle）/容量/访问模式（RWO/ROX/RWX）
+- **StorageClass**：动态供给/默认 StorageClass/参数配置/卷扩展（AllowVolumeExpansion）
+- **CSI（Container Storage Interface）**：架构设计（Node Plugin/Controller Plugin）/外部 Provisioner/Attacher/Resizer/常用 CSI 驱动
+- **常见存储方案**：
+  - 本地存储：local-path-provisioner/openebs-local
+  - 网络存储：NFS/Ceph RBD/CephFS/GlusterFS
+  - 云存储：AWS EBS/Azure Disk/GCE PD/阿里云云盘
+  - 分布式存储：Rook-Ceph/Longhorn/Vitastor
+- **持久化最佳实践**：StatefulSet + PVC/数据备份策略/存储选型/性能优化
+
+</details>
+
+<details>
+<summary>Prometheus 监控 K8s</summary>
+
+- **Prometheus 架构**：Server/Pushgateway/AlertManager/Exporters/Service Discovery
+- **K8s 集成方案**：
+  - Prometheus Operator：CRD（Prometheus/ServiceMonitor/PodMonitor/Alertmanager/PrometheusRule）
+  - kube-prometheus-stack：完整监控栈部署（Prometheus+Grafana+AlertManager+Node Exporter+kube-state-metrics）
+- **监控指标**：
+  - 节点指标：CPU/内存/磁盘/网络（node_exporter）
+  - Pod 指标：cAdvisor（容器 CPU/内存/网络/文件系统）
+  - 集群指标：kube-state-metrics（Deployment 状态/Pod 状态/资源请求与限制）
+  - etcd 指标：leader 变更/慢查询/磁盘性能
+  - API Server 指标：请求延迟/错误率/etcd 延迟
+- **告警规则**：节点宕机/Pod CrashLoopBackOff/资源超限/磁盘满/PVC 即将用尽
+- **Grafana 仪表盘**：集群概览/节点详情/Pod 详情/网络/存储
+- **自定义监控**：应用埋点（Prometheus client 库）/ServiceMonitor 配置
+- **长期存储**：Thanos/VictoriaMetrics/Cortex 远程写入方案
+
+</details>
+
+<details>
 <summary>Docker Swarm</summary>
 
 - 集群部署 / 节点管理 / 服务部署与扩缩容
@@ -2059,6 +2455,56 @@
 
 </details>
 
+#### 自动化运维
+
+<details>
+<summary>Puppet</summary>
+
+- **概述**：声明式配置管理/Agent-Master 架构/编译型（Catalog 预编译）
+- **安装部署**：Puppet Server/Puppet Agent/PuppetDB
+- **核心概念**：Manifest/Module/Class/Resource/Node/Facter（系统事实）
+- **资源类型**：file/package/service/user/cron/exec/notify/file_line
+- **模块开发**：目录结构（manifests/files/templates/lib/spec）/init.pp/params.pp
+- **Hiera 数据分离**：层次化数据/环境配置/加密数据（eyaml）/数据绑定
+- **Puppet DSL**：变量/条件/循环/模板（ERB/EPP）
+- **PuppetDB**：存储 Catalog/报告/事实/查询 API
+- **Puppet vs Ansible vs SaltStack 对比**
+
+</details>
+
+<details>
+<summary>Ansible</summary>
+
+- **概述**：无 Agent/SSH 推送/声明式 YAML/幂等性
+- **安装与配置**：pip/apt/yum/ansible.cfg/hosts 清单
+- **核心**：Inventory（静态/动态/Group/Host vars）/Module/Playbook/Role
+- **常用模块**：ping/shell/command/copy/template/file/yum/apt/service/systemd/user/git/docker_container
+- **Playbook**：任务/变量/条件（when）/循环（loop）/错误处理（block/rescue）/标签/触发器（handler）
+- **变量与模板**：Jinja2 模板/变量优先级/facts/注册变量/过滤器
+- **Role**：目录结构（tasks/handlers/templates/files/vars/defaults/meta）/依赖/ansible-galaxy
+- **高级**：Vault 加密/异步任务/策略（strategy）/回调插件/自定义模块
+- **AWX/Tower**：Web 管理界面/作业模板/工作流/RBAC
+- **实战**：批量部署 Web 服务/滚动更新/配置漂移检测
+
+</details>
+
+<details>
+<summary>SaltStack</summary>
+
+- **概述**：Agent（Minion）+ Master 架构/ZeroMQ 通信/高速执行
+- **安装部署**：salt-master/salt-minion/salt-syndic/多 Master
+- **核心概念**：State/Module/Pillar/Grains/Mine/Runner/Orchestrate
+- **目标匹配**：glob/PCRE/list/grain/pillar/compound/nodegroup
+- **State 系统**：SLS 文件/require/watch/onchanges/onfail/命名空间
+- **Pillar 数据**：加密变量/环境分离/数据渲染
+- **Grains**：系统信息采集/自定义 Grains
+- **Jinja 模板**：变量/条件/循环/宏/过滤器
+- **Salt SSH**：无 Agent 模式/roster 文件
+- **Salt API**：REST 推送/外部集成
+- **SaltStack vs Ansible vs Puppet 对比**
+
+</details>
+
 #### 基础设施
 
 <details>
@@ -2067,6 +2513,22 @@
 - **ES 集群**：节点角色（Master/Data/Coordinating）/分片与副本/集群健康状态/索引模板/ILM 生命周期管理
 - **Redis 运维**：主从复制/哨兵模式/Cluster 模式/内存优化/持久化（RDB/AOF）/慢查询监控/大 Key 治理
 - **监控系统集成**：Prometheus + Grafana + AlertManager 全链路监控
+
+</details>
+
+<details>
+<summary>ELK Stack</summary>
+
+- **Logstash**：安装配置/管道架构（input→filter→output）/Grok 模式/性能优化（pipeline.workers/batch.size）/多管道配置
+- **Kibana**：安装配置/Discover（日志搜索与过滤）/Visualize（图表创建）/Dashboard（仪表盘）/Dev Tools（ES 查询调试）/KQL 查询语法
+- **Filebeat**：轻量日志采集器/模块化配置（nginx/redis/mysql）/multiline 多行日志/与 Logstash/ES 直连/processors 处理器
+- **ELK 架构实践**：
+  - 方案1（标准）：Filebeat → Logstash → Elasticsearch → Kibana
+  - 方案2（轻量）：Filebeat → Elasticsearch → Kibana
+  - 方案3（缓冲）：Filebeat → Kafka → Logstash → Elasticsearch → Kibana
+- **索引生命周期管理（ILM）**：hot（rollover）→ warm（forcemerge/shrink）→ cold → delete
+- **集群规划**：Master/Data Hot/Data Warm/Data Cold/Coordinating 节点角色与规格
+- **替代方案**：EFK（Fluentd，K8s 生态常用）/Loki + Grafana（仅索引标签，存储成本低）
 
 </details>
 
@@ -2086,6 +2548,53 @@
 - **OVN**：OVS 集中式控制器；逻辑交换机（L2）/逻辑路由器（L3）/L2-L4 ACL/多种隧道封装（Geneve/STT/VXLAN）/Kube-OVN
 - **ovs-dpdk**：OVS + DPDK 用户态网络，绕过内核协议栈，极低延迟；编译 DPDK/大页内存配置/VFIO 设备绑定
 - **负载均衡**：四层（LVS/NAT/DR/TUN）/七层（Nginx Ingress Controller/HAProxy）；健康检查/会话保持/权重分配
+
+</details>
+
+<details>
+<summary>LVS（Linux Virtual Server）</summary>
+
+- **三种模式**：NAT（请求响应都经 Director）/DR（Direct Routing，响应直接返回）/TUN（IP 隧道封装，跨网段）
+- **IPVS 配置**：ipvsadm 命令（创建虚拟服务/添加 RS/查看规则/统计）
+- **调度算法**：rr/wrr/lc/wlc（推荐）/sh/dh/lblc/sed
+- **LVS + Keepalived 高可用**：Keepalived 管理 IPVS 规则/健康检查/主备切换
+
+</details>
+
+<details>
+<summary>HAProxy</summary>
+
+- **安装配置**：global/defaults/frontend/backend/listen 五段配置
+- **四层/七层代理**：TCP 模式（mysql/redis 代理）/HTTP 模式（Web 反向代理）
+- **ACL 规则**：path_beg/path_end/hdr/host/源 IP 匹配/use_backend 条件路由
+- **负载均衡算法**：roundrobin/static-rr/leastconn/source/uri
+- **健康检查**：option httpchk/TCP_CHECK/自定义检查脚本
+- **统计页面**：listen stats/stats enable/stats uri
+- **SSL 终结**：bind *:443 ssl crt/crl-file
+
+</details>
+
+<details>
+<summary>Nginx（负载均衡与反向代理）</summary>
+
+- **反向代理**：proxy_pass/proxy_set_header/proxy_buffering/proxy_connect_timeout
+- **负载均衡**：upstream/权重/backup/max_fails/fail_timeout/keepalive
+- **负载均衡算法**：轮询（默认）/least_conn/ip_hash/hash
+- **性能调优**：worker_processes/worker_connections/sendfile/tcp_nopush/gzip/open_file_cache
+- **安全配置**：SSL/TLS/限流（limit_req）/安全头部（X-Frame-Options/HSTS）
+- **平滑升级**：kill -USR2/kill -WINCH/回滚
+
+</details>
+
+<details>
+<summary>Keepalived</summary>
+
+- **VRRP 协议**：虚拟路由冗余协议/Master-Backup 选举/VIP 漂移
+- **配置**：global_defs/vrrp_instance/vrrp_script/virtual_ipaddress
+- **健康检查脚本**：track_script/weight/fall/rise
+- **与 LVS 集成**：virtual_server/real_server/TCP_CHECK
+- **与 HAProxy/Nginx 集成**：vrrp_script 检测进程状态/自动故障切换
+- **架构选型对比**：LVS（四层极高并发）vs HAProxy（四七层混合）vs Nginx（七层 HTTP 代理）
 
 </details>
 

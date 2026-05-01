@@ -9,6 +9,7 @@
 <link id="hljs-theme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css">
 <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/highlight.min.js"></script>
 <style>
+@font-face{font-family:'Virgil';src:url('https://excalidraw.com/Virgil.woff2') format('woff2');font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#0f1117;--bg-secondary:#1a1d2e;--bg-tertiary:#252a3a;
@@ -82,6 +83,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .node-group{cursor:pointer}
 .node-group:hover .node-bubble{filter:brightness(1.2)}
 .node-group.search-highlight .node-bubble{stroke-width:3;filter:drop-shadow(0 0 6px var(--accent))}
+.node-group.summary-node .node-bubble{stroke-dasharray:none}
+.node-group.summary-node .node-bubble-text{font-style:italic}
+.summary-icon{pointer-events:none;dominant-baseline:central;font-size:9px}
 .node-bubble{transition:filter .2s}
 .node-bubble-text{fill:var(--text-bright);pointer-events:none;dominant-baseline:central;transition:fill .3s}
 .fold-badge{fill:var(--text-dim);font-size:8px;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:central}
@@ -89,6 +93,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .bracket-path{fill:none;stroke-width:2;pointer-events:none;stroke-linecap:round}
 .sketch-path{fill:none;stroke-width:2;pointer-events:none;stroke-linecap:round;stroke-linejoin:round}
 .sketch-bubble{transition:filter .2s}
+.hachure-path{pointer-events:none;opacity:0.35}
+.file-link-indicator{pointer-events:none;dominant-baseline:central;font-size:8px;fill:var(--accent);opacity:0.7}
 
 .modal-overlay{position:fixed;inset:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade-in .2s ease}
 .modal-overlay.active{display:flex}
@@ -140,6 +146,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .markdown-body summary:hover{background:var(--highlight-bg)}
 .markdown-body details[open] summary{border-bottom:1px solid var(--border)}
 .markdown-body details>div,.markdown-body details>p{padding:8px 12px}
+
+.source-link{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-tertiary);color:var(--accent);font-size:12px;cursor:pointer;text-decoration:none;margin-bottom:12px;transition:all .2s}
+.source-link:hover{border-color:var(--accent);background:var(--highlight-bg)}
 
 .save-toast{position:absolute;top:12px;right:12px;background:var(--h3-color);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none}
 .save-toast.show{opacity:1}
@@ -254,8 +263,238 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   var currentEditSlug = '';
   var highlightedSlug = null;
   var clickTimers = {};
+  var mybookBase = '../src/mybook';
 
   var branchColors = ['#e0af68','#6cb4ee','#9ece6a','#ff9e64','#bb9af7','#7dcfff','#f7768e','#73daca'];
+
+  var h3DirMap = {
+    '1.1': 'go/1_语言基础', '1.2': 'go/2_核心概念', '1.3': 'go/3_并发编程',
+    '1.4': 'go/4_内存管理', '1.5': 'go/5_常见陷阱', '1.6': 'go/6_常用标准库',
+    '1.7': 'go/7_常用框架', '1.8': 'go/8_Web接口性能优化', '1.9': 'go/9_安全专题',
+    '1.10': 'go/10_开源项目', '1.11': 'go/11_工具与调试', '1.12': 'go/12_分布式基础',
+    '2.1': 'cpp/C语言教程', '2.2': 'cpp/C++专题',
+    '3.1': 'python/1_语言基础', '3.2': 'python/2_Python工匠', '3.3': 'python/3_版本演进',
+    '3.4': 'python/4_标准库', '3.5': 'python/5_常用库', '3.6': 'python/6_Web开发',
+    '3.7': 'python/7_第三方库', '3.8': 'python/8_高并发设计', '3.9': 'python/9_面试题',
+    '4.1': 'lua/1_语言基础', '4.2': 'lua/2_高级主题',
+    '5.1': 'web/1_前端基础', '5.2': 'web/2_前端框架', '5.3': 'web/3_后端与协议', '5.4': 'web/4_工程化与工具',
+    '6.1': 'security/1_Web安全', '6.2': 'security/2_安全工具与方法', '6.3': 'security/3_云与容器安全',
+    '7.1': 'algorithms', '7.2': 'devops', '7.3': 'architecture', '7.4': 'devops', '7.5': 'agents',
+    '7.6': 'devops'
+  };
+
+  var summaryFileMap = {
+    '数据类型': 'go/2_核心概念/2_数据类型.md',
+    '变量声明与控制结构': 'go/1_语言基础/3_语句.md',
+    '函数与方法': 'go/1_语言基础/4_函数.md',
+    '接口': 'go/1_语言基础/7_接口.md',
+    '包-模块-库': 'go/1_语言基础/11_包-模块-库.md',
+    '测试': 'go/1_语言基础/12_测试.md',
+    '项目结构与代码风格': 'go/1_语言基础/13_项目结构代码风格与标识符命名.md',
+    '错误处理': 'go/1_语言基础/10_错误和异常.md',
+    '设计模式': 'go/1_语言基础/16_设计模式.md',
+    '泛型': 'go/1_语言基础/8_泛型.md',
+    '版本新特性': 'go/1_语言基础/15_版本新特性.md',
+    '内部实现原理': 'go/1_语言基础/14_内部实现原理.md',
+    'Slice vs Array': 'go/2_核心概念/2_数据类型.md',
+    'Map': 'go/2_核心概念/2_数据类型.md',
+    '指针 & make vs new': 'go/2_核心概念/13_make与new.md',
+    'GMP 调度模型': 'go/3_并发编程/7_Golang协程调度器原理-GMP模型.md',
+    'Goroutine & Channel': 'go/3_并发编程/9_并发.md',
+    'sync 包': 'go/3_并发编程/9_并发.md',
+    'Context': 'go/6_常用标准库/20_context.md',
+    '并发编程模式': 'go/3_并发编程/14_并发模式详解.md',
+    '协程池': 'go/3_并发编程/11_协程池.md',
+    '限流与熔断': 'go/3_并发编程/15_限流与熔断.md',
+    '内存模型与分配': 'go/4_内存管理/9_内存管理.md',
+    '逃逸分析': 'go/4_内存管理/12_Go内存逃逸.md',
+    '垃圾回收（GC）': 'go/4_内存管理/8_GC-垃圾回收.md',
+    '混合写屏障详解': 'go/4_内存管理/10086_混合写屏障.md',
+    'fmt 格式化': 'go/6_常用标准库/12_fmt.md',
+    'time 时间包': 'go/6_常用标准库/13_time.md',
+    'strconv / flag': 'go/6_常用标准库/14_strconv.md',
+    '文件操作（os/io）': 'go/6_常用标准库/16_文件操作.md',
+    'html/template 模板': 'go/6_常用标准库/17_template.md',
+    'encoding/json 详解': 'go/6_常用标准库/18_json.md',
+    'reflect 反射': 'go/6_常用标准库/19_reflect.md',
+    'context 详解': 'go/6_常用标准库/20_context.md',
+    '日志': 'go/6_常用标准库/1_log.md',
+    'Viper 配置管理': 'go/6_常用标准库/21_viper.md',
+    'validator 参数校验': 'go/6_常用标准库/22_validator.md',
+    'sqlx 数据库操作': 'go/6_常用标准库/23_sqlx.md',
+    'Cobra CLI 开发': 'go/6_常用标准库/26_cobra.md',
+    'Swagger / Air': 'go/6_常用标准库/25_swagger.md',
+    'GORM': 'go/6_常用标准库/3_gorm.md',
+    'Go 操作 Redis': 'go/6_常用标准库/28_redis.md',
+    'Go 操作 MongoDB': 'go/6_常用标准库/29_mongodb.md',
+    'Go 操作 Kafka / NSQ / RabbitMQ': 'go/6_常用标准库/30_kafka.md',
+    'OpenTelemetry / Jaeger / Prometheus': 'go/6_常用标准库/35_opentelemetry.md',
+    '优雅关机与部署': 'go/6_常用标准库/33_优雅关机.md',
+    'Gin': 'go/7_常用框架/2_gin.md',
+    'go-zero': 'go/7_常用框架/1_go-zero.md',
+    'GoFrame': 'go/7_常用框架/6_GoFrame.md',
+    'Gin vs go-zero 对比': 'go/7_常用框架/1003_gin_vs_go-zero.md',
+    'gRPC': 'go/7_常用框架/3_grpc.md',
+    'Zinx / Etcd': 'go/7_常用框架/4_zinx.md',
+    'Wire & 依赖注入': 'go/7_常用框架/7_Wire依赖注入.md',
+    'Go kit 微服务': 'go/7_常用框架/8_go-kit.md',
+    'Consul 服务注册与发现': 'go/7_常用框架/9_consul.md',
+    'SBOM': 'go/9_安全专题/1004_sbom.md',
+    '国密算法与证书': 'go/9_安全专题/1005_国密算法证书.md',
+    '常用工具': 'go/11_工具与调试/0_常用工具.md',
+    '分布式理论 & 网络模型': 'go/12_分布式基础/6_分布式.md',
+    '语言基础': 'cpp/C语言教程/语言基础/intro.md',
+    '标准库': 'cpp/C语言教程/标准库/stdio.md',
+    '基础语法': 'cpp/C++专题/基础语法/C++MAP.md',
+    '内存管理': 'cpp/C++专题/现代特性/1_C++11特性.md',
+    '现代C++特性': 'cpp/C++专题/现代特性/1_C++11特性.md',
+    'C++ 版本特性总览': 'cpp/C++专题/现代特性/3_C++20-23特性.md',
+    '并发编程': 'cpp/C++专题/并发与STL/1_并发编程.md',
+    'STL': 'cpp/C++专题/并发与STL/1_STL详解.md',
+    '开发环境与工具': 'cpp/C++专题/工具与库/cmake-and-vcpkg.md',
+    '常用库': 'cpp/C++专题/工具与库/Boost.md',
+    '核心语法': 'python/1_语言基础/Python基础_第2版.md',
+    'Python风格指南': 'python/1_语言基础/Python风格指南.md',
+    '3.6 → 3.14 新特性': 'python/3_版本演进/版本演进总结.md',
+    '内置类型与异常': 'python/4_标准库/内置类型.md',
+    '文本与数据处理': 'python/4_标准库/文本处理服务.md',
+    '垃圾回收': 'python/4_标准库/垃圾回收.md',
+    '并发执行': 'python/4_标准库/并发执行.md',
+    '网络和进程间通信': 'python/4_标准库/网络和进程间通信.md',
+    'Django': 'python/6_Web开发/django/django.md',
+    'Flask': 'python/6_Web开发/flask/flask.md',
+    'FastAPI / Tornado / Bottle / Quart / Sanic': 'python/6_Web开发/fastapi.md',
+    '微服务': 'python/6_Web开发/微服务.md',
+    '反爬与安全': 'python/6_Web开发/反爬.md',
+    'Python面试题': 'python/9_面试题/面试题.md',
+    '数据类型与变量': 'lua/1_语言基础/02_lua数据类型与变量.md',
+    '函数': 'lua/1_语言基础/08_函数.md',
+    '协程': 'lua/1_语言基础/14_lua_coroutine.md',
+    '错误处理 & 模式匹配': 'lua/1_语言基础/04_错误处理与模式匹配.md',
+    'GC & 性能': 'lua/1_语言基础/17_GC与性能优化.md',
+    '标准库': 'lua/1_语言基础/20_lua标准库.md',
+    'LuaJIT & FFI': 'lua/2_高级主题/15_luaJIT.md',
+    'OpenResty': 'lua/2_高级主题/40_openresty安装.md',
+    'Lua与C++': 'lua/2_高级主题/30_Lua与C++.md',
+    'LuaGo': 'lua/2_高级主题/50_luago.md',
+    'HTML & CSS': 'web/1_前端基础/1_HTML5基础.md',
+    'JavaScript 核心': 'web/1_前端基础/1_JS核心.md',
+    'TypeScript': 'web/1_前端基础/2_TypeScript.md',
+    'React': 'web/2_前端框架/React.md',
+    'Vue': 'web/2_前端框架/Vue.md',
+    'Node.js': 'web/2_前端框架/Node.js.md',
+    'HTTP 协议': 'web/3_后端与协议/HTTP协议.md',
+    '浏览器原理': 'web/3_后端与协议/浏览器原理.md',
+    'Tailwind CSS': 'web/4_工程化与工具/tailwind-css.md',
+    'Vite': 'web/4_工程化与工具/vite.md',
+    'Vuepress': 'web/4_工程化与工具/vuepress.md',
+    'VSCode插件开发': 'web/4_工程化与工具/vscode/memos-vscode插件开发记录.md',
+    'OWASP Top 10': 'security/1_Web安全/1_OWASP-Top10.md',
+    'Web 安全': 'security/1_Web安全/3_常见漏洞.md',
+    '常见认证方式': 'security/1_Web安全/常见认证方式.md',
+    '逻辑漏洞': 'security/1_Web安全/逻辑漏洞.md',
+    '渗透测试方法论': 'security/2_安全工具与方法/1_方法论.md',
+    'Nuclei': 'security/2_安全工具与方法/3_Nuclei.md',
+    '漏扫爬虫': 'security/2_安全工具与方法/漏扫爬虫.md',
+    '容器内信息收集': 'security/3_云与容器安全/容器内信息收集.md',
+    '容器 & 云安全': 'security/3_云与容器安全/Docker安全.md',
+    '数据结构': 'algorithms/数据结构与算法.md',
+    '系统架构': 'architecture/1_架构设计.md',
+    '数据库': 'architecture/数据库/1_关系数据库.md',
+    'Kubernetes 核心概念': 'devops/kubernetes/1_K8s核心概念.md',
+    'CI/CD': 'devops/cicd/1_GitHub-Actions.md',
+    'Puppet': 'devops/自动化运维/1_Puppet.md',
+    'Ansible': 'devops/自动化运维/2_Ansible.md',
+    'SaltStack': 'devops/自动化运维/3_SaltStack.md',
+    '框架': 'agents/智能体框架.md',
+    'AI Coding 实践': 'agents/AI-Coding实践.md',
+    '循环与变量陷阱': 'go/5_常见陷阱/1_常见陷阱.md',
+    '类型与接口陷阱': 'go/5_常见陷阱/1_常见陷阱.md',
+    'Slice 与 Map 陷阱': 'go/5_常见陷阱/1_常见陷阱.md',
+    '性能与标准库误用': 'go/5_常见陷阱/1_常见陷阱.md',
+    '并发与同步': 'go/6_常用标准库/27_singleflight.md',
+    '网络与 I/O': 'go/6_常用标准库/5_http标准库.md',
+    '编码层面': 'go/8_Web接口性能优化/1001_web接口性能优化.md',
+    '并发 & 数据库 & 缓存': 'go/8_Web接口性能优化/3_性能优化实战.md',
+    'HTTP & JSON & 监控': 'go/8_Web接口性能优化/4_pprof性能分析.md',
+    '项目列表': 'go/10_开源项目/0_gin-vue-admin.md',
+    '并发安全退出': 'go/3_并发编程/16_conc.md',
+    '面向对象 & 环境': 'lua/1_语言基础/11_面向对象.md',
+    '生态': 'lua/2_高级主题/70_openstar.md',
+    'Markdown': 'web/4_工程化与工具/vuepress-demo/markdown.md',
+    '未定义行为 & 内存安全': 'cpp/C++专题/现代特性/1_C++11特性.md',
+    '汇编 & 调用约定': 'cpp/C++专题/工具与库/zeromq.md',
+    '模板': 'cpp/C++专题/现代特性/1_C++11特性.md',
+    '善用变量': 'python/2_Python工匠/备忘/1-using-variables-well.md',
+    '数值与字符串技巧': 'python/2_Python工匠/备忘/3-tips-on-numbers-and-strings.md',
+    '精通容器类型': 'python/2_Python工匠/备忘/4-mastering-container-types.md',
+    '循环编写技巧': 'python/2_Python工匠/备忘/7-two-tips-on-loop-writing.md',
+    '函数返回值技巧': 'python/2_Python工匠/备忘/5-function-returning-tips.md',
+    '异常处理三个习惯': 'python/2_Python工匠/备忘/6-three-rituals-of-exceptions-handling.md',
+    '装饰器技巧': 'python/2_Python工匠/备忘/8-tips-on-decorators.md',
+    'SOLID 原则': 'python/2_Python工匠/备忘/12-write-solid-python-codes-part-1.md',
+    'Edge Cases 思维': 'python/2_Python工匠/备忘/15-thinking-in-edge-cases.md',
+    'If-else 分支思维': 'python/2_Python工匠/备忘/2-if-else-block-secrets.md',
+    '路径与文件操作': 'python/2_Python工匠/备忘/11-three-tips-on-writing-file-related-codes.md',
+    '循环导入的故事': 'python/2_Python工匠/备忘/9-a-story-on-cyclic-imports.md',
+    '核心': 'python/5_常用库/celery.md',
+    '网络/爬虫': 'python/7_第三方库/scrapy.md',
+    '协程 & 性能': 'python/5_常用库/uvloop.md',
+    '安全 & 包管理': 'python/7_第三方库/常用包.md',
+    '数据处理 & 科学计算': 'python/7_第三方库/Pandas.md',
+    '包分发 & C扩展': 'python/7_第三方库/常用包.md',
+    '数据库驱动': 'python/7_第三方库/pymysql.md',
+    '消息队列 & 搜索': 'python/7_第三方库/rabbitmq.md',
+    'LLM & AI': 'python/7_第三方库/大模型.md',
+    '自动化 & 部署': 'python/7_第三方库/自动化运维/ansible.md',
+    '基础架构': 'python/8_高并发设计/基础架构.md',
+    '高可用': 'python/8_高并发设计/高可用.md',
+    '高并发': 'python/8_高并发设计/高并发.md',
+    '分库分表': 'python/8_高并发设计/分库分表.md',
+    '唯一ID': 'python/8_高并发设计/唯一id.md',
+    '缓存': 'python/8_高并发设计/缓存.md',
+    '可观测性': 'python/8_高并发设计/可观测性.md',
+    '海量推送系统': 'python/8_高并发设计/海量推送系统.md',
+    '用户登录服务': 'python/8_高并发设计/用户登陆服务.md',
+    '算法设计': 'algorithms/数据结构与算法.md',
+    '排序算法': 'algorithms/algo/chapter_sorting/sorting_algorithm.md',
+    '复杂度分析': 'algorithms/algo/chapter_computational_complexity/time_complexity.md',
+    '基础理论': 'algorithms/数据结构与算法.md',
+    '算法题分类（BM系列）': 'algorithms/数据结构与算法.md',
+    '操作系统基础': 'devops/基础设施/1_网络.md',
+    'Linux 核心': 'devops/基础设施/1_网络.md',
+    'iptables 与 netfilter': 'devops/ovs-ovn.md',
+    'Firewalld': 'devops/ovs-ovn.md',
+    'DenyHosts 与 SSH 安全': 'devops/ovs-ovn.md',
+    'Linux 性能优化': 'devops/基础设施/5_监控系统集成.md',
+    'Linux 网络工具': 'devops/基础设施/1_网络.md',
+    'Shell 编程': 'devops/构建deb包.md',
+    '网络协议': 'devops/基础设施/1_网络.md',
+    'Git 高级': 'devops/cicd/1_GitHub-Actions.md',
+    '信息系统架构': 'architecture/2_分布式理论.md',
+    '未来技术': 'architecture/2_分布式理论.md',
+    '安全基础': 'architecture/2_分布式理论.md',
+    'K8s 核心组件详解': 'devops/kubernetes/2_K8s实践.md',
+    'K8s 持久化存储': 'devops/kubernetes/4_K8s持久化存储.md',
+    'Prometheus 监控 K8s': 'devops/kubernetes/5_Prometheus监控K8s.md',
+    'Docker Swarm': 'devops/docker-swarm.md',
+    'API 设计': 'devops/cicd/1_GitHub-Actions.md',
+    'ES集群 / Redis / 监控': 'devops/基础设施/4_ES集群与ELK.md',
+    'ELK Stack': 'devops/基础设施/4_ES集群与ELK.md',
+    '虚拟化': 'devops/hyper-v.md',
+    '网络': 'devops/基础设施/1_网络.md',
+    'LVS（Linux Virtual Server）': 'devops/基础设施/3_负载均衡.md',
+    'HAProxy': 'devops/基础设施/3_负载均衡.md',
+    'Nginx（负载均衡与反向代理）': 'devops/基础设施/3_负载均衡.md',
+    'Keepalived': 'devops/基础设施/3_负载均衡.md',
+    'KubeSphere': 'devops/k3s集群上安装kubesphere.md',
+    'OpenStack': 'devops/openstack二次开发.md',
+    '大模型': 'agents/LangGraph.md',
+    '提高研发效能': 'agents/AI-Coding实践.md',
+    '大厂技术文章': 'devops/构建deb包.md',
+    'Shell编程风格': 'devops/构建deb包.md',
+    '杂项': 'devops/构建deb包.md'
+  };
 
   function slugify(text){
     return text.trim().toLowerCase().replace(/[^\w\u4e00-\u9fff]+/g, '-').replace(/^-+|-+$/g, '') || 'heading';
@@ -265,16 +504,29 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var lines = text.split('\n');
     var result = [];
     var counter = {};
+    var lastHeadingLevel = 0;
     lines.forEach(function(line, idx){
       var m = line.match(/^(#{1,6})\s+(.+)$/);
       if(m){
         var level = m[1].length;
         var t = m[2].trim();
+        lastHeadingLevel = level;
         var base = slugify(t);
         if(!counter[base]) counter[base] = 0;
         counter[base]++;
         var slug = counter[base] > 1 ? base + '-' + counter[base] : base;
-        result.push({level: level, text: t, slug: slug, line: idx});
+        result.push({level: level, text: t, slug: slug, line: idx, isSummary: false});
+      } else {
+        var sm = line.match(/^<summary>(.+?)<\/summary>/);
+        if(sm){
+          var t2 = sm[1].trim();
+          var level2 = lastHeadingLevel + 1;
+          var base2 = slugify(t2);
+          if(!counter[base2]) counter[base2] = 0;
+          counter[base2]++;
+          var slug2 = counter[base2] > 1 ? base2 + '-' + counter[base2] : base2;
+          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true});
+        }
       }
     });
     return result;
@@ -288,10 +540,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       rootSlug = hdgs[0].slug;
       hdgs = hdgs.slice(1);
     }
-    var root = {name: rootName, slug: rootSlug, level: 0, children: []};
+    var root = {name: rootName, slug: rootSlug, level: 0, children: [], isSummary: false};
     var stack = [root];
     hdgs.forEach(function(h){
-      var node = {name: h.text, slug: h.slug, level: h.level, children: []};
+      var node = {name: h.text, slug: h.slug, level: h.level, children: [], isSummary: h.isSummary};
       while(stack.length > 1 && stack[stack.length - 1].level >= node.level){
         stack.pop();
       }
@@ -309,13 +561,29 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     if(!heading) return '';
     var startLine = heading.line;
     var endLine = markdownText.split('\n').length;
-    for(var i = 0; i < headings.length; i++){
-      if(headings[i].line > startLine && headings[i].level <= heading.level){
-        endLine = headings[i].line;
+    if(heading.isSummary){
+      var lines = markdownText.split('\n');
+      var inDetails = false;
+      var contentLines = [];
+      for(var i = startLine + 1; i < lines.length; i++){
+        var l = lines[i];
+        if(l.trim() === '</details>') break;
+        contentLines.push(l);
+      }
+      var section = lines[startLine] + '\n' + contentLines.join('\n');
+      return renderMarkdown(section);
+    }
+    for(var j = 0; j < headings.length; j++){
+      if(headings[j].line > startLine && headings[j].level <= heading.level){
+        endLine = headings[j].line;
         break;
       }
     }
-    var section = markdownText.split('\n').slice(startLine, endLine).join('\n');
+    var section2 = markdownText.split('\n').slice(startLine, endLine).join('\n');
+    return renderMarkdown(section2);
+  }
+
+  function renderMarkdown(text){
     marked.setOptions({
       highlight: function(code, lang){
         if(lang && hljs.getLanguage(lang)){
@@ -326,24 +594,67 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       },
       breaks: true, gfm: true
     });
-    return marked.parse(section);
+    return marked.parse(text);
   }
 
   function getSectionMarkdown(slug){
-    if(slug === treeData.slug){
-      return markdownText;
-    }
+    if(slug === treeData.slug) return markdownText;
     var heading = headings.find(function(h){ return h.slug === slug; });
     if(!heading) return '';
     var startLine = heading.line;
     var endLine = markdownText.split('\n').length;
-    for(var i = 0; i < headings.length; i++){
-      if(headings[i].line > startLine && headings[i].level <= heading.level){
-        endLine = headings[i].line;
+    if(heading.isSummary){
+      var lines = markdownText.split('\n');
+      var contentLines = [];
+      for(var i = startLine; i < lines.length; i++){
+        if(lines[i].trim() === '</details>') break;
+        contentLines.push(lines[i]);
+      }
+      return contentLines.join('\n');
+    }
+    for(var j = 0; j < headings.length; j++){
+      if(headings[j].line > startLine && headings[j].level <= heading.level){
+        endLine = headings[j].line;
         break;
       }
     }
     return markdownText.split('\n').slice(startLine, endLine).join('\n');
+  }
+
+  var mdPathCache = {};
+
+  function resolveMdPath(slug){
+    if(mdPathCache[slug] !== undefined) return mdPathCache[slug];
+    var heading = headings.find(function(h){ return h.slug === slug; });
+    if(!heading || !heading.isSummary){
+      mdPathCache[slug] = null;
+      return null;
+    }
+    if(summaryFileMap[heading.text]){
+      mdPathCache[slug] = mybookBase + '/' + summaryFileMap[heading.text];
+      return mdPathCache[slug];
+    }
+    var path = findPathToSlug(slug);
+    if(path.length < 2){
+      mdPathCache[slug] = null;
+      return null;
+    }
+    var h3Num = '';
+    path.forEach(function(p){
+      var h = headings.find(function(hh){ return hh.slug === p.slug; });
+      if(h && h.level === 3){
+        var m = h.text.match(/^(\d+\.\d+)/);
+        if(m) h3Num = m[1];
+      }
+    });
+    if(h3Num && h3DirMap[h3Num]){
+      var dir = h3DirMap[h3Num];
+      var fileName = heading.text.replace(/[\/\\:*?"<>|]/g, '_');
+      mdPathCache[slug] = mybookBase + '/' + dir + '/' + fileName + '.md';
+      return mdPathCache[slug];
+    }
+    mdPathCache[slug] = null;
+    return null;
   }
 
   function findPathToSlug(targetSlug){
@@ -369,14 +680,43 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var overlay = document.getElementById('modal-overlay');
     var body = document.getElementById('modal-body');
     var bc = document.getElementById('modal-breadcrumb');
-    var content = getSectionContent(slug);
-    body.querySelector('.markdown-body').innerHTML = content;
-    body.querySelector('.markdown-body').style.display = '';
+    var mdBody = body.querySelector('.markdown-body');
+    var heading = headings.find(function(h){ return h.slug === slug; });
+
+    var mdPath = resolveMdPath(slug);
+    if(mdPath && heading && heading.isSummary){
+      mdBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">加载中...</div>';
+      fetch(mdPath).then(function(resp){
+        if(resp.ok) return resp.text();
+        throw new Error('not found');
+      }).then(function(text){
+        mdBody.innerHTML = '';
+        if(mdPath){
+          var link = document.createElement('a');
+          link.className = 'source-link';
+          link.href = mdPath;
+          link.target = '_blank';
+          link.innerHTML = '📄 打开源文件';
+          mdBody.appendChild(link);
+        }
+        var contentDiv = document.createElement('div');
+        contentDiv.className = 'markdown-body';
+        contentDiv.innerHTML = renderMarkdown(text);
+        mdBody.appendChild(contentDiv);
+      }).catch(function(){
+        mdBody.innerHTML = getSectionContent(slug);
+      });
+    } else {
+      mdBody.innerHTML = getSectionContent(slug);
+    }
+
+    mdBody.style.display = '';
     body.querySelector('.modal-edit-area').style.display = 'none';
     isEditing = false;
     currentEditSlug = slug;
     document.getElementById('btn-edit').classList.remove('active');
     document.getElementById('btn-edit').innerHTML = '✎';
+
     var path = findPathToSlug(slug);
     var bcHTML = '';
     path.forEach(function(p, i){
@@ -391,7 +731,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     });
     overlay.classList.add('active');
     body.scrollTop = 0;
-    var heading = headings.find(function(h){ return h.slug === slug; });
     if(heading) document.getElementById('status-path').textContent = heading.text;
     else if(slug === treeData.slug) document.getElementById('status-path').textContent = treeData.name;
   }
@@ -482,8 +821,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     return [(y = +y) * Math.cos(x -= Math.PI / 2), y * Math.sin(x)];
   }
 
-  function truncateText(name, depth){
-    var maxLen = depth <= 0 ? 20 : depth === 1 ? 14 : 10;
+  function truncateText(name, depth, isSummary){
+    var maxLen = isSummary ? 10 : (depth <= 0 ? 20 : depth === 1 ? 14 : 10);
     return name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
   }
 
@@ -507,33 +846,91 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     return val + (Math.random() - 0.5) * amount;
   }
 
-  function sketchRect(x, y, w, h, rx){
-    var pts = [
-      [jitter(x, 1.5), jitter(y, 1.5)],
-      [jitter(x + w, 1.5), jitter(y, 1.5)],
-      [jitter(x + w, 1.5), jitter(y + h, 1.5)],
-      [jitter(x, 1.5), jitter(y + h, 1.5)]
-    ];
-    var d = 'M' + pts[0][0] + ',' + pts[0][1];
-    for(var i = 1; i <= 4; i++){
-      var curr = pts[i % 4];
-      var next = pts[(i + 1) % 4];
-      var cpx = (curr[0] + next[0]) / 2 + (Math.random() - 0.5) * 2;
-      var cpy = (curr[1] + next[1]) / 2 + (Math.random() - 0.5) * 2;
-      d += ' Q' + jitter(curr[0], 1) + ',' + jitter(curr[1], 1) + ' ' + cpx + ',' + cpy;
-    }
-    d += ' Q' + jitter(pts[0][0], 1) + ',' + jitter(pts[0][1], 1) + ' ' + pts[0][0] + ',' + pts[0][1];
+  function excalidrawRect(x, y, w, h){
+    var j = function(v, a){ return v + (Math.random() - 0.5) * a; };
+    var d = 'M' + j(x, 3) + ' ' + j(y, 3);
+    d += ' C' + j(x + w*0.25, 4) + ' ' + j(y, 2.5);
+    d += ' ' + j(x + w*0.75, 4) + ' ' + j(y, 2.5);
+    d += ' ' + j(x + w, 3) + ' ' + j(y, 3);
+    d += ' C' + j(x + w, 2.5) + ' ' + j(y + h*0.25, 4);
+    d += ' ' + j(x + w, 2.5) + ' ' + j(y + h*0.75, 4);
+    d += ' ' + j(x + w, 3) + ' ' + j(y + h, 3);
+    d += ' C' + j(x + w*0.75, 4) + ' ' + j(y + h, 2.5);
+    d += ' ' + j(x + w*0.25, 4) + ' ' + j(y + h, 2.5);
+    d += ' ' + j(x, 3) + ' ' + j(y + h, 3);
+    d += ' C' + j(x, 2.5) + ' ' + j(y + h*0.75, 4);
+    d += ' ' + j(x, 2.5) + ' ' + j(y + h*0.25, 4);
+    d += ' ' + j(x, 3) + ' ' + j(y, 3);
+    d += ' Z';
     return d;
   }
 
-  function sketchLine(x1, y1, x2, y2, segments){
-    segments = segments || 3;
-    var d = 'M' + jitter(x1, 1) + ',' + jitter(y1, 1);
-    for(var i = 1; i <= segments; i++){
-      var t = i / segments;
-      var px = x1 + (x2 - x1) * t;
-      var py = y1 + (y2 - y1) * t;
-      d += ' L' + jitter(px, 1.5) + ',' + jitter(py, 1.5);
+  function hachureFill(x, y, w, h, gap, angle){
+    gap = gap || 9;
+    angle = angle || (-45 + (Math.random() - 0.5) * 8) * Math.PI / 180;
+    var cos = Math.cos(angle);
+    var sin = Math.sin(angle);
+    var d = '';
+    var cx = x + w/2;
+    var cy = y + h/2;
+    var diag = Math.sqrt(w*w + h*h);
+    for(var offset = -diag/2; offset < diag/2; offset += gap + (Math.random()-0.5)*2){
+      var x1 = cx + offset * cos - diag/2 * sin;
+      var y1 = cy + offset * sin + diag/2 * cos;
+      var x2 = cx + offset * cos + diag/2 * sin;
+      var y2 = cy + offset * sin - diag/2 * cos;
+      var clips = clipLine(x1, y1, x2, y2, x, y, w, h);
+      if(clips){
+        d += 'M' + jitter(clips[0],1.2) + ',' + jitter(clips[1],1.2);
+        d += ' L' + jitter(clips[2],1.2) + ',' + jitter(clips[3],1.2) + ' ';
+      }
+    }
+    return d || 'M0,0';
+  }
+
+  function clipLine(x1, y1, x2, y2, rx, ry, rw, rh){
+    var codes = [0,0];
+    var pts = [[x1,y1],[x2,y2]];
+    for(var i = 0; i < 2; i++){
+      if(pts[i][0] < rx) codes[i] |= 1;
+      if(pts[i][0] > rx+rw) codes[i] |= 2;
+      if(pts[i][1] < ry) codes[i] |= 4;
+      if(pts[i][1] > ry+rh) codes[i] |= 8;
+    }
+    if((codes[0] | codes[1]) === 0) return [x1,y1,x2,y2];
+    if((codes[0] & codes[1]) !== 0) return null;
+    var dx = x2 - x1, dy = y2 - y1;
+    for(var j = 0; j < 2; j++){
+      if(codes[j] !== 0){
+        var t;
+        if(codes[j] & 8){ t = (ry+rh-y1)/dy; }
+        else if(codes[j] & 4){ t = (ry-y1)/dy; }
+        else if(codes[j] & 2){ t = (rx+rw-x1)/dx; }
+        else { t = (rx-x1)/dx; }
+        if(j === 0){ x1 += dx*t; y1 += dy*t; }
+        else { x2 = x1+dx*t; y2 = y1+dy*t; }
+      }
+    }
+    return [x1,y1,x2,y2];
+  }
+
+  function excalidrawCurve(x1, y1, x2, y2){
+    var mx = (x1+x2)/2;
+    var my = (y1+y2)/2;
+    var dx = x2-x1, dy = y2-y1;
+    var len = Math.sqrt(dx*dx+dy*dy) || 1;
+    var bend = Math.min(len * 0.15, 20);
+    var cpx = mx + dy/len * bend + jitter(0, 4);
+    var cpy = my - dx/len * bend + jitter(0, 4);
+    return 'M' + jitter(x1,1.5) + ',' + jitter(y1,1.5)
+      + ' Q' + cpx + ',' + cpy + ' ' + jitter(x2,1.5) + ',' + jitter(y2,1.5);
+  }
+
+  function excalidrawPolyline(points){
+    if(!points || points.length < 2) return '';
+    var d = '';
+    for(var i = 0; i < points.length - 1; i++){
+      d += excalidrawCurve(points[i][0], points[i][1], points[i+1][0], points[i+1][1]);
     }
     return d;
   }
@@ -578,193 +975,22 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     });
   }
 
-  function updateBracket(source){
-    var width = svgEl.clientWidth;
-    var height = svgEl.clientHeight;
-
-    var nodeSizeH = 38;
-    var nodeSizeW = 220;
-
-    var treeLayout = d3.tree().nodeSize([nodeSizeH, nodeSizeW]);
-    var root = treeLayout(rootHierarchy);
+  function assignFishbone(root, levelGap, leafGap){
     var nodes = root.descendants();
-    var links = root.links();
-
-    nodes.forEach(function(d){
-      d.px = d.y;
-      d.py = d.x;
-    });
-
-    var sourceP = [source.y0 || 0, source.x0 || 0];
-
-    gEl.selectAll('.link-path').remove();
-    gEl.selectAll('.bracket-path').remove();
-    gEl.selectAll('.sketch-path').remove();
-
-    var nodeSel = gEl.selectAll('.node-group')
-      .data(nodes, function(d){ return d.data.name + d.depth; });
-
-    nodeSel.exit().transition().duration(duration * 0.6)
-      .ease(d3.easeBackIn)
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0)
-      .remove();
-
-    var nodeEnter = nodeSel.enter().append('g')
-      .attr('class', 'node-group')
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0);
-
-    nodeEnter.append('rect').attr('class', 'node-bubble');
-    nodeEnter.append('text').attr('class', 'node-bubble-text');
-    nodeEnter.append('text').attr('class', 'fold-badge');
-
-    nodeEnter.transition().duration(duration)
-      .ease(d3.easeBackOut)
-      .delay(function(d){ return d.depth * 60; })
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var nodeUpdate = nodeSel;
-
-    nodeUpdate.transition().duration(duration)
-      .ease(d3.easeCubicOut)
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var allNodes = nodeEnter.merge(nodeUpdate);
-
-    allNodes.each(function(d){
-      var g = d3.select(this);
-      var colorHex = getNodeColorHex(d);
-      var isFolded = !!d._children;
-      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : 11;
-      var text = truncateText(d.data.name, d.depth);
-      var paddingH = d.depth === 0 ? 14 : 10;
-      var paddingV = d.depth === 0 ? 8 : 5;
-      var rx = d.depth === 0 ? 10 : 6;
-
-      g.classed('search-highlight', d.data.slug === highlightedSlug);
-
-      var textEl = g.select('.node-bubble-text');
-      textEl
-        .attr('font-size', fontSize + 'px')
-        .attr('font-weight', d.depth <= 1 ? '700' : '400')
-        .attr('text-anchor', 'start')
-        .attr('x', 0)
-        .attr('y', 0)
-        .text(text);
-
-      var bbox;
-      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
-
-      var bw = bbox.width + paddingH * 2;
-      var bh = bbox.height + paddingV * 2;
-
-      d._bracketBubbleW = bw;
-      d._bracketBubbleH = bh;
-      d._bracketBubbleX = bbox.x - paddingH;
-
-      g.select('.node-bubble')
-        .attr('x', bbox.x - paddingH)
-        .attr('y', bbox.y - paddingV)
-        .attr('width', bw)
-        .attr('height', bh)
-        .attr('rx', rx)
-        .attr('ry', rx)
-        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : 0.15))
-        .attr('stroke', colorHex)
-        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
-        .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
-
-      textEl.attr('x', 0).attr('y', 0);
-
-      var badge = g.select('.fold-badge');
-      if(isFolded){
-        var count = countDescendants(d._children);
-        badge
-          .attr('x', bbox.x - paddingH + bw - 6)
-          .attr('y', bbox.y - paddingV + 8)
-          .attr('text-anchor', 'end')
-          .text(count);
-      } else {
-        badge.text('');
-      }
-    });
-
-    bindNodeEvents(allNodes);
-
-    var bracketSel = gEl.selectAll('.bracket-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
-
-    bracketSel.exit().transition().duration(duration * 0.6)
-      .attr('opacity', 0)
-      .remove();
-
-    var bracketEnter = bracketSel.enter().append('path')
-      .attr('class', 'bracket-path')
-      .attr('opacity', 0);
-
-    bracketEnter.merge(bracketSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', function(d){
-        var sx = d.source.px, sy = d.source.py;
-        var tx = d.target.px, ty = d.target.py;
-        var srcRight = sx + (d.source._bracketBubbleX || 0) + (d.source._bracketBubbleW || 60) + 4;
-        var tgtLeft = tx + (d.target._bracketBubbleX || 0) - 4;
-        var jx = (srcRight + tgtLeft) / 2;
-        var r = 6;
-        var dy = ty - sy;
-        if(Math.abs(dy) < r * 2) r = Math.max(Math.abs(dy) / 2, 0);
-        var dir = dy >= 0 ? 1 : -1;
-        return 'M' + srcRight + ',' + sy
-          + ' H' + (jx - r)
-          + ' Q' + jx + ',' + sy + ' ' + jx + ',' + (sy + r * dir)
-          + ' V' + (ty - r * dir)
-          + ' Q' + jx + ',' + ty + ' ' + (jx + r) + ',' + ty
-          + ' H' + tgtLeft;
-      })
-      .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.5);
-
-    nodes.forEach(function(d){
-      d.x0 = d.x;
-      d.y0 = d.y;
-    });
-
-    document.getElementById('status-info').textContent = nodes.length + ' 个节点';
-  }
-
-  function updateTree(source){
-    var width = svgEl.clientWidth;
-    var height = svgEl.clientHeight;
-
-    var levelGap = 100;
-    var leafGap = 36;
-
-    var root = rootHierarchy;
-    var nodes = root.descendants();
-    var links = root.links();
-
     nodes.forEach(function(d){
       d._fishSide = null;
       d._fishLeafIdx = 0;
     });
-
     var leftLeaves = [];
     var rightLeaves = [];
-
-    function assignFishLayout(node, side, depth){
+    function assign(node, side, depth){
       if(depth === 0){
         node.px = 0;
         node.py = 0;
         if(node.children){
           var half = Math.ceil(node.children.length / 2);
           node.children.forEach(function(child, i){
-            var s = i < half ? 'left' : 'right';
-            assignFishLayout(child, s, depth + 1);
+            assign(child, i < half ? 'left' : 'right', depth + 1);
           });
         }
       } else {
@@ -774,25 +1000,16 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           node._fishLeafIdx = arr.length;
           arr.push(node);
         } else {
-          node.children.forEach(function(child){
-            assignFishLayout(child, side, depth + 1);
-          });
+          node.children.forEach(function(child){ assign(child, side, depth + 1); });
         }
         node.px = (side === 'left' ? -1 : 1) * depth * levelGap;
         node.py = 0;
       }
     }
-
-    assignFishLayout(root, null, 0);
-
+    assign(root, null, 0);
     var maxLeaves = Math.max(leftLeaves.length, rightLeaves.length, 1);
-    leftLeaves.forEach(function(leaf, i){
-      leaf.py = -(maxLeaves - 1) * leafGap / 2 + i * leafGap;
-    });
-    rightLeaves.forEach(function(leaf, i){
-      leaf.py = -(maxLeaves - 1) * leafGap / 2 + i * leafGap;
-    });
-
+    leftLeaves.forEach(function(leaf, i){ leaf.py = -(maxLeaves - 1) * leafGap / 2 + i * leafGap; });
+    rightLeaves.forEach(function(leaf, i){ leaf.py = -(maxLeaves - 1) * leafGap / 2 + i * leafGap; });
     function propagateY(node){
       if(node.children && node.children.length > 0){
         node.children.forEach(propagateY);
@@ -801,354 +1018,364 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       }
     }
     if(root.children) root.children.forEach(propagateY);
+  }
 
-    var sourceP = [source.px0 || 0, source.py0 || 0];
+  function fishLinkPath(d){
+    var sx = d.source.px, sy = d.source.py;
+    var tx = d.target.px, ty = d.target.py;
+    var side = d.target._fishSide;
+    var srcBX = d.source._fishBubbleX || 0;
+    var srcBW = d.source._fishBubbleW || 60;
+    var srcBH = d.source._fishBubbleH || 20;
+    var tgtBX = d.target._fishBubbleX || 0;
+    var tgtBW = d.target._fishBubbleW || 60;
+    var tgtBH = d.target._fishBubbleH || 20;
+    var srcEdge, tgtEdge;
+    if(side === 'left'){
+      srcEdge = sx + srcBX - 4;
+      tgtEdge = tx + tgtBX + tgtBW + 4;
+    } else {
+      srcEdge = sx + srcBX + srcBW + 4;
+      tgtEdge = tx + tgtBX - 4;
+    }
+    if(d.source.depth === 0){
+      var r = 14;
+      var dir = side === 'left' ? -1 : 1;
+      var midX = (srcEdge + tgtEdge) / 2;
+      var dy = ty - sy;
+      var absDy = Math.abs(dy);
+      if(absDy < r * 2) r = Math.max(absDy / 2, 2);
+      var ydir = dy >= 0 ? 1 : -1;
+      return 'M' + srcEdge + ',' + sy
+        + ' H' + (midX - r * dir)
+        + ' C' + midX + ',' + sy + ' ' + midX + ',' + sy + ' ' + midX + ',' + (sy + r * ydir)
+        + ' V' + (ty - r * ydir)
+        + ' C' + midX + ',' + ty + ' ' + midX + ',' + ty + ' ' + (midX + r * dir) + ',' + ty
+        + ' H' + tgtEdge;
+    }
+    var midX2 = (srcEdge + tgtEdge) / 2;
+    var srcY = sy, tgtY = ty;
+    var cpOffset = Math.abs(tgtY - srcY) * 0.3;
+    cpOffset = Math.min(cpOffset, 30);
+    return 'M' + srcEdge + ',' + srcY
+      + ' C' + midX2 + ',' + srcY + ' ' + midX2 + ',' + (srcY + cpOffset * (tgtY > srcY ? 1 : -1)) + ' ' + midX2 + ',' + ((srcY + tgtY) / 2)
+      + ' S' + midX2 + ',' + tgtY + ' ' + tgtEdge + ',' + tgtY;
+  }
 
-    gEl.selectAll('.bracket-path').remove();
-    gEl.selectAll('.sketch-path').remove();
-    gEl.selectAll('.link-path').remove();
-
-    var nodeSel = gEl.selectAll('.node-group')
-      .data(nodes, function(d){ return d.data.name + d.depth; });
-
-    nodeSel.exit().transition().duration(duration * 0.6)
-      .ease(d3.easeBackIn)
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0)
-      .remove();
-
-    var nodeEnter = nodeSel.enter().append('g')
-      .attr('class', 'node-group')
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0);
-
-    nodeEnter.append('rect').attr('class', 'node-bubble');
-    nodeEnter.append('text').attr('class', 'node-bubble-text');
-    nodeEnter.append('text').attr('class', 'fold-badge');
-
-    nodeEnter.transition().duration(duration)
-      .ease(d3.easeBackOut)
-      .delay(function(d){ return d.depth * 60; })
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var nodeUpdate = nodeSel;
-
-    nodeUpdate.transition().duration(duration)
-      .ease(d3.easeCubicOut)
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var allNodes = nodeEnter.merge(nodeUpdate);
-
+  function renderFishNodes(allNodes, isSketch){
     allNodes.each(function(d){
       var g = d3.select(this);
       var colorHex = getNodeColorHex(d);
       var isFolded = !!d._children;
-      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : 11;
-      var text = truncateText(d.data.name, d.depth);
-      var paddingH = d.depth === 0 ? 14 : 10;
-      var paddingV = d.depth === 0 ? 8 : 5;
-      var rx = d.depth === 0 ? 10 : 6;
+      var isSummary = d.data.isSummary;
+      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : (isSummary ? 10 : 11);
+      var text = truncateText(d.data.name, d.depth, isSummary);
+      var paddingH = d.depth === 0 ? 14 : (isSummary ? 10 : 10);
+      var paddingV = d.depth === 0 ? 8 : (isSummary ? 5 : 5);
       var side = d._fishSide;
       var anchor = d.depth === 0 ? 'middle' : (side === 'left' ? 'end' : 'start');
 
       g.classed('search-highlight', d.data.slug === highlightedSlug);
+      g.classed('summary-node', isSummary);
+
+      var iconEl = g.select('.summary-icon');
+      if(iconEl.empty()) iconEl = g.append('text').attr('class','summary-icon');
+      if(isSummary){
+        iconEl.attr('x', side === 'left' ? -4 : 4)
+          .attr('y', 0)
+          .attr('text-anchor', side === 'left' ? 'end' : 'start')
+          .text('▹');
+      } else {
+        iconEl.text('');
+      }
 
       var textEl = g.select('.node-bubble-text');
       textEl
         .attr('font-size', fontSize + 'px')
-        .attr('font-weight', d.depth <= 1 ? '700' : '400')
+        .attr('font-weight', isSummary ? '400' : (d.depth <= 1 ? '700' : '400'))
         .attr('text-anchor', anchor)
-        .attr('x', 0)
-        .attr('y', 0)
+        .attr('x', 0).attr('y', 0)
         .text(text);
 
       var bbox;
-      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
+      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x:0, width: text.length * fontSize * 0.6, height: fontSize}; }
 
       var bw = bbox.width + paddingH * 2;
       var bh = bbox.height + paddingV * 2;
-
       d._fishBubbleW = bw;
       d._fishBubbleH = bh;
       d._fishBubbleX = bbox.x - paddingH;
 
-      g.select('.node-bubble')
-        .attr('x', bbox.x - paddingH)
-        .attr('y', bbox.y - paddingV)
-        .attr('width', bw)
-        .attr('height', bh)
-        .attr('rx', rx)
-        .attr('ry', rx)
-        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : 0.15))
-        .attr('stroke', colorHex)
-        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
-        .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
+      var bubbleEl = g.select('.node-bubble');
+      if(isSketch){
+        bubbleEl.attr('d', excalidrawRect(bbox.x - paddingH, bbox.y - paddingV, bw, bh))
+          .attr('fill', 'none')
+          .attr('stroke', colorHex)
+          .attr('stroke-width', d.depth === 0 ? 2.5 : (isSummary ? 1.2 : 1.8))
+          .attr('stroke-dasharray', isFolded ? '6,4' : 'none');
+      } else {
+        var rx = d.depth === 0 ? 10 : (isSummary ? 12 : 6);
+        bubbleEl.attr('x', bbox.x - paddingH)
+          .attr('y', bbox.y - paddingV)
+          .attr('width', bw).attr('height', bh)
+          .attr('rx', rx).attr('ry', rx)
+          .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : (isSummary ? 0.06 : 0.15)))
+          .attr('stroke', colorHex)
+          .attr('stroke-width', d.depth === 0 ? 2.5 : (isSummary ? 1 : 1.5))
+          .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
+      }
+
+      var hachure = g.select('.hachure-path');
+      if(isSketch){
+        var hGap = d.depth === 0 ? 7 : (isSummary ? 12 : 9);
+        hachure.attr('d', hachureFill(bbox.x - paddingH, bbox.y - paddingV, bw, bh, hGap, undefined))
+          .attr('stroke', colorHex).attr('stroke-width', 0.7).style('display','');
+      } else {
+        hachure.style('display','none');
+      }
+
+      var fileInd = g.select('.file-link-indicator');
+      if(fileInd.empty()) fileInd = g.append('text').attr('class','file-link-indicator');
+      if(isSummary && resolveMdPath(d.data.slug)){
+        fileInd.attr('x', side === 'left' ? bbox.x - paddingH - 2 : bbox.x - paddingH + bw + 2)
+          .attr('y', bbox.y - paddingV + 6)
+          .attr('text-anchor', side === 'left' ? 'end' : 'start')
+          .text('🔗');
+      } else {
+        fileInd.text('');
+      }
 
       textEl.attr('x', 0).attr('y', 0);
-
       var badge = g.select('.fold-badge');
       if(isFolded){
         var count = countDescendants(d._children);
-        badge
-          .attr('x', side === 'left' ? bbox.x - paddingH + 6 : bbox.x - paddingH + bw - 6)
+        badge.attr('x', side === 'left' ? bbox.x - paddingH + 6 : bbox.x - paddingH + bw - 6)
           .attr('y', bbox.y - paddingV + 8)
           .attr('text-anchor', side === 'left' ? 'start' : 'end')
           .text(count);
-      } else {
-        badge.text('');
-      }
+      } else { badge.text(''); }
     });
+  }
 
+  function updateTree(source){
+    var levelGap = 180;
+    var leafGap = 44;
+    var root = rootHierarchy;
+    var nodes = root.descendants();
+    var links = root.links();
+    assignFishbone(root, levelGap, leafGap);
+    var sourceP = [source.px0 || 0, source.py0 || 0];
+
+    gEl.selectAll('.bracket-path,.sketch-path,.link-path').remove();
+
+    var nodeSel = gEl.selectAll('.node-group').data(nodes, function(d){ return d.data.name + d.depth; });
+    nodeSel.exit().transition().duration(duration*0.6).ease(d3.easeBackIn)
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0).remove();
+
+    var nodeEnter = nodeSel.enter().append('g').attr('class','node-group')
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0);
+    nodeEnter.append('rect').attr('class','node-bubble');
+    nodeEnter.append('path').attr('class','hachure-path').style('display','none');
+    nodeEnter.append('text').attr('class','node-bubble-text');
+    nodeEnter.append('text').attr('class','fold-badge');
+    nodeEnter.transition().duration(duration).ease(d3.easeBackOut)
+      .delay(function(d){return d.depth*60;})
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
+
+    nodeSel.transition().duration(duration).ease(d3.easeCubicOut)
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
+
+    var allNodes = nodeEnter.merge(nodeSel);
+    renderFishNodes(allNodes, false);
     bindNodeEvents(allNodes);
 
-    var linkSel = gEl.selectAll('.link-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+    var linkSel = gEl.selectAll('.link-path').data(links, function(d){return d.target.data.name+d.target.depth;});
+    linkSel.exit().transition().duration(duration*0.6).attr('opacity',0).remove();
+    var linkEnter = linkSel.enter().append('path').attr('class','link-path').attr('opacity',0);
+    linkEnter.merge(linkSel).transition().duration(duration).ease(d3.easeCubicInOut)
+      .attr('opacity',1).attr('d', fishLinkPath)
+      .attr('stroke',function(d){return getNodeColor(d.target);}).attr('stroke-opacity',0.4);
 
-    linkSel.exit().transition().duration(duration * 0.6)
-      .attr('opacity', 0)
-      .remove();
-
-    var linkEnter = linkSel.enter().append('path')
-      .attr('class', 'link-path')
-      .attr('opacity', 0);
-
-    linkEnter.merge(linkSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', function(d){
-        var sx = d.source.px, sy = d.source.py;
-        var tx = d.target.px, ty = d.target.py;
-        var side = d.target._fishSide;
-        var srcW = d.source._fishBubbleW || 60;
-        var srcH = d.source._fishBubbleH || 20;
-        var srcRX = d.source._fishBubbleX || 0;
-        var tgtW = d.target._fishBubbleW || 60;
-        var tgtH = d.target._fishBubbleH || 20;
-        var tgtRX = d.target._fishBubbleX || 0;
-
-        var srcEdge, tgtEdge;
-        if(side === 'left'){
-          srcEdge = sx + srcRX - 4;
-          tgtEdge = tx + tgtRX + tgtW + 4;
-        } else {
-          srcEdge = sx + srcRX + srcW + 4;
-          tgtEdge = tx + tgtRX - 4;
-        }
-
-        if(d.source.depth === 0){
-          var r = 8;
-          var dir = side === 'left' ? -1 : 1;
-          var midX = (srcEdge + tgtEdge) / 2;
-          var dy = ty - sy;
-          var absDy = Math.abs(dy);
-          if(absDy < r * 2) r = Math.max(absDy / 2, 0);
-          var ydir = dy >= 0 ? 1 : -1;
-          return 'M' + srcEdge + ',' + sy
-            + ' H' + (midX - r * dir)
-            + ' Q' + midX + ',' + sy + ' ' + midX + ',' + (sy + r * ydir)
-            + ' V' + (ty - r * ydir)
-            + ' Q' + midX + ',' + ty + ' ' + (midX + r * dir) + ',' + ty
-            + ' H' + tgtEdge;
-        } else {
-          var midX2 = (srcEdge + tgtEdge) / 2;
-          return 'M' + srcEdge + ',' + sy
-            + ' H' + midX2
-            + ' V' + ty
-            + ' H' + tgtEdge;
-        }
-      })
-      .attr('stroke', function(d){ return getNodeColor(d.target); })
-      .attr('stroke-opacity', 0.4);
-
-    nodes.forEach(function(d){
-      d.px0 = d.px;
-      d.py0 = d.py;
-    });
-
+    nodes.forEach(function(d){d.px0=d.px;d.py0=d.py;});
     document.getElementById('status-info').textContent = nodes.length + ' 个节点';
   }
 
   function updateSketch(source){
-    var width = svgEl.clientWidth;
-    var height = svgEl.clientHeight;
+    var levelGap = 180;
+    var leafGap = 46;
+    var root = rootHierarchy;
+    var nodes = root.descendants();
+    var links = root.links();
+    assignFishbone(root, levelGap, leafGap);
+    var sourceP = [source.px0 || 0, source.py0 || 0];
 
-    var nodeSizeH = 38;
-    var nodeSizeW = 220;
+    gEl.selectAll('.link-path,.bracket-path').remove();
 
+    var nodeSel = gEl.selectAll('.node-group').data(nodes, function(d){return d.data.name+d.depth;});
+    nodeSel.exit().transition().duration(duration*0.6).ease(d3.easeBackIn)
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0).remove();
+
+    var nodeEnter = nodeSel.enter().append('g').attr('class','node-group')
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0);
+    nodeEnter.append('path').attr('class','node-bubble sketch-bubble');
+    nodeEnter.append('path').attr('class','hachure-path');
+    nodeEnter.append('text').attr('class','node-bubble-text').style('font-family','Virgil, cursive');
+    nodeEnter.append('text').attr('class','fold-badge');
+    nodeEnter.transition().duration(duration).ease(d3.easeBackOut)
+      .delay(function(d){return d.depth*60;})
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
+
+    nodeSel.transition().duration(duration).ease(d3.easeCubicOut)
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
+
+    var allNodes = nodeEnter.merge(nodeSel);
+    allNodes.select('.node-bubble-text').style('font-family','Virgil, cursive');
+    renderFishNodes(allNodes, true);
+    bindNodeEvents(allNodes);
+
+    var sketchSel = gEl.selectAll('.sketch-path').data(links, function(d){return d.target.data.name+d.target.depth;});
+    sketchSel.exit().transition().duration(duration*0.6).attr('opacity',0).remove();
+    var sketchEnter = sketchSel.enter().append('path').attr('class','sketch-path').attr('opacity',0);
+    sketchEnter.merge(sketchSel).transition().duration(duration).ease(d3.easeCubicInOut)
+      .attr('opacity',1)
+      .attr('d', function(d){
+        var sx=d.source.px,sy=d.source.py,tx=d.target.px,ty=d.target.py;
+        var side=d.target._fishSide;
+        var srcBX=d.source._fishBubbleX||0,srcBW=d.source._fishBubbleW||60;
+        var tgtBX=d.target._fishBubbleX||0,tgtBW=d.target._fishBubbleW||60;
+        var srcEdge,tgtEdge;
+        if(side==='left'){srcEdge=sx+srcBX-4;tgtEdge=tx+tgtBX+tgtBW+4;}
+        else{srcEdge=sx+srcBX+srcBW+4;tgtEdge=tx+tgtBX-4;}
+        if(d.source.depth===0){
+          var r=14,dir=side==='left'?-1:1;
+          var midX=(srcEdge+tgtEdge)/2;
+          var dy=ty-sy,absDy=Math.abs(dy);
+          if(absDy<r*2)r=Math.max(absDy/2,2);
+          var ydir=dy>=0?1:-1;
+          var pts=[[srcEdge,sy],[midX-r*dir,sy],[midX,sy+r*ydir]];
+          if(absDy>r*2)pts.push([midX,ty-r*ydir]);
+          pts.push([midX,ty],[midX+r*dir,ty],[tgtEdge,ty]);
+          return excalidrawPolyline(pts);
+        }
+        var midX2=(srcEdge+tgtEdge)/2;
+        var cpOff=Math.abs(ty-sy)*0.3;
+        cpOff=Math.min(cpOff,30);
+        var pts2=[[srcEdge,sy],[midX2,sy],[midX2,sy+cpOff*(ty>sy?1:-1)],[midX2,(sy+ty)/2],[midX2,ty],[tgtEdge,ty]];
+        return excalidrawPolyline(pts2);
+      })
+      .attr('stroke',function(d){return getNodeColor(d.source);}).attr('stroke-opacity',0.55);
+
+    nodes.forEach(function(d){d.px0=d.px;d.py0=d.py;});
+    document.getElementById('status-info').textContent = nodes.length + ' 个节点';
+  }
+
+  function updateBracket(source){
+    var nodeSizeH = 38, nodeSizeW = 220;
     var treeLayout = d3.tree().nodeSize([nodeSizeH, nodeSizeW]);
     var root = treeLayout(rootHierarchy);
     var nodes = root.descendants();
     var links = root.links();
+    nodes.forEach(function(d){d.px=d.y;d.py=d.x;});
+    var sourceP = [source.y0||0, source.x0||0];
 
-    nodes.forEach(function(d){
-      d.px = d.y;
-      d.py = d.x;
-    });
+    gEl.selectAll('.bracket-path,.sketch-path,.link-path').remove();
 
-    var sourceP = [source.y0 || 0, source.x0 || 0];
+    var nodeSel = gEl.selectAll('.node-group').data(nodes, function(d){return d.data.name+d.depth;});
+    nodeSel.exit().transition().duration(duration*0.6).ease(d3.easeBackIn)
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0).remove();
 
-    gEl.selectAll('.link-path').remove();
-    gEl.selectAll('.bracket-path').remove();
+    var nodeEnter = nodeSel.enter().append('g').attr('class','node-group')
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0);
+    nodeEnter.append('rect').attr('class','node-bubble');
+    nodeEnter.append('path').attr('class','hachure-path').style('display','none');
+    nodeEnter.append('text').attr('class','node-bubble-text');
+    nodeEnter.append('text').attr('class','fold-badge');
+    nodeEnter.transition().duration(duration).ease(d3.easeBackOut)
+      .delay(function(d){return d.depth*60;})
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
 
-    var nodeSel = gEl.selectAll('.node-group')
-      .data(nodes, function(d){ return d.data.name + d.depth; });
+    nodeSel.transition().duration(duration).ease(d3.easeCubicOut)
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
 
-    nodeSel.exit().transition().duration(duration * 0.6)
-      .ease(d3.easeBackIn)
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0)
-      .remove();
-
-    var nodeEnter = nodeSel.enter().append('g')
-      .attr('class', 'node-group')
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0);
-
-    nodeEnter.append('path').attr('class', 'node-bubble sketch-bubble');
-    nodeEnter.append('text').attr('class', 'node-bubble-text');
-    nodeEnter.append('text').attr('class', 'fold-badge');
-
-    nodeEnter.transition().duration(duration)
-      .ease(d3.easeBackOut)
-      .delay(function(d){ return d.depth * 60; })
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var nodeUpdate = nodeSel;
-
-    nodeUpdate.transition().duration(duration)
-      .ease(d3.easeCubicOut)
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var allNodes = nodeEnter.merge(nodeUpdate);
-
+    var allNodes = nodeEnter.merge(nodeSel);
     allNodes.each(function(d){
       var g = d3.select(this);
       var colorHex = getNodeColorHex(d);
       var isFolded = !!d._children;
-      var fontSize = d.depth === 0 ? 16 : d.depth === 1 ? 14 : d.depth === 2 ? 12 : 11;
-      var text = truncateText(d.data.name, d.depth);
-      var paddingH = d.depth === 0 ? 16 : 12;
-      var paddingV = d.depth === 0 ? 10 : 6;
+      var isSummary = d.data.isSummary;
+      var fontSize = d.depth===0?15:d.depth===1?13:d.depth===2?12:(isSummary?10:11);
+      var text = truncateText(d.data.name, d.depth, isSummary);
+      var paddingH = d.depth===0?14:(isSummary?10:10);
+      var paddingV = d.depth===0?8:(isSummary?5:5);
+      var rx = d.depth===0?10:(isSummary?12:6);
 
-      g.classed('search-highlight', d.data.slug === highlightedSlug);
+      g.classed('search-highlight', d.data.slug===highlightedSlug);
+      g.classed('summary-node', isSummary);
+
+      var iconEl = g.select('.summary-icon');
+      if(iconEl.empty()) iconEl = g.append('text').attr('class','summary-icon');
+      if(isSummary){
+        iconEl.attr('x', -4).attr('y', 0).attr('text-anchor','end').text('▹');
+      } else {
+        iconEl.text('');
+      }
 
       var textEl = g.select('.node-bubble-text');
-      textEl
-        .attr('font-size', fontSize + 'px')
-        .attr('font-weight', d.depth <= 1 ? '700' : '400')
-        .attr('font-style', 'italic')
-        .attr('text-anchor', 'start')
-        .attr('x', 0)
-        .attr('y', 0)
-        .text(text);
+      textEl.attr('font-size',fontSize+'px')
+        .attr('font-weight',isSummary?'400':(d.depth<=1?'700':'400'))
+        .attr('text-anchor','start').attr('x',0).attr('y',0).text(text);
 
       var bbox;
-      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
-
-      var bw = bbox.width + paddingH * 2;
-      var bh = bbox.height + paddingV * 2;
-
-      d._sketchBubbleX = bbox.x - paddingH;
-      d._sketchBubbleW = bw;
-      d._sketchBubbleH = bh;
+      try{bbox=textEl.node().getBBox();}catch(e){bbox={x:0,width:text.length*fontSize*0.6,height:fontSize};}
+      var bw=bbox.width+paddingH*2, bh=bbox.height+paddingV*2;
+      d._bracketBubbleW=bw; d._bracketBubbleH=bh; d._bracketBubbleX=bbox.x-paddingH;
 
       g.select('.node-bubble')
-        .attr('d', sketchRect(bbox.x - paddingH, bbox.y - paddingV, bw, bh, 8))
-        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.2 : 0.1))
-        .attr('stroke', colorHex)
-        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.8)
-        .attr('stroke-dasharray', isFolded ? '6,4' : 'none');
+        .attr('x',bbox.x-paddingH).attr('y',bbox.y-paddingV)
+        .attr('width',bw).attr('height',bh).attr('rx',rx).attr('ry',rx)
+        .attr('fill',hexToRgba(colorHex,d.depth===0?0.25:(isSummary?0.06:0.15)))
+        .attr('stroke',colorHex)
+        .attr('stroke-width',d.depth===0?2.5:(isSummary?1:1.5))
+        .attr('stroke-dasharray',isFolded?'4,3':'none');
+      g.select('.hachure-path').style('display','none');
 
-      textEl.attr('x', 0).attr('y', 0);
-
-      var badge = g.select('.fold-badge');
-      if(isFolded){
-        var count = countDescendants(d._children);
-        badge
-          .attr('x', bbox.x - paddingH + bw - 6)
-          .attr('y', bbox.y - paddingV + 8)
-          .attr('text-anchor', 'end')
-          .attr('font-style', 'italic')
-          .text(count);
+      var fileInd = g.select('.file-link-indicator');
+      if(fileInd.empty()) fileInd = g.append('text').attr('class','file-link-indicator');
+      if(isSummary && resolveMdPath(d.data.slug)){
+        fileInd.attr('x', bbox.x-paddingH+bw+2).attr('y', bbox.y-paddingV+6)
+          .attr('text-anchor','start').text('🔗');
       } else {
-        badge.text('');
+        fileInd.text('');
       }
-    });
 
+      var badge=g.select('.fold-badge');
+      if(isFolded){
+        var count=countDescendants(d._children);
+        badge.attr('x',bbox.x-paddingH+bw-6).attr('y',bbox.y-paddingV+8)
+          .attr('text-anchor','end').text(count);
+      } else badge.text('');
+    });
     bindNodeEvents(allNodes);
 
-    var sketchSel = gEl.selectAll('.sketch-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
-
-    sketchSel.exit().transition().duration(duration * 0.6)
-      .attr('opacity', 0)
-      .remove();
-
-    var sketchEnter = sketchSel.enter().append('path')
-      .attr('class', 'sketch-path')
-      .attr('opacity', 0);
-
-    sketchEnter.merge(sketchSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', function(d){
-        var sx = d.source.px, sy = d.source.py;
-        var tx = d.target.px, ty = d.target.py;
-        var srcW = d.source._sketchBubbleW || 60;
-        var tgtW = d.target._sketchBubbleW || 60;
-        var srcH = d.source._sketchBubbleH || 20;
-        var tgtH = d.target._sketchBubbleH || 20;
-        var srcRight = sx + (d.source._sketchBubbleX || 0) + srcW;
-        var srcLeft = sx + (d.source._sketchBubbleX || 0);
-        var tgtLeft = tx + (d.target._sketchBubbleX || 0);
-        var tgtRight = tgtLeft + tgtW;
-        var srcTop = sy - srcH / 2;
-        var srcBottom = sy + srcH / 2;
-        var tgtTop = ty - tgtH / 2;
-        var tgtBottom = ty + tgtH / 2;
-
-        var x1, y1, x2, y2;
-
-        if(tx > sx){
-          x1 = srcRight + 2;
-          y1 = sy;
-          x2 = tgtLeft - 2;
-          y2 = ty;
-        } else if(tx < sx){
-          x1 = srcLeft - 2;
-          y1 = sy;
-          x2 = tgtRight + 2;
-          y2 = ty;
-        } else {
-          if(ty > sy){
-            x1 = sx;
-            y1 = srcBottom + 2;
-            x2 = tx;
-            y2 = tgtTop - 2;
-          } else {
-            x1 = sx;
-            y1 = srcTop - 2;
-            x2 = tx;
-            y2 = tgtBottom + 2;
-          }
-        }
-
-        return sketchLine(x1, y1, x2, y2, 4);
+    var bracketSel = gEl.selectAll('.bracket-path').data(links, function(d){return d.target.data.name+d.target.depth;});
+    bracketSel.exit().transition().duration(duration*0.6).attr('opacity',0).remove();
+    var bracketEnter = bracketSel.enter().append('path').attr('class','bracket-path').attr('opacity',0);
+    bracketEnter.merge(bracketSel).transition().duration(duration).ease(d3.easeCubicInOut)
+      .attr('opacity',1)
+      .attr('d',function(d){
+        var sx=d.source.px,sy=d.source.py,tx=d.target.px,ty=d.target.py;
+        var srcRight=sx+(d.source._bracketBubbleX||0)+(d.source._bracketBubbleW||60)+4;
+        var tgtLeft=tx+(d.target._bracketBubbleX||0)-4;
+        var jx=(srcRight+tgtLeft)/2;
+        var r=6,dy=ty-sy;
+        if(Math.abs(dy)<r*2)r=Math.max(Math.abs(dy)/2,0);
+        var dir=dy>=0?1:-1;
+        return 'M'+srcRight+','+sy+' H'+(jx-r)+' Q'+jx+','+sy+' '+jx+','+(sy+r*dir)
+          +' V'+(ty-r*dir)+' Q'+jx+','+ty+' '+(jx+r)+','+ty+' H'+tgtLeft;
       })
-      .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.6);
+      .attr('stroke',function(d){return getNodeColor(d.source);}).attr('stroke-opacity',0.5);
 
-    nodes.forEach(function(d){
-      d.x0 = d.x;
-      d.y0 = d.y;
-    });
-
+    nodes.forEach(function(d){d.x0=d.x;d.y0=d.y;});
     document.getElementById('status-info').textContent = nodes.length + ' 个节点';
   }
 
@@ -1158,195 +1385,127 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var nodeCount = rootHierarchy.descendants().length;
     var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 5);
 
-    var treeLayout = d3.tree()
-      .size([2 * Math.PI, radius])
-      .separation(function(a, b){
-        return (a.parent === b.parent ? 2 : 4) / Math.max(a.depth, 1);
-      });
+    var treeLayout = d3.tree().size([2 * Math.PI, radius])
+      .separation(function(a, b){ return (a.parent === b.parent ? 2 : 4) / Math.max(a.depth, 1); });
 
     var root = treeLayout(rootHierarchy);
     var nodes = root.descendants();
     var links = root.links();
-
-    nodes.forEach(function(d){
-      var p = radialPoint(d.x, d.y);
-      d.px = p[0];
-      d.py = p[1];
-    });
-
+    nodes.forEach(function(d){ var p = radialPoint(d.x, d.y); d.px = p[0]; d.py = p[1]; });
     var sourceP = radialPoint(source.x0 || 0, source.y0 || 0);
 
-    gEl.selectAll('.bracket-path').remove();
-    gEl.selectAll('.sketch-path').remove();
-    gEl.selectAll('.link-path').remove();
+    gEl.selectAll('.bracket-path,.sketch-path,.link-path').remove();
 
-    var nodeSel = gEl.selectAll('.node-group')
-      .data(nodes, function(d){ return d.data.name + d.depth; });
+    var nodeSel = gEl.selectAll('.node-group').data(nodes, function(d){return d.data.name+d.depth;});
+    nodeSel.exit().transition().duration(duration*0.6).ease(d3.easeBackIn)
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0).remove();
 
-    nodeSel.exit().transition().duration(duration * 0.6)
-      .ease(d3.easeBackIn)
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0)
-      .remove();
+    var nodeEnter = nodeSel.enter().append('g').attr('class','node-group')
+      .attr('transform','translate('+sourceP[0]+','+sourceP[1]+') scale(0)').attr('opacity',0);
+    nodeEnter.append('rect').attr('class','node-bubble');
+    nodeEnter.append('path').attr('class','hachure-path').style('display','none');
+    nodeEnter.append('text').attr('class','node-bubble-text');
+    nodeEnter.append('text').attr('class','fold-badge');
+    nodeEnter.transition().duration(duration).ease(d3.easeBackOut)
+      .delay(function(d){return d.depth*60;})
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
 
-    var nodeEnter = nodeSel.enter().append('g')
-      .attr('class', 'node-group')
-      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
-      .attr('opacity', 0);
+    nodeSel.transition().duration(duration).ease(d3.easeCubicOut)
+      .attr('transform',function(d){return 'translate('+d.px+','+d.py+') scale(1)';}).attr('opacity',1);
 
-    nodeEnter.append('rect').attr('class', 'node-bubble');
-    nodeEnter.append('text').attr('class', 'node-bubble-text');
-    nodeEnter.append('text').attr('class', 'fold-badge');
-
-    nodeEnter.transition().duration(duration)
-      .ease(d3.easeBackOut)
-      .delay(function(d){ return d.depth * 60; })
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var nodeUpdate = nodeSel;
-
-    nodeUpdate.transition().duration(duration)
-      .ease(d3.easeCubicOut)
-      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
-      .attr('opacity', 1);
-
-    var allNodes = nodeEnter.merge(nodeUpdate);
-
+    var allNodes = nodeEnter.merge(nodeSel);
     allNodes.each(function(d){
       var g = d3.select(this);
       var colorHex = getNodeColorHex(d);
       var isFolded = !!d._children;
-      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 12 : d.depth === 2 ? 11 : 10;
-      var text = truncateText(d.data.name, d.depth);
-      var paddingH = d.depth === 0 ? 14 : 10;
-      var paddingV = d.depth === 0 ? 8 : 5;
-      var rx = d.depth === 0 ? 10 : 6;
+      var isSummary = d.data.isSummary;
+      var fontSize = d.depth===0?15:d.depth===1?12:d.depth===2?11:(isSummary?9:10);
+      var text = truncateText(d.data.name, d.depth, isSummary);
+      var paddingH = d.depth===0?14:(isSummary?9:10);
+      var paddingV = d.depth===0?8:(isSummary?4:5);
+      var rx = d.depth===0?10:(isSummary?10:6);
       var angle = (d.x * 180 / Math.PI) % 360;
       var isRight = !(angle > 90 && angle < 270);
-      var anchor = d.depth === 0 ? 'middle' : (isRight ? 'start' : 'end');
+      var anchor = d.depth===0?'middle':(isRight?'start':'end');
 
-      g.classed('search-highlight', d.data.slug === highlightedSlug);
+      g.classed('search-highlight', d.data.slug===highlightedSlug);
+      g.classed('summary-node', isSummary);
+
+      var iconEl = g.select('.summary-icon');
+      if(iconEl.empty()) iconEl = g.append('text').attr('class','summary-icon');
+      if(isSummary){
+        iconEl.attr('x', isRight ? -4 : 4).attr('y', 0)
+          .attr('text-anchor', isRight ? 'end' : 'start').text('▹');
+      } else {
+        iconEl.text('');
+      }
 
       var textEl = g.select('.node-bubble-text');
-      textEl
-        .attr('font-size', fontSize + 'px')
-        .attr('font-weight', d.depth <= 1 ? '700' : '400')
-        .attr('text-anchor', anchor)
-        .attr('x', 0)
-        .attr('y', 0)
-        .text(text);
+      textEl.attr('font-size',fontSize+'px')
+        .attr('font-weight',isSummary?'400':(d.depth<=1?'700':'400'))
+        .attr('text-anchor',anchor).attr('x',0).attr('y',0).text(text);
 
       var bbox;
-      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
-
-      var bw = bbox.width + paddingH * 2;
-      var bh = bbox.height + paddingV * 2;
-      var rectX;
-
-      if(d.depth === 0){
-        rectX = -bw / 2;
-      } else {
-        rectX = bbox.x - paddingH;
-      }
-
-      d._bubbleRectX = rectX;
-      d._bubbleW = bw;
-      d._bubbleH = bh;
-      d._bubbleIsRight = isRight;
+      try{bbox=textEl.node().getBBox();}catch(e){bbox={x:0,width:text.length*fontSize*0.6,height:fontSize};}
+      var bw=bbox.width+paddingH*2, bh=bbox.height+paddingV*2;
+      var rectX = d.depth===0 ? -bw/2 : bbox.x-paddingH;
+      d._bubbleRectX=rectX; d._bubbleW=bw; d._bubbleH=bh;
 
       g.select('.node-bubble')
-        .attr('x', rectX)
-        .attr('y', bbox.y - paddingV)
-        .attr('width', bw)
-        .attr('height', bh)
-        .attr('rx', rx)
-        .attr('ry', rx)
-        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : 0.15))
-        .attr('stroke', colorHex)
-        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
-        .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
+        .attr('x',rectX).attr('y',bbox.y-paddingV)
+        .attr('width',bw).attr('height',bh).attr('rx',rx).attr('ry',rx)
+        .attr('fill',hexToRgba(colorHex,d.depth===0?0.25:(isSummary?0.06:0.15)))
+        .attr('stroke',colorHex)
+        .attr('stroke-width',d.depth===0?2.5:(isSummary?1:1.5))
+        .attr('stroke-dasharray',isFolded?'4,3':'none');
+      g.select('.hachure-path').style('display','none');
 
-      textEl.attr('x', 0).attr('y', 0);
-
-      var badge = g.select('.fold-badge');
-      if(isFolded){
-        var count = countDescendants(d._children);
-        var badgeX = isRight ? rectX + bw - 6 : rectX + 6;
-        badge
-          .attr('x', badgeX)
-          .attr('y', bbox.y - paddingV + 8)
-          .attr('text-anchor', isRight ? 'end' : 'start')
-          .text(count);
+      var fileInd = g.select('.file-link-indicator');
+      if(fileInd.empty()) fileInd = g.append('text').attr('class','file-link-indicator');
+      if(isSummary && resolveMdPath(d.data.slug)){
+        fileInd.attr('x', isRight ? rectX+bw+2 : rectX-2).attr('y', bbox.y-paddingV+6)
+          .attr('text-anchor', isRight ? 'start' : 'end').text('🔗');
       } else {
-        badge.text('');
+        fileInd.text('');
       }
-    });
 
+      var badge=g.select('.fold-badge');
+      if(isFolded){
+        var count=countDescendants(d._children);
+        badge.attr('x',isRight?rectX+bw-6:rectX+6).attr('y',bbox.y-paddingV+8)
+          .attr('text-anchor',isRight?'end':'start').text(count);
+      } else badge.text('');
+    });
     bindNodeEvents(allNodes);
 
-    var linkSel = gEl.selectAll('.link-path')
-      .data(links, function(d){ return d.target.data.name + d.target.depth; });
-
-    linkSel.exit().transition().duration(duration * 0.6)
-      .attr('opacity', 0)
-      .remove();
-
-    var linkEnter = linkSel.enter().append('path')
-      .attr('class', 'link-path')
-      .attr('opacity', 0);
-
-    linkEnter.merge(linkSel)
-      .transition().duration(duration)
-      .ease(d3.easeCubicInOut)
-      .attr('opacity', 1)
-      .attr('d', function(d){
-        var sx = d.source.px, sy = d.source.py;
-        var tx = d.target.px, ty = d.target.py;
-        var srcW = d.source._bubbleW || 60;
-        var srcH = d.source._bubbleH || 20;
-        var srcRX = d.source._bubbleRectX || 0;
-        var tgtW = d.target._bubbleW || 60;
-        var tgtH = d.target._bubbleH || 20;
-        var tgtRX = d.target._bubbleRectX || 0;
-
-        var dx = tx - sx;
-        var dy = ty - sy;
-        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        var ux = dx / dist;
-        var uy = dy / dist;
-
-        var srcHalfW = srcW / 2;
-        var srcHalfH = srcH / 2;
-        var srcOffset = Math.abs(ux) * srcHalfW + Math.abs(uy) * srcHalfH + 3;
-        srcOffset = Math.min(srcOffset, dist * 0.4);
-
-        var tgtHalfW = tgtW / 2;
-        var tgtHalfH = tgtH / 2;
-        var tgtOffset = Math.abs(ux) * tgtHalfW + Math.abs(uy) * tgtHalfH + 3;
-        tgtOffset = Math.min(tgtOffset, dist * 0.4);
-
-        var x1 = sx + ux * srcOffset;
-        var y1 = sy + uy * srcOffset;
-        var x2 = tx - ux * tgtOffset;
-        var y2 = ty - uy * tgtOffset;
-
-        var midX = (x1 + x2) / 2;
-        var midY = (y1 + y2) / 2;
-        var cpx = midX + (y2 - y1) * 0.15;
-        var cpy = midY - (x2 - x1) * 0.15;
-
-        return 'M' + x1 + ',' + y1
-          + ' Q' + cpx + ',' + cpy + ' ' + x2 + ',' + y2;
+    var linkSel = gEl.selectAll('.link-path').data(links, function(d){return d.target.data.name+d.target.depth;});
+    linkSel.exit().transition().duration(duration*0.6).attr('opacity',0).remove();
+    var linkEnter = linkSel.enter().append('path').attr('class','link-path').attr('opacity',0);
+    linkEnter.merge(linkSel).transition().duration(duration).ease(d3.easeCubicInOut)
+      .attr('opacity',1)
+      .attr('d',function(d){
+        var sx=d.source.px,sy=d.source.py,tx=d.target.px,ty=d.target.py;
+        var srcRX=d.source._bubbleRectX||0,srcRW=d.source._bubbleW||60,srcRH=d.source._bubbleH||20;
+        var tgtRX=d.target._bubbleRectX||0,tgtRW=d.target._bubbleW||60,tgtRH=d.target._bubbleH||20;
+        var srcLeft=sx+srcRX,srcRight=sx+srcRX+srcRW,srcTop=sy-srcRH/2,srcBottom=sy+srcRH/2;
+        var tgtLeft=tx+tgtRX,tgtRight=tx+tgtRX+tgtRW,tgtTop=ty-tgtRH/2,tgtBottom=ty+tgtRH/2;
+        var dx=tx-sx,dy=ty-sy,dist=Math.sqrt(dx*dx+dy*dy)||1;
+        var ux=dx/dist,uy=dy/dist;
+        var x1,y1,x2,y2;
+        if(Math.abs(ux)>Math.abs(uy)){
+          if(dx>0){x1=srcRight+3;y1=sy;x2=tgtLeft-3;y2=ty;}
+          else{x1=srcLeft-3;y1=sy;x2=tgtRight+3;y2=ty;}
+        } else {
+          if(dy>0){x1=sx;y1=srcBottom+3;x2=tx;y2=tgtTop-3;}
+          else{x1=sx;y1=srcTop-3;x2=tx;y2=tgtBottom+3;}
+        }
+        var midX=(x1+x2)/2,midY=(y1+y2)/2;
+        var cpx=midX+(y2-y1)*0.15,cpy=midY-(x2-x1)*0.15;
+        return 'M'+x1+','+y1+' Q'+cpx+','+cpy+' '+x2+','+y2;
       })
-      .attr('stroke', function(d){ return getNodeColor(d.source); })
-      .attr('stroke-opacity', 0.3);
+      .attr('stroke',function(d){return getNodeColor(d.source);}).attr('stroke-opacity',0.3);
 
-    nodes.forEach(function(d){
-      d.x0 = d.x;
-      d.y0 = d.y;
-    });
-
+    nodes.forEach(function(d){d.x0=d.x;d.y0=d.y;});
     document.getElementById('status-info').textContent = nodes.length + ' 个节点';
   }
 
@@ -1354,105 +1513,61 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var svg = d3.select('#mindmap-svg');
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
-
     if(currentLayout === 'bubble'){
       var nodeCount = rootHierarchy.descendants().length;
       var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 5);
       var scale = Math.min(width, height) / 2 / (radius + 100);
       scale = Math.min(scale, 1.5);
-      svg.transition().duration(500).call(
-        zoom.transform,
-        d3.zoomIdentity.translate(width / 2, height / 2).scale(scale)
-      );
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(width/2, height/2).scale(scale));
     } else {
       var nodes = rootHierarchy.descendants();
-      var xs = nodes.map(function(d){ return d.px || 0; });
-      var ys = nodes.map(function(d){ return d.py || 0; });
-      var minX = d3.min(xs), maxX = d3.max(xs);
-      var minY = d3.min(ys), maxY = d3.max(ys);
-      var contentW = maxX - minX + 400;
-      var contentH = maxY - minY + 80;
-      var midX = (minX + maxX) / 2;
-      var midY = (minY + maxY) / 2;
-      var scale = Math.min(width / contentW, height / contentH, 1.5);
+      var xs = nodes.map(function(d){return d.px||0;}), ys = nodes.map(function(d){return d.py||0;});
+      var minX=d3.min(xs),maxX=d3.max(xs),minY=d3.min(ys),maxY=d3.max(ys);
+      var contentW=maxX-minX+400, contentH=maxY-minY+80;
+      var midX=(minX+maxX)/2, midY=(minY+maxY)/2;
+      var scale = Math.min(width/contentW, height/contentH, 1.5);
       scale = Math.max(scale, 0.1);
-      var tx = width / 2 - midX * scale;
-      var ty = height / 2 - midY * scale;
-      svg.transition().duration(500).call(
-        zoom.transform,
-        d3.zoomIdentity.translate(tx, ty).scale(scale)
-      );
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(width/2-midX*scale, height/2-midY*scale).scale(scale));
     }
   }
 
   function focusNode(slug){
     var nodes = rootHierarchy.descendants();
-    var target = nodes.find(function(d){ return d.data.slug === slug; });
+    var target = nodes.find(function(d){return d.data.slug===slug;});
     if(!target) return;
     var svg = d3.select('#mindmap-svg');
-    var width = svgEl.clientWidth;
-    var height = svgEl.clientHeight;
+    var width = svgEl.clientWidth, height = svgEl.clientHeight;
     var scale = 1.2;
-    var tx = width / 2 - (target.px || 0) * scale;
-    var ty = height / 2 - (target.py || 0) * scale;
-    svg.transition().duration(600).call(
-      zoom.transform,
-      d3.zoomIdentity.translate(tx, ty).scale(scale)
-    );
+    svg.transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(width/2-(target.px||0)*scale, height/2-(target.py||0)*scale).scale(scale));
   }
 
   function switchLayout(layout){
     if(layout === currentLayout) return;
     currentLayout = layout;
     localStorage.setItem('mindmap-layout', layout);
-
-    document.querySelectorAll('.layout-btn').forEach(function(btn){
-      btn.classList.toggle('active', btn.dataset.layout === layout);
-    });
-
-    gEl.selectAll('.node-group').remove();
-    gEl.selectAll('.link-path').remove();
-    gEl.selectAll('.bracket-path').remove();
-    gEl.selectAll('.sketch-path').remove();
-
+    document.querySelectorAll('.layout-btn').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.layout===layout); });
+    gEl.selectAll('.node-group,.link-path,.bracket-path,.sketch-path').remove();
     update(rootHierarchy);
     setTimeout(fitToScreen, duration + 50);
   }
 
   function initMindmap(){
     svgEl = document.getElementById('mindmap-svg');
-    var width = svgEl.clientWidth;
-    var height = svgEl.clientHeight;
-
+    var width = svgEl.clientWidth, height = svgEl.clientHeight;
     var svg = d3.select('#mindmap-svg');
-    zoom = d3.zoom()
-      .scaleExtent([0.1, 4])
-      .on('zoom', function(e){
-        gEl.attr('transform', e.transform);
-      });
-
+    zoom = d3.zoom().scaleExtent([0.1, 4]).on('zoom', function(e){ gEl.attr('transform', e.transform); });
     svg.call(zoom);
-
     gEl = svg.append('g');
 
     treeData = buildHeadingTree(headings);
     rootHierarchy = d3.hierarchy(treeData);
-
     expandAll(rootHierarchy);
-    rootHierarchy.children.forEach(function(child){
-      if(child.children){
-        child.children.forEach(collapseAll);
-      }
-    });
-
-    rootHierarchy.x0 = 0;
-    rootHierarchy.y0 = 0;
+    rootHierarchy.children.forEach(function(child){ if(child.children) child.children.forEach(collapseAll); });
+    rootHierarchy.x0 = 0; rootHierarchy.y0 = 0;
 
     update(rootHierarchy);
     fitToScreen();
-
     document.getElementById('loading').style.display = 'none';
-
     var hint = document.getElementById('hint');
     hint.classList.add('show');
     setTimeout(function(){ hint.classList.remove('show'); }, 5000);
@@ -1461,34 +1576,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   function setupSearch(){
     var input = document.getElementById('search-input');
     var dropdown = document.getElementById('search-dropdown');
-
     input.addEventListener('input', function(){
       var query = input.value.trim().toLowerCase();
-      if(!query){
-        dropdown.classList.remove('show');
-        dropdown.innerHTML = '';
-        highlightedSlug = null;
-        update(rootHierarchy);
-        return;
-      }
-      var matches = headings.filter(function(h){
-        return h.text.toLowerCase().indexOf(query) !== -1;
-      });
-      if(matches.length === 0){
-        dropdown.innerHTML = '<div class="search-empty">未找到匹配项</div>';
-        dropdown.classList.add('show');
-        return;
-      }
+      if(!query){ dropdown.classList.remove('show'); dropdown.innerHTML=''; highlightedSlug=null; update(rootHierarchy); return; }
+      var matches = headings.filter(function(h){ return h.text.toLowerCase().indexOf(query)!==-1; });
+      if(matches.length===0){ dropdown.innerHTML='<div class="search-empty">未找到匹配项</div>'; dropdown.classList.add('show'); return; }
       var html = '';
-      matches.slice(0, 20).forEach(function(h){
-        html += '<div class="search-item" data-slug="' + h.slug + '">'
-          + '<span class="search-item-level">H' + h.level + '</span>'
-          + '<span class="search-item-text">' + h.text + '</span>'
-          + '</div>';
+      matches.slice(0,20).forEach(function(h){
+        html += '<div class="search-item" data-slug="'+h.slug+'">'
+          + '<span class="search-item-level">'+(h.isSummary?'S':'H'+h.level)+'</span>'
+          + '<span class="search-item-text">'+h.text+'</span></div>';
       });
       dropdown.innerHTML = html;
       dropdown.classList.add('show');
-
       dropdown.querySelectorAll('.search-item').forEach(function(el){
         el.addEventListener('click', function(){
           var slug = el.dataset.slug;
@@ -1497,74 +1597,39 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           highlightedSlug = slug;
           expandPathToNode(slug);
           update(rootHierarchy);
-          setTimeout(function(){
-            focusNode(slug);
-          }, duration + 50);
+          setTimeout(function(){ focusNode(slug); }, duration + 50);
         });
       });
     });
-
     input.addEventListener('keydown', function(e){
-      if(e.key === 'Escape'){
-        input.value = '';
-        dropdown.classList.remove('show');
-        dropdown.innerHTML = '';
-        highlightedSlug = null;
-        update(rootHierarchy);
-        input.blur();
-      }
+      if(e.key==='Escape'){input.value='';dropdown.classList.remove('show');dropdown.innerHTML='';highlightedSlug=null;update(rootHierarchy);input.blur();}
     });
-
-    document.addEventListener('click', function(e){
-      if(!e.target.closest('.search-wrap')){
-        dropdown.classList.remove('show');
-      }
-    });
+    document.addEventListener('click', function(e){ if(!e.target.closest('.search-wrap')) dropdown.classList.remove('show'); });
   }
 
   function setupToolbar(){
     document.querySelectorAll('.layout-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        switchLayout(btn.dataset.layout);
-      });
+      btn.addEventListener('click', function(){ switchLayout(btn.dataset.layout); });
     });
-
     document.getElementById('btn-expand-all').addEventListener('click', function(){
-      expandAll(rootHierarchy);
-      update(rootHierarchy);
-      setTimeout(fitToScreen, duration + 50);
+      expandAll(rootHierarchy); update(rootHierarchy); setTimeout(fitToScreen, duration+50);
     });
-
     document.getElementById('btn-collapse-all').addEventListener('click', function(){
-      rootHierarchy.children.forEach(function(child){
-        collapseAll(child);
-      });
-      update(rootHierarchy);
-      setTimeout(fitToScreen, duration + 50);
+      rootHierarchy.children.forEach(function(child){ collapseAll(child); });
+      update(rootHierarchy); setTimeout(fitToScreen, duration+50);
     });
-
     document.getElementById('btn-fit').addEventListener('click', fitToScreen);
-
     document.getElementById('btn-reset').addEventListener('click', function(){
       expandAll(rootHierarchy);
-      rootHierarchy.children.forEach(function(child){
-        if(child.children){
-          child.children.forEach(collapseAll);
-        }
-      });
-      update(rootHierarchy);
-      setTimeout(fitToScreen, duration + 50);
+      rootHierarchy.children.forEach(function(child){ if(child.children) child.children.forEach(collapseAll); });
+      update(rootHierarchy); setTimeout(fitToScreen, duration+50);
     });
   }
 
   function setupModal(){
     document.getElementById('modal-close').addEventListener('click', hideModal);
-    document.getElementById('modal-overlay').addEventListener('click', function(e){
-      if(e.target === this) hideModal();
-    });
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape') hideModal();
-    });
+    document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this) hideModal(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') hideModal(); });
 
     document.getElementById('btn-fullscreen').addEventListener('click', function(){
       var modal = document.getElementById('modal');
@@ -1576,14 +1641,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var body = document.getElementById('modal-body');
       var mdBody = body.querySelector('.markdown-body');
       var editArea = body.querySelector('.modal-edit-area');
-
       if(!isEditing){
         isEditing = true;
         this.classList.add('active');
         this.innerHTML = '👁';
         this.title = '预览';
-        var rawMd = getSectionMarkdown(currentEditSlug);
-        editArea.value = rawMd;
+        editArea.value = getSectionMarkdown(currentEditSlug);
         editArea.style.display = '';
         mdBody.style.display = 'none';
       } else {
@@ -1609,53 +1672,38 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     if(slug === treeData.slug){
       markdownText = newContent;
     } else {
-      var heading = headings.find(function(h){ return h.slug === slug; });
+      var heading = headings.find(function(h){return h.slug===slug;});
       if(!heading) return;
       var startLine = heading.line;
       var endLine = markdownText.split('\n').length;
-      for(var i = 0; i < headings.length; i++){
-        if(headings[i].line > startLine && headings[i].level <= heading.level){
-          endLine = headings[i].line;
-          break;
-        }
+      for(var i=0;i<headings.length;i++){
+        if(headings[i].line>startLine && headings[i].level<=heading.level){endLine=headings[i].line;break;}
       }
       var lines = markdownText.split('\n');
-      lines.splice(startLine, endLine - startLine, newContent);
+      lines.splice(startLine, endLine-startLine, newContent);
       markdownText = lines.join('\n');
     }
     headings = parseHeadings(markdownText);
     treeData = buildHeadingTree(headings);
     rootHierarchy = d3.hierarchy(treeData);
     expandAll(rootHierarchy);
-    rootHierarchy.children.forEach(function(child){
-      if(child.children){
-        child.children.forEach(collapseAll);
-      }
-    });
-    rootHierarchy.x0 = 0;
-    rootHierarchy.y0 = 0;
+    rootHierarchy.children.forEach(function(child){ if(child.children) child.children.forEach(collapseAll); });
+    rootHierarchy.x0 = 0; rootHierarchy.y0 = 0;
     update(rootHierarchy);
   }
 
   function setupTheme(){
     var saved = localStorage.getItem('theme');
-    if(saved){
-      document.documentElement.dataset.theme = saved;
-    } else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){
+    if(saved){ document.documentElement.dataset.theme = saved; }
+    else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){
       document.documentElement.dataset.theme = 'light';
     }
     updateHljsTheme();
-
     document.getElementById('btn-theme').addEventListener('click', function(){
       var current = document.documentElement.dataset.theme;
-      var next = current === 'light' ? '' : 'light';
-      if(next){
-        document.documentElement.dataset.theme = next;
-        localStorage.setItem('theme', next);
-      } else {
-        delete document.documentElement.dataset.theme;
-        localStorage.setItem('theme', 'dark');
-      }
+      var next = current==='light'?'':'light';
+      if(next){ document.documentElement.dataset.theme=next; localStorage.setItem('theme',next); }
+      else { delete document.documentElement.dataset.theme; localStorage.setItem('theme','dark'); }
       updateHljsTheme();
     });
   }
@@ -1675,11 +1723,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       markdownText = await resp.text();
       headings = parseHeadings(markdownText);
       setupTheme();
-
-      document.querySelectorAll('.layout-btn').forEach(function(btn){
-        btn.classList.toggle('active', btn.dataset.layout === currentLayout);
-      });
-
+      document.querySelectorAll('.layout-btn').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.layout===currentLayout); });
       initMindmap();
       setupToolbar();
       setupModal();
@@ -1691,11 +1735,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     }
   }
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 </body>

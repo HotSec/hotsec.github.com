@@ -140,6 +140,8 @@
 - **Go 1.22**：range over integer/循环变量语义修复（每次迭代新变量）/net/http 路由增强
 - **Go 1.23**：iterator 支持（range over func）/unique 包/osroot
 - **Go 1.24**：弱指针（weak pointer）/finalizer 改进/工具链管理 go version
+- **Go 1.25**：Container-aware GOMAXPROCS（cgroup CPU 配额自动适配）/实验性 GreenTea GC/实验性 encoding/json v2/testing/synctest 并发测试/sync.WaitGroup.Go()/Core Types 移除/go doc -http/go vet 新分析器（waitgroup/hostport）
+- **Go 1.26**：new(expr) 表达式初始化/泛型类型自引用/GreenTea GC 默认启用/SIMD 加速扫描/实验性 simd/archsimd 包/实验性 runtime/secret 包/crypto/hpke/errors.AsType/go fix 现代化修复器/实验性 goroutine leak profile/cgo 调用开销降低 ~30%/堆基地址随机化
 
 </details>
 
@@ -300,7 +302,7 @@
 - 三色并发标记算法
 - 混合写屏障（Hybrid Write Barrier）— 1.8+ 默认
 - 触发时机（内存翻倍 / 定时 / 手动 runtime.GC()）
-- Go 1.19+ 分代扫描（实验性）/ Go 1.26 新特性
+- Go 1.19+ 分代扫描（实验性）/ Go 1.25 实验性 GreenTea GC / Go 1.26 GreenTea GC 默认启用（10-40% GC 开销降低）
 - GC 优化策略
 
 </details>
