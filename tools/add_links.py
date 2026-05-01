@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import re
+import os
 
 LINK_MAP = {
     "数据类型": "go/2_核心概念/2_数据类型.md",
@@ -214,6 +215,27 @@ LINK_MAP = {
     "杂项": "other/杂项/shell编程风格.md devops/构建deb包.md python/1_语言基础/zipapp打包应用.md",
 }
 
+MYBOOK_BASE = "./mybook"
+
+
+def path_to_markdown_link(rel_path):
+    is_dir = rel_path.endswith("/")
+    href = f"{MYBOOK_BASE}/{rel_path}"
+    if is_dir:
+        display = rel_path.rstrip("/") + "/"
+        icon = "📁"
+    else:
+        display = os.path.basename(rel_path)
+        icon = "📄"
+    return f"[{icon} {display}]({href})"
+
+
+def paths_to_markdown_line(paths_str):
+    paths = paths_str.strip().split()
+    links = [path_to_markdown_link(p) for p in paths]
+    return "> " + " · ".join(links)
+
+
 with open("/Users/m5/Desktop/notebook/src/ALL.md", "r") as f:
     content = f.read()
 
@@ -237,14 +259,15 @@ while i < len(lines):
             j += 1
         closing_line_idx = j - 1
         if summary in LINK_MAP:
-            link = LINK_MAP[summary]
+            link_str = LINK_MAP[summary]
+            md_line = paths_to_markdown_line(link_str)
             has_link = False
-            for k in range(max(0, closing_line_idx - 2), closing_line_idx + 1):
-                if '<link>' in lines[k]:
+            for k in range(max(0, closing_line_idx - 3), closing_line_idx + 1):
+                if lines[k].startswith("> [") or lines[k].startswith(">["):
                     has_link = True
                     break
             if not has_link:
-                lines[closing_line_idx] = f"<link>{link}</link>\n{lines[closing_line_idx]}"
+                lines[closing_line_idx] = f"{md_line}\n{lines[closing_line_idx]}"
                 count += 1
         else:
             missed.append(summary)
@@ -255,7 +278,7 @@ result = '\n'.join(lines)
 with open("/Users/m5/Desktop/notebook/src/ALL.md", "w") as f:
     f.write(result)
 
-print(f"Added {count} <link> tags")
+print(f"Added {count} markdown link lines")
 if missed:
     print(f"Missed {len(missed)} summaries:")
     for s in missed:

@@ -264,8 +264,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   var highlightedSlug = null;
   var clickTimers = {};
   var mybookBase = '';
-  var h3DirMap = {};
-  var summaryFileMap = {};
 
   var branchColors = ['#e0af68','#6cb4ee','#9ece6a','#ff9e64','#bb9af7','#7dcfff','#f7768e','#73daca'];
 
@@ -288,7 +286,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         if(!counter[base]) counter[base] = 0;
         counter[base]++;
         var slug = counter[base] > 1 ? base + '-' + counter[base] : base;
-        result.push({level: level, text: t, slug: slug, line: idx, isSummary: false});
+        result.push({level: level, text: t, slug: slug, line: idx, isSummary: false, mdLinks: []});
       } else {
         var sm = line.match(/^<summary>(.+?)<\/summary>/);
         if(sm){
@@ -298,7 +296,17 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           if(!counter[base2]) counter[base2] = 0;
           counter[base2]++;
           var slug2 = counter[base2] > 1 ? base2 + '-' + counter[base2] : base2;
-          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true});
+          var mdLinks = [];
+          for(var k = idx + 1; k < lines.length; k++){
+            var lk = lines[k];
+            if(lk.trim() === '</details>') break;
+            var linkRe = /\[📄[^\]]*\]\(([^)]+)\)/g;
+            var lm;
+            while((lm = linkRe.exec(lk)) !== null){
+              mdLinks.push(lm[1]);
+            }
+          }
+          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true, mdLinks: mdLinks});
         }
       }
     });
@@ -316,7 +324,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var root = {name: rootName, slug: rootSlug, level: 0, children: [], isSummary: false};
     var stack = [root];
     hdgs.forEach(function(h){
-      var node = {name: h.text, slug: h.slug, level: h.level, children: [], isSummary: h.isSummary};
+      var node = {name: h.text, slug: h.slug, level: h.level, children: [], isSummary: h.isSummary, mdLinks: h.mdLinks || []};
       while(stack.length > 1 && stack[stack.length - 1].level >= node.level){
         stack.pop();
       }
@@ -399,35 +407,22 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   function resolveMdPath(slug){
     if(mdPathCache[slug] !== undefined) return mdPathCache[slug];
     var heading = headings.find(function(h){ return h.slug === slug; });
-    if(!heading || !heading.isSummary){
+    if(!heading || !heading.isSummary || !heading.mdLinks || heading.mdLinks.length === 0){
       mdPathCache[slug] = null;
       return null;
     }
-    if(summaryFileMap[heading.text]){
-      mdPathCache[slug] = mybookBase + '/' + summaryFileMap[heading.text];
-      return mdPathCache[slug];
-    }
-    var path = findPathToSlug(slug);
-    if(path.length < 2){
-      mdPathCache[slug] = null;
-      return null;
-    }
-    var h3Num = '';
-    path.forEach(function(p){
-      var h = headings.find(function(hh){ return hh.slug === p.slug; });
-      if(h && h.level === 3){
-        var m = h.text.match(/^(\d+\.\d+)/);
-        if(m) h3Num = m[1];
-      }
+    var rawPath = heading.mdLinks[0];
+    var resolved = rawPath.replace(/^\.\//, mybookBase + '/');
+    mdPathCache[slug] = resolved;
+    return resolved;
+  }
+
+  function resolveAllMdLinks(slug){
+    var heading = headings.find(function(h){ return h.slug === slug; });
+    if(!heading || !heading.isSummary || !heading.mdLinks) return [];
+    return heading.mdLinks.map(function(p){
+      return p.replace(/^\.\//, mybookBase + '/');
     });
-    if(h3Num && h3DirMap[h3Num]){
-      var dir = h3DirMap[h3Num];
-      var fileName = heading.text.replace(/[\/\\:*?"<>|]/g, '_');
-      mdPathCache[slug] = mybookBase + '/' + dir + '/' + fileName + '.md';
-      return mdPathCache[slug];
-    }
-    mdPathCache[slug] = null;
-    return null;
   }
 
   function findPathToSlug(targetSlug){
@@ -459,18 +454,25 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var mdPath = resolveMdPath(slug);
     if(mdPath && heading && heading.isSummary){
       mdBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">加载中...</div>';
+      var allLinks = resolveAllMdLinks(slug);
       fetch(mdPath).then(function(resp){
         if(resp.ok) return resp.text();
         throw new Error('not found');
       }).then(function(text){
         mdBody.innerHTML = '';
-        if(mdPath){
-          var link = document.createElement('a');
-          link.className = 'source-link';
-          link.href = mdPath;
-          link.target = '_blank';
-          link.innerHTML = '📄 打开源文件';
-          mdBody.appendChild(link);
+        if(allLinks.length > 0){
+          var linksDiv = document.createElement('div');
+          linksDiv.style.cssText = 'margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;';
+          allLinks.forEach(function(link, i){
+            var a = document.createElement('a');
+            a.className = 'source-link';
+            a.href = link;
+            a.target = '_blank';
+            var fileName = link.split('/').pop().replace(/\.md$/, '');
+            a.innerHTML = i === 0 ? '📄 ' + fileName : '📎 ' + fileName;
+            linksDiv.appendChild(a);
+          });
+          mdBody.appendChild(linksDiv);
         }
         var contentDiv = document.createElement('div');
         contentDiv.className = 'markdown-body';
@@ -1498,8 +1500,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         if(cfgResp.ok){
           var cfg = await cfgResp.json();
           if(cfg.mybookBase) mybookBase = cfg.mybookBase;
-          if(cfg.h3DirMap) h3DirMap = cfg.h3DirMap;
-          if(cfg.summaryFileMap) summaryFileMap = cfg.summaryFileMap;
         }
       }catch(e){ console.warn('config.json load failed, using defaults:', e); }
 
