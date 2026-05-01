@@ -11,27 +11,38 @@
 <details>
 <summary>数据类型</summary>
 
-- 基本类型：int, float, string, bool, byte, rune
-- 复合类型：array, slice, map, struct, pointer, channel, interface
-- 类型转换（强制显式转换）
+- 基本类型：int8~int64/uint8~uint64/float32/float64/complex64/complex128/bool/string/byte/rune
+- 类型转换（强制显式转换）/ strconv 系列
+- 数组：定义/初始化/遍历/多维数组/值类型特性
+- 切片详解：定义/长度容量/切片表达式/make/本质(SliceHeader)/append/copy/删除元素/避免内存泄漏
+- 映射详解：定义/基本操作/判断键/遍历/delete/有序遍历/元素为map的切片/值为切片的map/并发安全(sync.Map)
+- 类型别名：type NewType OldType vs type Alias = OldType
 
 </details>
 
 <details>
 <summary>变量声明与控制结构</summary>
 
-- var / := 短变量声明
-- if / for / switch / select
+- var / := 短变量声明 / 批量声明 / 匿名变量 _
+- 常量与 iota：枚举/跳过值/中间插队/数量级定义
+- 运算符：算术/关系/逻辑/位(&|^&^<</>>)/赋值/优先级
+- if / for / switch（默认不穿透/fallthrough）/ select
 - defer / panic / recover
+- goto / break(标签) / continue
 
 </details>
 
 <details>
 <summary>函数与方法</summary>
 
-- 多返回值、命名返回值、可变参数
-- 闭包
+- 多返回值、命名返回值、可变参数(...语法)
+- 高阶函数：函数作为参数/返回值
+- 匿名函数与闭包（捕获变量引用）
+- defer 详解：LIFO/参数确定时机/执行时机/修改返回值
+- 内置函数：len/cap/append/copy/delete/new/make/close/panic/recover
+- 递归：阶乘/斐波那契/分金币问题
 - 方法接收者选择（值接收者 vs 指针接收者）
+- 结构体详解：自定义类型/实例化/构造函数/匿名字段(嵌入)/嵌套/JSON序列化Tag/方法继承与重写
 
 </details>
 
@@ -50,22 +61,30 @@
 <details>
 <summary>包-模块-库</summary>
 
+- 包定义/标识符可见性(大写导出/小写私有)/包引入/别名导入/空白导入
+- init 函数：执行顺序/多个 init/注册驱动
 - go mod 包管理
 - 常用命令：go mod init/tidy/download/vendor/graph/why
 - GOPROXY 模块代理（goproxy.cn/goproxy.io/athens）
 - go.sum 校验与模块完整性
 - replace / exclude / retract 指令
 - 私有仓库配置（GOPRIVATE/GONOSUMCHECK）
+- Go Workspace（go.work）：多模块开发
+- 版本号规则：语义化版本/v2+ 路径后缀/伪版本
 
 </details>
 
 <details>
 <summary>测试</summary>
 
-- 单元测试（go test）
+- 单元测试（go test）/ 子测试(t.Run) / 表驱动测试
+- 覆盖率：-cover/-covermode/-coverprofile
 - 性能/基准测试（Benchmark）
 - 模糊测试（Fuzzing）
-- 集成测试
+- Mock 接口：手动 Mock / gomock
+- monkey 打桩：gomonkey
+- goconvey：BDD 风格/Web 界面
+- 测试 MySQL（sqlmock）/ Redis（redismock）
 
 </details>
 
@@ -88,6 +107,18 @@
 </details>
 
 #### 进阶特性
+
+<details>
+<summary>设计模式</summary>
+
+- 函数选项模式（Functional Options）：解决多参数构造问题
+- 单例模式：sync.Once 保证只执行一次
+- 工厂模式：根据类型创建不同实例
+- 策略模式：接口+组合实现算法切换
+- 装饰器模式：中间件链式调用
+- 构建者模式：链式调用构建复杂对象
+
+</details>
 
 <details>
 <summary>泛型</summary>
@@ -150,8 +181,11 @@
 <summary>指针 & make vs new</summary>
 
 - & / * 操作，Go 指针不能运算
+- 指针传值：值传递 vs 指针传递
+- 指针使用场景：修改外部变量/避免大结构体拷贝/修改接收者
 - new：分配零值返回指针
 - make：只用于 slice/map/chan，返回初始化后的引用
+- make vs new 对比
 
 </details>
 
@@ -233,6 +267,7 @@
 <summary>并发安全退出</summary>
 
 - Context 取消 / Channel 通知 / errgroup 错误处理
+- conc 并发库：pool(并发池)/stream(流式)/iter(迭代器)/泛型支持/对比errgroup
 
 </details>
 
@@ -321,46 +356,256 @@
 
 ### 1.6 常用标准库
 
-#### I/O与编码
+#### 格式化与时间
 
 <details>
-<summary>网络与 I/O</summary>
+<summary>fmt 格式化</summary>
 
-- net/http：HTTP 客户端/服务端、Handler/HandlerFunc、中间件模式
-- io / bufio / os：文件读写、缓冲 I/O、路径操作
+- Printf 占位符：%v/%+v/%#v/%T/%%
+- 整数：%d/%b/%o/%x/%X/%c/%U
+- 浮点：%f/%.2f/%e/%E/%g
+- 字符串：%s/%q/%x
+- 宽度精度：%5d/%-5d/%05d/%8.2f
+- Sprint/Sprintf/Fprint/Fprintf
 
 </details>
 
 <details>
-<summary>编码与序列化</summary>
+<summary>time 时间包</summary>
 
-- encoding/json：Marshal / Unmarshal、自定义 JSON 标签、流式编解码
+- 时间获取：Now()/Year()/Month()/Unix()/UnixMilli()
+- 格式化：Format("2006-01-02 15:04:05")/Parse()
+- 时间计算：Add/Sub/Before/After/Equal
+- 定时器：Timer/Ticker/Sleep/After
+- Duration：常量(Nanosecond~Hour)/方法(Seconds/Milliseconds)
+
+</details>
+
+<details>
+<summary>strconv / flag</summary>
+
+- strconv：Atoi/Itoa/ParseBool/ParseInt/ParseFloat/FormatBool/FormatInt/FormatFloat
+- flag：StringVar/IntVar/BoolVar/Parse/子命令(NewFlagSet)
+
+</details>
+
+#### I/O与编码
+
+<details>
+<summary>文件操作（os/io）</summary>
+
+- 读取：Open/Read/ReadFile/bufio.Scanner
+- 写入：Create/Write/WriteFile/OpenFile(追加)
+- 文件信息：Stat/Name/Size/IsDir/Mode/ModTime
+- 目录：Mkdir/MkdirAll/Remove/RemoveAll/ReadDir/Walk
+- 临时文件：MkdirTemp/CreateTemp
+- io 工具：ReadAll/Copy
+
+</details>
+
+<details>
+<summary>html/template 模板</summary>
+
+- 基本语法：{{.}}/{{.Field}}/管道
+- 条件：if/else/end
+- 循环：range/else
+- with：切换上下文
+- 自定义变量：{{$x := .Name}}
+- 比较函数：eq/ne/lt/le/gt/ge
+- 自定义函数：FuncMap
+- 模板嵌套：define/template
+- 从文件加载：ParseGlob/ParseFiles
+- 安全处理：自动转义/template.HTML
+
+</details>
+
+<details>
+<summary>encoding/json 详解</summary>
+
+- Marshal/Unmarshal
+- Tag 选项：json:"name"/omitempty/-/-,
+- 自定义 JSON：MarshalJSON/UnmarshalJSON
+- json.RawMessage：延迟解析
+- 流式编解码：Encoder/Decoder
+- map 与 slice 的 JSON 处理
+- 数字精度：UseNumber
+- 空切片 vs nil 的 JSON 差异
+
+</details>
+
+<details>
+<summary>reflect 反射</summary>
+
+- TypeOf/ValueOf/Kind
+- 结构体反射：NumField/Field/Tag.Get/NumMethod
+- 修改值：Elem/Set/CanSet
+- 动态调用方法：MethodByName/Call
+- 应用场景：ORM/配置解析/验证/序列化
+- 注意事项：性能/类型安全/可维护性
 
 </details>
 
 #### 并发与底层
 
 <details>
+<summary>context 详解</summary>
+
+- 设计理念：取消信号/超时控制/值传递
+- 创建：Background/TODO/WithCancel/WithTimeout/WithDeadline/WithValue
+- 传播规则：子取消不影响父/父取消级联子
+- 最佳实践：第一个参数/不传nil/不存结构体/defer cancel
+- 常见模式：HTTP请求超时/数据库查询超时/优雅关闭
+
+</details>
+
+<details>
 <summary>并发与同步</summary>
 
 - sync / sync/atomic：Mutex / RWMutex / WaitGroup / Once / Map / Pool / Cond
-- context：超时控制、取消传播、值传递
+- singleflight：防缓存击穿/Do/DoChan/Forget
 
 </details>
 
 <details>
-<summary>字符串与格式化</summary>
+<summary>网络与 I/O</summary>
 
-- fmt / strings / strconv：格式化输出、字符串操作、类型转换
+- net/http：HTTP 客户端/服务端、Handler/HandlerFunc、中间件模式、文件服务、优雅关闭
+- io / bufio / os：文件读写、缓冲 I/O、路径操作
+
+</details>
+
+#### 第三方库
+
+<details>
+<summary>日志</summary>
+
+- 标准库 log
+- slog（Go 1.21+）：结构化日志/JSONHandler
+- Zap：Logger/SugaredLogger/自定义配置/Gin集成
+- lumberjack：日志轮转(MaxSize/MaxBackups/MaxAge/Compress)
 
 </details>
 
 <details>
-<summary>反射与底层</summary>
+<summary>Viper 配置管理</summary>
 
-- reflect：类型反射、值反射、结构体字段遍历
-- unsafe：指针操作、内存布局
-- log / flag：日志记录、命令行参数解析
+- 读取配置文件：SetConfigName/AddConfigPath/ReadInConfig
+- 读取配置值：Get/GetString/GetInt/嵌套key
+- 默认值：SetDefault
+- 绑定结构体：Unmarshal + mapstructure tag
+- 环境变量：AutomaticEnv/SetEnvPrefix/BindEnv
+- 命令行参数：BindPFlag
+- 热更新：WatchConfig/OnConfigChange
+- 写入配置：WriteConfig/SafeWriteConfig
+
+</details>
+
+<details>
+<summary>validator 参数校验</summary>
+
+- 常用标签：required/omitempty/min/max/len/gte/lte/email/url/ip/oneof
+- 跨字段验证：eqfield/nefield/gtfield
+- 自定义验证器：RegisterValidation
+- 中文错误信息：locales/ut/translations
+- Gin 集成：binding tag
+
+</details>
+
+<details>
+<summary>sqlx 数据库操作</summary>
+
+- 连接：sqlx.Connect/Connect设置
+- 查询：Get/Select/Queryx/StructScan/MapScan
+- 增删改：Exec/NamedExec/批量插入
+- 事务：Beginx/Commit/Rollback/BeginTxFunc
+- 结构体映射：db tag
+
+</details>
+
+<details>
+<summary>Cobra CLI 开发</summary>
+
+- 命令结构：Command/Use/Short/Long/Run
+- 子命令：AddCommand
+- 标志：PersistentFlags/Flags/IntP/StringP
+- 必填标志：MarkFlagRequired
+- 生命周期：PreRun/Run/PostRun
+- 脚手架：cobra-cli
+
+</details>
+
+<details>
+<summary>Swagger / Air</summary>
+
+- **Swagger**：swag init/主入口注解/接口注解(@Summary/@Param/@Success/@Router)/Gin集成
+- **Air**：热重载/air init/.air.toml配置/Docker中使用
+
+</details>
+
+#### 数据库操作
+
+<details>
+<summary>GORM</summary>
+
+- 安装连接/连接池配置
+- 模型定义：gorm tag(primarykey/type/not null/index/uniqueIndex/default)
+- 自动迁移：AutoMigrate
+- CRUD：Create/First/Find/Where/Update/Updates/Delete
+- 关联：Preload/Joins/foreignKey
+- 事务：Transaction
+- GORM Gen：类型安全ORM/代码生成
+
+</details>
+
+<details>
+<summary>Go 操作 Redis</summary>
+
+- go-redis 连接/配置
+- 5大类型：String(SET/GET/INCR)/Hash(HSET/HGET/HGETALL)/List(LPush/RPush/LPop)/Set(SAdd/SMembers)/SortedSet(ZAdd/ZRange/ZScore)
+- Pipeline：批量操作
+- Lua 脚本：NewScript/Run
+- 分布式锁：SetNX + Lua 释放
+- 发布订阅：Subscribe/Publish
+
+</details>
+
+<details>
+<summary>Go 操作 MongoDB</summary>
+
+- mongo-driver 连接
+- CRUD：InsertOne/InsertMany/FindOne/Find/UpdateOne/UpdateMany/DeleteOne/DeleteMany
+- 聚合管道：Aggregate/$match/$group/$sort/$limit
+- 索引：Indexes().CreateOne/CreateMany
+
+</details>
+
+<details>
+<summary>Go 操作 Kafka / NSQ / RabbitMQ</summary>
+
+- **Kafka**：kafka-go/Writer(生产)/Reader(消费)/ConsumerGroup/管理操作
+- **NSQ**：go-nsq/Producer(Publish)/Consumer(AddHandler)/nsqlookupd发现
+- **RabbitMQ**：amqp091-go/工作队列/发布订阅(Fanout)/路由(Direct)/主题(Topic)
+
+</details>
+
+#### 可观测性
+
+<details>
+<summary>OpenTelemetry / Jaeger / Prometheus</summary>
+
+- **OpenTelemetry**：TracerProvider/Span/属性/事件/错误记录/HTTP(gin)集成/gRPC集成
+- **Jaeger**：部署(all-in-one)/Go集成/采样策略(AlwaysSample/TraceIDRatioBased)/Web UI
+- **Prometheus Go**：Counter/Gauge/Histogram/Summary/Gin中间件/PromQL查询
+
+</details>
+
+<details>
+<summary>优雅关机与部署</summary>
+
+- **优雅关机**：signal.Notify/srv.Shutdown/超时控制
+- **优雅重启**：SIGHUP 信号处理
+- **部署方式**：二进制/Systemd/Docker/K8s
+- **编译优化**：-ldflags="-s -w"/版本信息注入(-X)
 
 </details>
 
@@ -459,6 +704,28 @@
 
 </details>
 
+#### 微服务
+
+<details>
+<summary>Go kit 微服务</summary>
+
+- 代码分层：Service(业务逻辑)/Endpoint(端点)/Transport(传输)
+- 中间件模式：日志/指标/链路追踪
+- 支持 HTTP/gRPC 传输
+
+</details>
+
+<details>
+<summary>Consul 服务注册与发现</summary>
+
+- 服务注册：AgentServiceRegistration/健康检查
+- 服务发现：Health().Service()
+- KV 存储：Put/Get
+- 健康检查：HTTP/TCP/gRPC
+- 注销服务：ServiceDeregister
+
+</details>
+
 ### 1.8 Web接口性能优化
 
 #### 编码优化
@@ -540,6 +807,7 @@
 - go build / fmt / vet / test / doc / generate / embed / race
 - golangci-lint（多 Linter 聚合）/ gomvpkg（包迁移）/ Docker 多阶段构建
 - 性能调试：pprof（CPU/Mem/Goroutine/Block）/ 火焰图 / go test -bench / trace
+- 部署：二进制/Systemd/Docker(docker-compose)/K8s/编译优化(-ldflags)
 
 </details>
 

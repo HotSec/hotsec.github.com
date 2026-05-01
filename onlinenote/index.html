@@ -55,6 +55,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 [data-theme="light"] .btn .icon-sun{display:block}
 [data-theme="light"] .btn .icon-moon{display:none}
 
+.layout-switcher{display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary)}
+.layout-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:none;border-radius:6px;background:transparent;color:var(--text-dim);font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.layout-btn:hover{color:var(--text);background:var(--highlight-bg)}
+.layout-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.layout-btn svg{width:14px;height:14px;fill:currentColor}
+
 .mindmap-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);transition:background .3s}
 #mindmap-svg{width:100%;height:100%;cursor:grab}
 #mindmap-svg:active{cursor:grabbing}
@@ -66,6 +72,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .node-bubble-text{fill:var(--text-bright);pointer-events:none;dominant-baseline:central;transition:fill .3s}
 .fold-badge{fill:var(--text-dim);font-size:8px;font-weight:700;pointer-events:none;text-anchor:middle;dominant-baseline:central}
 .link-path{fill:none;stroke-width:1.5;pointer-events:none}
+.bracket-path{fill:none;stroke-width:2;pointer-events:none;stroke-linecap:round}
 
 .modal-overlay{position:fixed;inset:0;background:var(--modal-overlay);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade-in .2s ease}
 .modal-overlay.active{display:flex}
@@ -121,6 +128,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 @media(max-width:768px){
   .modal{width:96%;max-height:90vh;border-radius:8px}
   .toolbar-right .btn span{display:none}
+  .layout-btn span{display:none}
 }
 </style>
 </head>
@@ -131,6 +139,20 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       <div class="toolbar-title"><span>◉</span> 知识图谱</div>
     </div>
     <div class="toolbar-right">
+      <div class="layout-switcher" id="layout-switcher">
+        <button class="layout-btn active" data-layout="bracket" title="括号图">
+          <svg viewBox="0 0 24 24"><path d="M3 3h4v2H5v14h2v2H3V3zm14 0h4v18h-4v-2h2V5h-2V3zM8 8h2v8H8V8zm3 0h2v8h-2V8zm3 0h2v8h-2V8z"/></svg>
+          <span>括号</span>
+        </button>
+        <button class="layout-btn" data-layout="tree" title="树形图">
+          <svg viewBox="0 0 24 24"><path d="M22 11V3h-7v3H9V3H2v8h7V8h2v10h2v6h7v-8h-7v2h-2V8h2v3h7z"/></svg>
+          <span>树形</span>
+        </button>
+        <button class="layout-btn" data-layout="bubble" title="气泡图">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+          <span>气泡</span>
+        </button>
+      </div>
       <button class="btn" id="btn-theme" title="切换主题">
         <svg class="icon-sun" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
@@ -157,7 +179,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   <div class="mindmap-wrap">
     <svg id="mindmap-svg"></svg>
     <div class="mindmap-loading" id="loading">加载中...</div>
-    <div class="hint" id="hint">点击气泡查看详情或展开/折叠</div>
+    <div class="hint" id="hint">点击节点查看详情或展开/折叠</div>
   </div>
 
   <div class="statusbar">
@@ -184,6 +206,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   var headings = [];
   var svgEl, gEl, zoom, rootHierarchy, treeData;
   var duration = 500;
+  var currentLayout = localStorage.getItem('mindmap-layout') || 'bracket';
 
   var branchColors = ['#e0af68','#6cb4ee','#9ece6a','#ff9e64','#bb9af7','#7dcfff','#f7768e','#73daca'];
 
@@ -211,7 +234,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function buildHeadingTree(hdgs){
-    var root = {name: 'ALL', slug: '', level: 0, children: []};
+    var rootName = '知识点总结';
+    if(hdgs.length > 0 && hdgs[0].level === 1){
+      rootName = hdgs[0].text;
+      hdgs = hdgs.slice(1);
+    }
+    var root = {name: rootName, slug: '', level: 0, children: []};
     var stack = [root];
     hdgs.forEach(function(h){
       var node = {name: h.text, slug: h.slug, level: h.level, children: []};
@@ -351,7 +379,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function truncateText(name, depth){
-    var maxLen = depth <= 0 ? 20 : depth === 1 ? 12 : 8;
+    var maxLen = depth <= 0 ? 20 : depth === 1 ? 14 : 10;
     return name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
   }
 
@@ -372,6 +400,310 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function update(source){
+    if(currentLayout === 'bracket') updateBracket(source);
+    else if(currentLayout === 'tree') updateTree(source);
+    else updateBubble(source);
+  }
+
+  function updateBracket(source){
+    var width = svgEl.clientWidth;
+    var height = svgEl.clientHeight;
+
+    var nodeSizeH = 38;
+    var nodeSizeW = 220;
+
+    var treeLayout = d3.tree().nodeSize([nodeSizeH, nodeSizeW]);
+    var root = treeLayout(rootHierarchy);
+    var nodes = root.descendants();
+    var links = root.links();
+
+    nodes.forEach(function(d){
+      d.px = d.y;
+      d.py = d.x;
+    });
+
+    var sourceP = [source.y0 || 0, source.x0 || 0];
+
+    gEl.selectAll('.link-path').remove();
+    gEl.selectAll('.bracket-path').remove();
+
+    var bracketSel = gEl.selectAll('.bracket-path')
+      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+
+    bracketSel.exit().transition().duration(duration * 0.6)
+      .attr('opacity', 0)
+      .remove();
+
+    var bracketEnter = bracketSel.enter().append('path')
+      .attr('class', 'bracket-path')
+      .attr('opacity', 0);
+
+    bracketEnter.merge(bracketSel)
+      .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
+      .attr('opacity', 1)
+      .attr('d', function(d){
+        var sx = d.source.px, sy = d.source.py;
+        var tx = d.target.px, ty = d.target.py;
+        var jx = sx + 40;
+        var r = 6;
+        var dy = ty - sy;
+        if(Math.abs(dy) < r * 2) r = Math.max(Math.abs(dy) / 2, 0);
+        var dir = dy >= 0 ? 1 : -1;
+        return 'M' + sx + ',' + sy
+          + ' H' + (jx - r)
+          + ' Q' + jx + ',' + sy + ' ' + jx + ',' + (sy + r * dir)
+          + ' V' + (ty - r * dir)
+          + ' Q' + jx + ',' + ty + ' ' + (jx + r) + ',' + ty
+          + ' H' + tx;
+      })
+      .attr('stroke', function(d){ return getNodeColor(d.source); })
+      .attr('stroke-opacity', 0.5);
+
+    var nodeSel = gEl.selectAll('.node-group')
+      .data(nodes, function(d){ return d.data.name + d.depth; });
+
+    nodeSel.exit().transition().duration(duration * 0.6)
+      .ease(d3.easeBackIn)
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0)
+      .remove();
+
+    var nodeEnter = nodeSel.enter().append('g')
+      .attr('class', 'node-group')
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0);
+
+    nodeEnter.append('rect').attr('class', 'node-bubble');
+    nodeEnter.append('text').attr('class', 'node-bubble-text');
+    nodeEnter.append('text').attr('class', 'fold-badge');
+
+    nodeEnter.transition().duration(duration)
+      .ease(d3.easeBackOut)
+      .delay(function(d){ return d.depth * 60; })
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
+
+    var nodeUpdate = nodeSel;
+
+    nodeUpdate.transition().duration(duration)
+      .ease(d3.easeCubicOut)
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
+
+    var allNodes = nodeEnter.merge(nodeUpdate);
+
+    allNodes.each(function(d){
+      var g = d3.select(this);
+      var colorHex = getNodeColorHex(d);
+      var isFolded = !!d._children;
+      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : 11;
+      var text = truncateText(d.data.name, d.depth);
+      var paddingH = d.depth === 0 ? 14 : 10;
+      var paddingV = d.depth === 0 ? 8 : 5;
+      var rx = d.depth === 0 ? 10 : 6;
+
+      var textEl = g.select('.node-bubble-text');
+      textEl
+        .attr('font-size', fontSize + 'px')
+        .attr('font-weight', d.depth <= 1 ? '700' : '400')
+        .attr('text-anchor', 'start')
+        .attr('x', 0)
+        .attr('y', 0)
+        .text(text);
+
+      var bbox;
+      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
+
+      var bw = bbox.width + paddingH * 2;
+      var bh = bbox.height + paddingV * 2;
+
+      g.select('.node-bubble')
+        .attr('x', bbox.x - paddingH)
+        .attr('y', bbox.y - paddingV)
+        .attr('width', bw)
+        .attr('height', bh)
+        .attr('rx', rx)
+        .attr('ry', rx)
+        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.25 : 0.15))
+        .attr('stroke', colorHex)
+        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
+        .attr('stroke-dasharray', isFolded ? '4,3' : 'none');
+
+      textEl.attr('x', 0).attr('y', 0);
+
+      var badge = g.select('.fold-badge');
+      if(isFolded){
+        var count = countDescendants(d._children);
+        badge
+          .attr('x', bbox.x - paddingH + bw - 6)
+          .attr('y', bbox.y - paddingV + 8)
+          .attr('text-anchor', 'end')
+          .text(count);
+      } else {
+        badge.text('');
+      }
+    });
+
+    allNodes.on('click', function(e, d){
+      e.stopPropagation();
+      if(d.children || d._children){
+        toggleNode(d);
+      } else if(d.data.slug){
+        showModal(d.data.slug);
+      }
+    });
+
+    nodes.forEach(function(d){
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+
+    document.getElementById('status-info').textContent = nodes.length + ' 个节点';
+  }
+
+  function updateTree(source){
+    var width = svgEl.clientWidth;
+    var height = svgEl.clientHeight;
+
+    var nodeSizeH = 36;
+    var nodeSizeW = 200;
+
+    var treeLayout = d3.tree().nodeSize([nodeSizeH, nodeSizeW]);
+    var root = treeLayout(rootHierarchy);
+    var nodes = root.descendants();
+    var links = root.links();
+
+    nodes.forEach(function(d){
+      d.px = d.y;
+      d.py = d.x;
+    });
+
+    var sourceP = [source.y0 || 0, source.x0 || 0];
+
+    gEl.selectAll('.bracket-path').remove();
+
+    var linkSel = gEl.selectAll('.link-path')
+      .data(links, function(d){ return d.target.data.name + d.target.depth; });
+
+    linkSel.exit().transition().duration(duration * 0.6)
+      .ease(d3.easeBackIn)
+      .attr('d', function(d){
+        return 'M' + d.source.px + ',' + d.source.py + 'L' + d.source.px + ',' + d.source.py;
+      })
+      .attr('opacity', 0)
+      .remove();
+
+    var linkEnter = linkSel.enter().append('path')
+      .attr('class', 'link-path')
+      .attr('opacity', 0)
+      .attr('d', function(d){
+        return 'M' + d.source.px + ',' + d.source.py + 'L' + d.source.px + ',' + d.source.py;
+      });
+
+    linkEnter.merge(linkSel)
+      .transition().duration(duration)
+      .ease(d3.easeCubicInOut)
+      .attr('opacity', 1)
+      .attr('d', function(d){
+        var sx = d.source.px, sy = d.source.py;
+        var tx = d.target.px, ty = d.target.py;
+        var midX = (sx + tx) / 2;
+        return 'M' + sx + ',' + sy
+          + ' C' + midX + ',' + sy + ' ' + midX + ',' + ty + ' ' + tx + ',' + ty;
+      })
+      .attr('stroke', function(d){ return getNodeColor(d.source); })
+      .attr('stroke-opacity', 0.35);
+
+    var nodeSel = gEl.selectAll('.node-group')
+      .data(nodes, function(d){ return d.data.name + d.depth; });
+
+    nodeSel.exit().transition().duration(duration * 0.6)
+      .ease(d3.easeBackIn)
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0)
+      .remove();
+
+    var nodeEnter = nodeSel.enter().append('g')
+      .attr('class', 'node-group')
+      .attr('transform', 'translate(' + sourceP[0] + ',' + sourceP[1] + ') scale(0)')
+      .attr('opacity', 0);
+
+    nodeEnter.append('circle').attr('class', 'node-bubble');
+    nodeEnter.append('text').attr('class', 'node-bubble-text');
+    nodeEnter.append('text').attr('class', 'fold-badge');
+
+    nodeEnter.transition().duration(duration)
+      .ease(d3.easeBackOut)
+      .delay(function(d){ return d.depth * 60; })
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
+
+    var nodeUpdate = nodeSel;
+
+    nodeUpdate.transition().duration(duration)
+      .ease(d3.easeCubicOut)
+      .attr('transform', function(d){ return 'translate(' + d.px + ',' + d.py + ') scale(1)'; })
+      .attr('opacity', 1);
+
+    var allNodes = nodeEnter.merge(nodeUpdate);
+
+    allNodes.each(function(d){
+      var g = d3.select(this);
+      var colorHex = getNodeColorHex(d);
+      var isFolded = !!d._children;
+      var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : 11;
+      var text = truncateText(d.data.name, d.depth);
+      var circleR = d.depth === 0 ? 8 : d.depth === 1 ? 6 : 4;
+
+      g.select('.node-bubble')
+        .attr('r', circleR)
+        .attr('fill', hexToRgba(colorHex, d.depth === 0 ? 0.4 : 0.25))
+        .attr('stroke', colorHex)
+        .attr('stroke-width', d.depth === 0 ? 2.5 : 1.5)
+        .attr('stroke-dasharray', isFolded ? '3,2' : 'none');
+
+      var textEl = g.select('.node-bubble-text');
+      textEl
+        .attr('font-size', fontSize + 'px')
+        .attr('font-weight', d.depth <= 1 ? '700' : '400')
+        .attr('text-anchor', 'start')
+        .attr('x', circleR + 6)
+        .attr('y', 1)
+        .text(text);
+
+      var badge = g.select('.fold-badge');
+      if(isFolded){
+        var count = countDescendants(d._children);
+        badge
+          .attr('x', circleR + 6)
+          .attr('y', -circleR - 2)
+          .attr('text-anchor', 'start')
+          .attr('font-size', '8px')
+          .text('+' + count);
+      } else {
+        badge.text('');
+      }
+    });
+
+    allNodes.on('click', function(e, d){
+      e.stopPropagation();
+      if(d.children || d._children){
+        toggleNode(d);
+      } else if(d.data.slug){
+        showModal(d.data.slug);
+      }
+    });
+
+    nodes.forEach(function(d){
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+
+    document.getElementById('status-info').textContent = nodes.length + ' 个节点';
+  }
+
+  function updateBubble(source){
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
     var nodeCount = rootHierarchy.descendants().length;
@@ -393,7 +725,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       d.py = p[1];
     });
 
-    var sourceP = radialPoint(source.x, source.y);
+    var sourceP = radialPoint(source.x0 || 0, source.y0 || 0);
+
+    gEl.selectAll('.bracket-path').remove();
 
     var linkSel = gEl.selectAll('.link-path')
       .data(links, function(d){ return d.target.data.name + d.target.depth; });
@@ -476,10 +810,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         .attr('font-size', fontSize + 'px')
         .attr('font-weight', d.depth <= 1 ? '700' : '400')
         .attr('text-anchor', anchor)
+        .attr('x', 0)
+        .attr('y', 0)
         .text(text);
 
       var bbox;
-      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {width: text.length * fontSize * 0.6, height: fontSize}; }
+      try{ bbox = textEl.node().getBBox(); }catch(e){ bbox = {x: 0, width: text.length * fontSize * 0.6, height: fontSize}; }
 
       var bw = bbox.width + paddingH * 2;
       var bh = bbox.height + paddingV * 2;
@@ -489,16 +825,16 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         rectX = -bw / 2;
         textX = 0;
       } else if(isRight){
-        rectX = -paddingH;
-        textX = -paddingH + paddingH / 2;
+        rectX = bbox.x - paddingH;
+        textX = 0;
       } else {
-        rectX = -bw + paddingH;
-        textX = bw - paddingH - paddingH / 2;
+        rectX = bbox.x - paddingH;
+        textX = 0;
       }
 
       g.select('.node-bubble')
         .attr('x', rectX)
-        .attr('y', -bh / 2)
+        .attr('y', bbox.y - paddingV)
         .attr('width', bw)
         .attr('height', bh)
         .attr('rx', rx)
@@ -513,10 +849,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var badge = g.select('.fold-badge');
       if(isFolded){
         var count = countDescendants(d._children);
-        var badgeX = isRight ? rectX + bw - 10 : rectX + 10;
+        var badgeX = isRight ? rectX + bw - 6 : rectX + 6;
         badge
           .attr('x', badgeX)
-          .attr('y', -bh / 2 + 8)
+          .attr('y', rectX !== -bw / 2 ? bbox.y - paddingV + 8 : -bh / 2 + 8)
           .attr('text-anchor', isRight ? 'end' : 'start')
           .text(count);
       } else {
@@ -545,17 +881,55 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var svg = d3.select('#mindmap-svg');
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
-    var nodeCount = rootHierarchy.descendants().length;
-    var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 5);
-    var scale = Math.min(width, height) / 2 / (radius + 100);
-    scale = Math.min(scale, 1.5);
-    svg.transition().duration(500).call(
-      zoom.transform,
-      d3.zoomIdentity.translate(width / 2, height / 2).scale(scale)
-    );
+
+    if(currentLayout === 'bubble'){
+      var nodeCount = rootHierarchy.descendants().length;
+      var radius = Math.max(Math.min(width, height) * 0.42, nodeCount * 5);
+      var scale = Math.min(width, height) / 2 / (radius + 100);
+      scale = Math.min(scale, 1.5);
+      svg.transition().duration(500).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(width / 2, height / 2).scale(scale)
+      );
+    } else {
+      var nodes = rootHierarchy.descendants();
+      var xs = nodes.map(function(d){ return d.px || 0; });
+      var ys = nodes.map(function(d){ return d.py || 0; });
+      var minX = d3.min(xs), maxX = d3.max(xs);
+      var minY = d3.min(ys), maxY = d3.max(ys);
+      var contentW = maxX - minX + 300;
+      var contentH = maxY - minY + 60;
+      var midX = (minX + maxX) / 2;
+      var midY = (minY + maxY) / 2;
+      var scale = Math.min(width / contentW, height / contentH, 1.5);
+      scale = Math.max(scale, 0.1);
+      var tx = width / 2 - midX * scale;
+      var ty = height / 2 - midY * scale;
+      svg.transition().duration(500).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(tx, ty).scale(scale)
+      );
+    }
   }
 
-  function initRadialTree(){
+  function switchLayout(layout){
+    if(layout === currentLayout) return;
+    currentLayout = layout;
+    localStorage.setItem('mindmap-layout', layout);
+
+    document.querySelectorAll('.layout-btn').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.layout === layout);
+    });
+
+    gEl.selectAll('.node-group').remove();
+    gEl.selectAll('.link-path').remove();
+    gEl.selectAll('.bracket-path').remove();
+
+    update(rootHierarchy);
+    setTimeout(fitToScreen, duration + 50);
+  }
+
+  function initMindmap(){
     svgEl = document.getElementById('mindmap-svg');
     var width = svgEl.clientWidth;
     var height = svgEl.clientHeight;
@@ -569,8 +943,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
     svg.call(zoom);
 
-    gEl = svg.append('g')
-      .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+    gEl = svg.append('g');
 
     treeData = buildHeadingTree(headings);
     rootHierarchy = d3.hierarchy(treeData);
@@ -596,6 +969,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function setupToolbar(){
+    document.querySelectorAll('.layout-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        switchLayout(btn.dataset.layout);
+      });
+    });
+
     document.getElementById('btn-expand-all').addEventListener('click', function(){
       expandAll(rootHierarchy);
       update(rootHierarchy);
@@ -672,7 +1051,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       markdownText = await resp.text();
       headings = parseHeadings(markdownText);
       setupTheme();
-      initRadialTree();
+
+      document.querySelectorAll('.layout-btn').forEach(function(btn){
+        btn.classList.toggle('active', btn.dataset.layout === currentLayout);
+      });
+
+      initMindmap();
       setupToolbar();
       setupModal();
     } catch(err){
