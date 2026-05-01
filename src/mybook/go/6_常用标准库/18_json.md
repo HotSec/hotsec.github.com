@@ -187,3 +187,61 @@ data2, _ := json.Marshal(r2)
 fmt.Println(string(data1))
 fmt.Println(string(data2))
 ```
+
+## 七、json-iterator 高性能替代
+
+```bash
+go get github.com/json-iterator/go
+```
+
+```go
+import jsoniter "github.com/json-iterator/go"
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+data, _ := json.Marshal(s)
+json.Unmarshal(data, &s2)
+```
+
+| 特性 | encoding/json | json-iterator |
+|------|---------------|---------------|
+| 性能 | 基准 | 2-3x 更快 |
+| API | 标准库 | 完全兼容 |
+| 零拷贝 | 否 | 支持 |
+| 流式 | 是 | 是 |
+| 依赖 | 无 | 第三方 |
+
+- API 完全兼容标准库，只需替换 import
+- 适合高频 JSON 序列化场景（百万级 QPS）
+- 可通过 `jsoniter.ConfigFastest` 获取最大性能
+
+## 八、流式处理大 JSON
+
+```go
+func processLargeJSON(filename string) error {
+    f, err := os.Open(filename)
+    if err != nil {
+        return err
+    }
+    defer f.Close()
+
+    decoder := json.NewDecoder(f)
+
+    decoder.Token()
+
+    for decoder.More() {
+        var item map[string]interface{}
+        if err := decoder.Decode(&item); err != nil {
+            return err
+        }
+        processItem(item)
+    }
+
+    decoder.Token()
+    return nil
+}
+```
+
+- 使用 `json.Decoder` 逐条解码，避免一次性加载到内存
+- 适合处理 GB 级 JSON 文件
+- 配合 `decoder.Token()` 处理数组/对象的开始和结束

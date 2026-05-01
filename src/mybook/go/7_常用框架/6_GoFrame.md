@@ -375,15 +375,23 @@ func (c *ControllerV1) GetUser(ctx context.Context, req *v1.GetUserReq) (res *v1
 
 ---
 
-## 十、GoFrame vs Gin 对比
+## 十、GoFrame vs Gin vs go-zero 对比
 
-| 维度 | GoFrame | Gin |
-|------|---------|-----|
-| 定位 | 企业级全栈框架 | 轻量 HTTP 框架 |
-| ORM | 内置 gdb | 需搭配 GORM |
-| 配置 | 内置 gcfg | 需搭配 viper |
-| 缓存 | 内置 gcache | 需搭配 go-redis |
-| 代码生成 | gf CLI | 无 |
-| 分层架构 | Controller/Service/DAO | 自由组织 |
-| 学习曲线 | 较陡 | 平缓 |
-| 适用场景 | 中大型企业项目 | 中小型 API 服务 |
+| 维度 | GoFrame | Gin | go-zero |
+|------|---------|-----|---------|
+| 定位 | 企业级全栈框架 | 轻量 HTTP 框架 | 微服务框架 |
+| ORM | 内置 gdb | 需搭配 GORM | 需搭配 sqlx/sqlc |
+| 配置 | 内置 gcfg | 需搭配 viper | 内置 conf |
+| 缓存 | 内置 gcache | 需搭配 go-redis | 需搭配 go-redis |
+| 代码生成 | gf CLI | 无 | goctl（API/RPC/Model） |
+| 分层架构 | Controller/Service/DAO | 自由组织 | Handler/Logic/Model |
+| 微服务 | 需自行搭建 | 需自行搭建 | 内置（API+RPC+网关） |
+| 服务治理 | 无内置 | 无内置 | 内置限流/熔断/降级 |
+| 学习曲线 | 较陡 | 平缓 | 中等 |
+| 适用场景 | 中大型企业项目 | 中小型 API 服务 | 微服务架构项目 |
+
+### 选择建议
+
+- **GoFrame**：团队规范严格、需要全栈解决方案、中大型单体或模块化项目
+- **Gin**：快速开发 API、中小型项目、需要灵活选型
+- **go-zero**：微服务架构、需要服务治理、高并发场景
