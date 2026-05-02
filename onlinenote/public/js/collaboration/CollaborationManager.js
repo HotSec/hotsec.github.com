@@ -90,6 +90,14 @@ export class CollaborationManager {
     });
   }
 
+  sendChanges(changes) {
+    this.send({
+      type: 'edit',
+      docId: this.docId,
+      data: { changes },
+    });
+  }
+
   sendCursor(position) {
     this.send({
       type: 'cursor',

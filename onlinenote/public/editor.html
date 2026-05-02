@@ -142,6 +142,7 @@
         this.editor = new Editor(document.getElementById('editorContainer'), {
           content: initialContent,
           onChange: (content) => this.onContentChange(content),
+          onChanges: (changes) => this.onLocalChanges(changes),
           onSave: (content) => this.saveDocument(content),
           onCursorChange: (pos) => this.onCursorChange(pos),
         });
@@ -181,7 +182,9 @@
           onRemoteEdit: (msg) => {
             try {
               const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
-              if (data.fullContent !== undefined) {
+              if (data.changes && data.changes.length > 0) {
+                this.editor.applyChanges(data.changes);
+              } else if (data.fullContent !== undefined) {
                 this.editor.setContent(data.fullContent);
               }
             } catch (e) {}
@@ -205,9 +208,11 @@
         this.outline.update();
         this.updateStats(content);
         this.setSaveStatus('unsaved');
+      }
 
+      onLocalChanges(changes) {
         if (this.collab) {
-          this.collab.sendEdit({ fullContent: content });
+          this.collab.sendChanges(changes);
         }
       }
 

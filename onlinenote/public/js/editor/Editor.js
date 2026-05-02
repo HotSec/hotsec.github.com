@@ -5,8 +5,10 @@ export class Editor {
     this.cm = null;
     this.onChange = options.onChange || (() => {});
     this.onSave = options.onSave || (() => {});
+    this.onChanges = options.onChanges || (() => {});
     this.saveTimer = null;
     this.debounceTimer = null;
+    this.pendingChanges = [];
   }
 
   async init() {
@@ -111,6 +113,13 @@ export class Editor {
           customTheme,
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
+              update.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
+                this.pendingChanges.push({
+                  from: fromA,
+                  to: toA,
+                  inserted: inserted.toString(),
+                });
+              });
               this.scheduleChange();
             }
             if (update.selectionSet) {
@@ -138,6 +147,11 @@ export class Editor {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
       this.onChange(this.getContent());
+      if (this.pendingChanges.length > 0) {
+        const changes = this.pendingChanges.map(c => ({...c}));
+        this.pendingChanges = [];
+        this.onChanges(changes);
+      }
     }, 300);
 
     clearTimeout(this.saveTimer);
@@ -148,6 +162,21 @@ export class Editor {
 
   getContent() {
     return this.cm ? this.cm.state.doc.toString() : '';
+  }
+
+  applyChanges(changes) {
+    if (!this.cm || !changes || changes.length === 0) return;
+    const pos = this.cm.state.selection.main.head;
+    let offset = 0;
+    const adjusted = changes.map(c => {
+      const adj = { from: c.from + offset, to: c.to + offset, insert: c.inserted };
+      offset += (c.inserted ? c.inserted.length : 0) - (c.to - c.from);
+      return adj;
+    });
+    this.cm.dispatch({
+      changes: adjusted,
+      selection: { anchor: Math.min(pos, this.cm.state.doc.length + offset) },
+    });
   }
 
   setContent(content) {
