@@ -111,19 +111,26 @@
         const params = new URLSearchParams(window.location.search);
         const docId = params.get('doc') || 'all-md';
         const targetSlug = params.get('slug') || '';
+        const srcPath = params.get('src') || '';
 
-        document.getElementById('docTitle').textContent = docId === 'all-md' ? 'ALL.md' : docId;
+        const titleText = srcPath
+          ? srcPath.split('/').pop().replace(/\.md$/, '')
+          : (docId === 'all-md' ? 'ALL.md' : docId.replace(/--/g, '/'));
+        document.getElementById('docTitle').textContent = titleText;
 
         let initialContent = '';
         try {
-          const resp = await fetch(`/api/documents/${docId}`);
+          let apiUrl = `/api/documents/${docId}`;
+          if (srcPath) apiUrl += `?src=${encodeURIComponent(srcPath)}`;
+          const resp = await fetch(apiUrl);
           if (resp.ok) {
             const data = await resp.json();
             initialContent = data.content || '';
           }
         } catch (e) {
           try {
-            const resp = await fetch('ALL.md');
+            const fallbackPath = srcPath || 'ALL.md';
+            const resp = await fetch(fallbackPath);
             if (resp.ok) initialContent = await resp.text();
           } catch (e2) {
             console.warn('Could not load document');

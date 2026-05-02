@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"onlinenote/config"
@@ -236,11 +237,27 @@ func (s *Server) handleLogin(c *gin.Context) {
 
 func (s *Server) handleGetDocument(c *gin.Context) {
 	docID := c.Param("id")
+	src := c.Query("src")
+
 	doc, err := s.DocMgr.Load(docID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	if doc.Content == "" && src != "" {
+		resolved := src
+		if len(resolved) >= 2 && resolved[:2] == "./" {
+			resolved = resolved[2:]
+		}
+		filePath := filepath.Join(s.Config.StaticDir, resolved)
+		content, err := os.ReadFile(filePath)
+		if err == nil {
+			doc.Content = string(content)
+			doc.Version = 1
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"id":      doc.ID,
 		"content": doc.Content,

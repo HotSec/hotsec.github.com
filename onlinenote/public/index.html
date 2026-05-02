@@ -281,17 +281,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var result = [];
     var counter = {};
     var lastHeadingLevel = 0;
+    var lastHeadingText = '';
     lines.forEach(function(line, idx){
       var m = line.match(/^(#{1,6})\s+(.+)$/);
       if(m){
         var level = m[1].length;
         var t = m[2].trim();
         lastHeadingLevel = level;
+        lastHeadingText = t;
         var base = slugify(t);
         if(!counter[base]) counter[base] = 0;
         counter[base]++;
         var slug = counter[base] > 1 ? base + '-' + counter[base] : base;
-        result.push({level: level, text: t, slug: slug, line: idx, isSummary: false, mdLinks: []});
+        result.push({level: level, text: t, slug: slug, line: idx, isSummary: false, mdLinks: [], parentText: ''});
       } else {
         var sm = line.match(/^<summary>(.+?)<\/summary>/);
         if(sm){
@@ -311,7 +313,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
               mdLinks.push(lm[1]);
             }
           }
-          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true, mdLinks: mdLinks});
+          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true, mdLinks: mdLinks, parentText: lastHeadingText});
         }
       }
     });
@@ -329,7 +331,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var root = {name: rootName, slug: rootSlug, level: 0, children: [], isSummary: false};
     var stack = [root];
     hdgs.forEach(function(h){
-      var node = {name: h.text, slug: h.slug, level: h.level, children: [], isSummary: h.isSummary, mdLinks: h.mdLinks || []};
+      var node = {name: h.text, slug: h.slug, level: h.level, children: [], isSummary: h.isSummary, mdLinks: h.mdLinks || [], parentText: h.parentText || ''};
       while(stack.length > 1 && stack[stack.length - 1].level >= node.level){
         stack.pop();
       }
@@ -430,6 +432,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     });
   }
 
+  function openMdInEditor(mdLink){
+    var docId = mdLink.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
+    window.open('editor.html?doc=' + encodeURIComponent(docId) + '&src=' + encodeURIComponent(mdLink), '_blank');
+  }
+
   function findPathToSlug(targetSlug){
     var path = [];
     function find(node, current){
@@ -457,35 +464,32 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var heading = headings.find(function(h){ return h.slug === slug; });
 
     var mdPath = resolveMdPath(slug);
-    if(mdPath && heading && heading.isSummary){
-      mdBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">加载中...</div>';
+    if(heading && heading.isSummary){
+      mdBody.innerHTML = '';
       var allLinks = resolveAllMdLinks(slug);
-      fetch(mdPath).then(function(resp){
-        if(resp.ok) return resp.text();
-        throw new Error('not found');
-      }).then(function(text){
-        mdBody.innerHTML = '';
-        if(allLinks.length > 0){
-          var linksDiv = document.createElement('div');
-          linksDiv.style.cssText = 'margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;';
-          allLinks.forEach(function(link, i){
-            var a = document.createElement('a');
-            a.className = 'source-link';
-            a.href = link;
-            a.target = '_blank';
-            var fileName = link.split('/').pop().replace(/\.md$/, '');
-            a.innerHTML = i === 0 ? '📄 ' + fileName : '📎 ' + fileName;
-            linksDiv.appendChild(a);
+      if(allLinks.length > 0){
+        var linksDiv = document.createElement('div');
+        linksDiv.className = 'modal-md-links';
+        linksDiv.style.cssText = 'margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;';
+        allLinks.forEach(function(link, i){
+          var a = document.createElement('a');
+          a.className = 'source-link md-editor-link';
+          a.href = '#';
+          a.dataset.mdPath = link;
+          var fileName = link.split('/').pop().replace(/\.md$/, '');
+          a.innerHTML = i === 0 ? '📄 ' + fileName : '📎 ' + fileName;
+          a.addEventListener('click', function(e){
+            e.preventDefault();
+            openMdInEditor(link);
           });
-          mdBody.appendChild(linksDiv);
-        }
-        var contentDiv = document.createElement('div');
-        contentDiv.className = 'markdown-body';
-        contentDiv.innerHTML = renderMarkdown(text);
-        mdBody.appendChild(contentDiv);
-      }).catch(function(){
-        mdBody.innerHTML = getSectionContent(slug);
-      });
+          linksDiv.appendChild(a);
+        });
+        mdBody.appendChild(linksDiv);
+      }
+      var contentDiv = document.createElement('div');
+      contentDiv.className = 'markdown-body';
+      contentDiv.innerHTML = getSectionContent(slug);
+      mdBody.appendChild(contentDiv);
     } else {
       mdBody.innerHTML = getSectionContent(slug);
     }
@@ -508,6 +512,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     bc.innerHTML = bcHTML;
     bc.querySelectorAll('.modal-breadcrumb-item').forEach(function(el){
       el.addEventListener('click', function(){ showModal(el.dataset.slug); });
+    });
+    mdBody.querySelectorAll('a[href]').forEach(function(a){
+      var href = a.getAttribute('href');
+      if(href && href.match(/\.md$/i)){
+        a.addEventListener('click', function(e){
+          e.preventDefault();
+          openMdInEditor(href);
+        });
+      }
     });
     overlay.classList.add('active');
     body.scrollTop = 0;
@@ -602,8 +615,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function truncateText(name, depth, isSummary){
-    var maxLen = isSummary ? 10 : (depth <= 0 ? 20 : depth === 1 ? 14 : 10);
+    var maxLen = isSummary ? 16 : (depth <= 0 ? 20 : depth === 1 ? 14 : 10);
     return name.length > maxLen ? name.slice(0, maxLen) + '…' : name;
+  }
+
+  function getSummaryDisplayName(d){
+    if(d.data.isSummary && d.data.parentText){
+      return d.data.parentText + ' - ' + d.data.name;
+    }
+    return d.data.name;
   }
 
   function countDescendants(children){
@@ -733,7 +753,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       }
       clickTimers[id] = setTimeout(function(){
         delete clickTimers[id];
-        if(d.data.isSummary && resolveMdPath(d.data.slug)){
+        if(d.data.isSummary){
           showModal(d.data.slug);
         } else if(d.children || d._children){
           toggleNode(d);
@@ -855,7 +875,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var isFolded = !!d._children;
       var isSummary = d.data.isSummary;
       var fontSize = d.depth === 0 ? 15 : d.depth === 1 ? 13 : d.depth === 2 ? 12 : (isSummary ? 10 : 11);
-      var text = truncateText(d.data.name, d.depth, isSummary);
+      var displayName = isSummary ? getSummaryDisplayName(d) : d.data.name;
+      var text = truncateText(displayName, d.depth, isSummary);
       var paddingH = d.depth === 0 ? 14 : (isSummary ? 10 : 10);
       var paddingV = d.depth === 0 ? 8 : (isSummary ? 5 : 5);
       var side = d._fishSide;
@@ -1090,7 +1111,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var isFolded = !!d._children;
       var isSummary = d.data.isSummary;
       var fontSize = d.depth===0?15:d.depth===1?13:d.depth===2?12:(isSummary?10:11);
-      var text = truncateText(d.data.name, d.depth, isSummary);
+      var displayName = isSummary ? getSummaryDisplayName(d) : d.data.name;
+      var text = truncateText(displayName, d.depth, isSummary);
       var paddingH = d.depth===0?14:(isSummary?10:10);
       var paddingV = d.depth===0?8:(isSummary?5:5);
       var rx = d.depth===0?10:(isSummary?12:6);
@@ -1206,7 +1228,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var isFolded = !!d._children;
       var isSummary = d.data.isSummary;
       var fontSize = d.depth===0?15:d.depth===1?12:d.depth===2?11:(isSummary?9:10);
-      var text = truncateText(d.data.name, d.depth, isSummary);
+      var displayName = isSummary ? getSummaryDisplayName(d) : d.data.name;
+      var text = truncateText(displayName, d.depth, isSummary);
       var paddingH = d.depth===0?14:(isSummary?9:10);
       var paddingV = d.depth===0?8:(isSummary?4:5);
       var rx = d.depth===0?10:(isSummary?10:6);
@@ -1369,9 +1392,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       if(matches.length===0){ dropdown.innerHTML='<div class="search-empty">未找到匹配项</div>'; dropdown.classList.add('show'); return; }
       var html = '';
       matches.slice(0,20).forEach(function(h){
+        var displayText = h.isSummary && h.parentText ? h.parentText + ' - ' + h.text : h.text;
         html += '<div class="search-item" data-slug="'+h.slug+'">'
           + '<span class="search-item-level">'+(h.isSummary?'S':'H'+h.level)+'</span>'
-          + '<span class="search-item-text">'+h.text+'</span></div>';
+          + '<span class="search-item-text">'+displayText+'</span></div>';
       });
       dropdown.innerHTML = html;
       dropdown.classList.add('show');
