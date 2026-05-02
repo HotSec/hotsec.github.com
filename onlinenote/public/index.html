@@ -316,6 +316,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           var slug2 = counter[base2] > 1 ? base2 + '-' + counter[base2] : base2;
           var mdLinks = [];
           var contentLines = [];
+          var detailsLine = idx - 1;
+          if(detailsLine >= 0 && lines[detailsLine].trim() !== '<details>'){
+            detailsLine = idx;
+          }
           for(var k = idx + 1; k < lines.length; k++){
             var lk = lines[k];
             if(lk.trim() === '</details>') break;
@@ -327,7 +331,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
             }
           }
           var fullContent = t2 + '\n' + contentLines.join('\n');
-          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true, mdLinks: mdLinks, parentText: lastHeadingText, fullContent: fullContent});
+          result.push({level: level2, text: t2, slug: slug2, line: detailsLine, isSummary: true, mdLinks: mdLinks, parentText: lastHeadingText, fullContent: fullContent});
         }
       }
     });
@@ -1635,7 +1639,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var lines = markdownText.split('\n');
       var startLine = heading.line;
       var endLine = lines.length;
-      var preserveAfter = '';
       var contentStartLine = startLine;
       if(heading.isSummary){
         if(contentStartLine < lines.length && lines[contentStartLine].trim() === '<details>') contentStartLine++;
@@ -1643,7 +1646,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         for(var k = contentStartLine; k < lines.length; k++){
           if(lines[k].trim() === '</details>'){
             endLine = k;
-            preserveAfter = '\n</details>';
             break;
           }
         }
@@ -1653,10 +1655,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           if(!replacement.endsWith('\n')) replacement += '\n';
         }
         replacement += newContent;
-        if(preserveAfter){
-          if(!replacement.endsWith('\n')) replacement += '\n';
-          replacement += '</details>';
-        }
         lines.splice(startLine, endLine-startLine, replacement);
       } else {
         for(var i=0;i<headings.length;i++){
