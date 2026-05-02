@@ -239,15 +239,28 @@ export class Editor {
     if (!this.cm) return [];
     const doc = this.cm.state.doc;
     const outline = [];
+    let lastHeadingLevel = 0;
     for (let i = 1; i <= doc.lines; i++) {
       const line = doc.line(i);
-      const match = line.text.match(/^(#{1,6})\s+(.+)$/);
-      if (match) {
+      const headingMatch = line.text.match(/^(#{1,6})\s+(.+)$/);
+      if (headingMatch) {
+        lastHeadingLevel = headingMatch[1].length;
         outline.push({
-          level: match[1].length,
-          text: match[2],
+          level: lastHeadingLevel,
+          text: headingMatch[2],
           line: i,
+          isSummary: false,
         });
+      } else {
+        const summaryMatch = line.text.match(/^<summary>(.+?)<\/summary>/);
+        if (summaryMatch) {
+          outline.push({
+            level: lastHeadingLevel + 1,
+            text: summaryMatch[1],
+            line: i,
+            isSummary: true,
+          });
+        }
       }
     }
     return outline;

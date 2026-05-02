@@ -18,8 +18,10 @@ export class Outline {
 
     this.container.innerHTML = this.items.map((item) => {
       const indent = (item.level - 1) * 16;
+      const levelLabel = item.isSummary ? 'S' : `H${item.level}`;
+      const levelClass = item.isSummary ? 'outline-level outline-level-summary' : 'outline-level';
       return `<div class="outline-item" data-line="${item.line}" style="padding-left: ${indent + 8}px">
-        <span class="outline-level">H${item.level}</span>
+        <span class="${levelClass}">${levelLabel}</span>
         <span class="outline-text">${item.text}</span>
       </div>`;
     }).join('');

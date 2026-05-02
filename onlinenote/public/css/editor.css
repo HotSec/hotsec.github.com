@@ -136,6 +136,11 @@
   flex-shrink: 0;
 }
 
+.outline-level-summary {
+  background: rgba(137, 180, 250, 0.15);
+  color: var(--accent);
+}
+
 .outline-text {
   overflow: hidden;
   text-overflow: ellipsis;
