@@ -4,3 +4,6 @@ src/.vuepress/.cache/
 src/.vuepress/.temp/
 src/.vuepress/dist/
 .codebuddy/
+onlinenote/data/onlinenote.db
+onlinenote/data/onlinenote.db-wal
+onlinenote/data/onlinenote.db-shm

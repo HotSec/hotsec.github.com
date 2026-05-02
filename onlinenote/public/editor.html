@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OnlineNote - 协作编辑器</title>
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css">
+  <style>
+    :root {
+      --bg: #1e1e2e;
+      --bg-secondary: #181825;
+      --bg-tertiary: #11111b;
+      --text: #cdd6f4;
+      --text-bright: #f5f5f5;
+      --text-dim: #6c7086;
+      --accent: #89b4fa;
+      --border: #313244;
+      --highlight-bg: rgba(137, 180, 250, 0.1);
+      --h1-color: #f38ba8;
+      --h2-color: #fab387;
+      --h3-color: #a6e3a1;
+      --h4-color: #f9e2af;
+      --h5-color: #bb9af7;
+      --h6-color: #7dcfff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="editor-page">
+    <div class="editor-header">
+      <div class="editor-header-left">
+        <a href="index.html" class="editor-btn" title="返回思维导图">← 导图</a>
+        <span class="editor-header-title" id="docTitle">ALL.md</span>
+      </div>
+      <div class="editor-header-right">
+        <div class="editor-mode-switch">
+          <button class="editor-mode-btn active" data-mode="split">分屏</button>
+          <button class="editor-mode-btn" data-mode="edit">编辑</button>
+          <button class="editor-mode-btn" data-mode="preview">预览</button>
+        </div>
+        <div class="editor-collab-users" id="collabUsers"></div>
+        <button class="editor-btn" id="btnOutline" title="大纲">☰</button>
+        <button class="editor-btn primary" id="btnSave">保存</button>
+      </div>
+    </div>
+
+    <div class="editor-toolbar" id="editorToolbar"></div>
+
+    <div class="editor-body">
+      <div class="editor-outline" id="editorOutline" style="display: none;">
+        <div class="editor-outline-header">大纲</div>
+        <div id="outlineContent"></div>
+      </div>
+
+      <div class="editor-split" id="editorSplit">
+        <div class="editor-pane editor-pane-editor" id="editorPane">
+          <div class="editor-pane-label">Markdown</div>
+          <div class="editor-pane-content" id="editorContainer"></div>
+        </div>
+        <div class="editor-resizer" id="editorResizer"></div>
+        <div class="editor-pane" id="previewPane">
+          <div class="editor-pane-label">预览</div>
+          <div class="editor-preview" id="previewContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-footer">
+      <div class="editor-footer-left">
+        <span id="cursorInfo">行 1, 列 1</span>
+        <span id="charCount">0 字符</span>
+        <span id="lineCount">0 行</span>
+      </div>
+      <div class="editor-footer-right">
+        <div class="editor-save-status">
+          <div class="editor-save-dot" id="saveDot"></div>
+          <span id="saveStatus">已保存</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11"></script>
+  <script type="module">
+    import { Editor } from './js/editor/Editor.js';
+    import { Toolbar } from './js/editor/Toolbar.js';
+    import { Outline } from './js/editor/Outline.js';
+    import { LivePreview } from './js/renderer/LivePreview.js';
+    import { SyncScroll } from './js/renderer/SyncScroll.js';
+    import { CollaborationManager } from './js/collaboration/CollaborationManager.js';
+
+    class EditorApp {
+      constructor() {
+        this.editor = null;
+        this.preview = null;
+        this.toolbar = null;
+        this.outline = null;
+        this.syncScroll = null;
+        this.collab = null;
+        this.mode = 'split';
+        this.outlineVisible = false;
+        this.saveStatus = 'saved';
+        this.lastSavedContent = '';
+      }
+
+      async init() {
+        const params = new URLSearchParams(window.location.search);
+        const docId = params.get('doc') || 'all-md';
+
+        document.getElementById('docTitle').textContent = docId === 'all-md' ? 'ALL.md' : docId;
+
+        let initialContent = '';
+        try {
+          const resp = await fetch(`/api/documents/${docId}`);
+          if (resp.ok) {
+            const data = await resp.json();
+            initialContent = data.content || '';
+          }
+        } catch (e) {
+          try {
+            const resp = await fetch('ALL.md');
+            if (resp.ok) initialContent = await resp.text();
+          } catch (e2) {
+            console.warn('Could not load document');
+          }
+        }
+
+        this.lastSavedContent = initialContent;
+
+        this.editor = new Editor(document.getElementById('editorContainer'), {
+          content: initialContent,
+          onChange: (content) => this.onContentChange(content),
+          onSave: (content) => this.saveDocument(content),
+          onCursorChange: (pos) => this.onCursorChange(pos),
+        });
+        await this.editor.init();
+
+        this.preview = new LivePreview(document.getElementById('previewContainer'));
+        await this.preview.init();
+        this.preview.render(initialContent);
+
+        this.toolbar = new Toolbar(document.getElementById('editorToolbar'), this.editor);
+        this.toolbar.render();
+
+        this.outline = new Outline(document.getElementById('outlineContent'), this.editor);
+        this.outline.update();
+
+        this.syncScroll = new SyncScroll(this.editor, this.preview);
+        this.syncScroll.init();
+
+        this.initCollaboration(docId);
+        this.setupUI();
+        this.updateStats(initialContent);
+      }
+
+      initCollaboration(docId) {
+        const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${location.host}/ws`;
+
+        this.collab = new CollaborationManager({
+          docId,
+          onUserList: (users) => this.updateCollabUsers(users),
+          onUserJoin: (msg) => console.log('User joined:', msg.userName),
+          onUserLeave: (msg) => console.log('User left:', msg.userId),
+          onRemoteEdit: (msg) => {
+            try {
+              const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
+              if (data.fullContent !== undefined) {
+                this.editor.setContent(data.fullContent);
+              }
+            } catch (e) {}
+          },
+        });
+
+        this.collab.connect(wsUrl);
+      }
+
+      updateCollabUsers(users) {
+        const container = document.getElementById('collabUsers');
+        container.innerHTML = users.map(u => `
+          <div class="editor-collab-avatar" style="background:${u.color}" title="${u.userName}">
+            ${u.userName.charAt(0).toUpperCase()}
+          </div>
+        `).join('');
+      }
+
+      onContentChange(content) {
+        this.preview.render(content);
+        this.outline.update();
+        this.updateStats(content);
+        this.setSaveStatus('unsaved');
+
+        if (this.collab) {
+          this.collab.sendEdit({ fullContent: content });
+        }
+      }
+
+      onCursorChange(pos) {
+        document.getElementById('cursorInfo').textContent = `行 ${pos.line}, 列 ${pos.column}`;
+      }
+
+      updateStats(content) {
+        document.getElementById('charCount').textContent = `${content.length} 字符`;
+        const lines = content.split('\n').length;
+        document.getElementById('lineCount').textContent = `${lines} 行`;
+      }
+
+      setSaveStatus(status) {
+        const dot = document.getElementById('saveDot');
+        const label = document.getElementById('saveStatus');
+        this.saveStatus = status;
+
+        dot.className = 'editor-save-dot';
+        if (status === 'saving') {
+          dot.classList.add('saving');
+          label.textContent = '保存中...';
+        } else if (status === 'unsaved') {
+          dot.classList.add('unsaved');
+          label.textContent = '未保存';
+        } else {
+          label.textContent = '已保存';
+        }
+      }
+
+      async saveDocument(content) {
+        if (content === this.lastSavedContent) return;
+
+        this.setSaveStatus('saving');
+
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const docId = params.get('doc') || 'all-md';
+          const resp = await fetch(`/api/documents/${docId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content }),
+          });
+
+          if (resp.ok) {
+            this.lastSavedContent = content;
+            this.setSaveStatus('saved');
+          } else {
+            this.setSaveStatus('unsaved');
+          }
+        } catch (e) {
+          localStorage.setItem('onlinenote-draft', content);
+          this.setSaveStatus('unsaved');
+        }
+      }
+
+      setupUI() {
+        document.getElementById('btnSave').addEventListener('click', () => {
+          this.saveDocument(this.editor.getContent());
+        });
+
+        document.getElementById('btnOutline').addEventListener('click', () => {
+          this.outlineVisible = !this.outlineVisible;
+          document.getElementById('editorOutline').style.display = this.outlineVisible ? '' : 'none';
+          document.getElementById('btnOutline').classList.toggle('active', this.outlineVisible);
+        });
+
+        document.querySelectorAll('.editor-mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.editor-mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.setMode(btn.dataset.mode);
+          });
+        });
+
+        this.setupResizer();
+
+        document.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+            e.preventDefault();
+            this.editor.wrapSelection('**');
+          }
+          if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+            e.preventDefault();
+            this.editor.wrapSelection('*');
+          }
+          if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            this.toolbar.insertLink();
+          }
+        });
+      }
+
+      setMode(mode) {
+        this.mode = mode;
+        const editorPane = document.getElementById('editorPane');
+        const previewPane = document.getElementById('previewPane');
+        const resizer = document.getElementById('editorResizer');
+
+        editorPane.style.display = '';
+        previewPane.style.display = '';
+        resizer.style.display = '';
+
+        if (mode === 'edit') {
+          previewPane.style.display = 'none';
+          resizer.style.display = 'none';
+        } else if (mode === 'preview') {
+          editorPane.style.display = 'none';
+          resizer.style.display = 'none';
+        }
+      }
+
+      setupResizer() {
+        const resizer = document.getElementById('editorResizer');
+        const split = document.getElementById('editorSplit');
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', (e) => {
+          isResizing = true;
+          resizer.classList.add('active');
+          document.body.style.cursor = 'col-resize';
+          document.body.style.userSelect = 'none';
+          e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isResizing) return;
+          const rect = split.getBoundingClientRect();
+          const ratio = (e.clientX - rect.left) / rect.width;
+          const clamped = Math.max(0.2, Math.min(0.8, ratio));
+          const editorPane = document.getElementById('editorPane');
+          const previewPane = document.getElementById('previewPane');
+          editorPane.style.flex = `${clamped}`;
+          previewPane.style.flex = `${1 - clamped}`;
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isResizing) {
+            isResizing = false;
+            resizer.classList.remove('active');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+          }
+        });
+      }
+    }
+
+    const app = new EditorApp();
+    app.init().catch(err => {
+      console.error('Failed to initialize editor:', err);
+    });
+  </script>
+</body>
+</html>
