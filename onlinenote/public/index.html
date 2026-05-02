@@ -1495,6 +1495,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   var editOriginalContent = '';
   var editAutoSaveTimer = null;
   var editDirty = false;
+  var editHadAutoSave = false;
+  var editSaving = false;
+  var editNeedsResave = false;
 
   function enterEditMode(){
     var body = document.getElementById('modal-body');
@@ -1502,6 +1505,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var editArea = body.querySelector('.modal-edit-area');
     isEditing = true;
     editDirty = false;
+    editHadAutoSave = false;
+    editSaving = false;
+    editNeedsResave = false;
     editOriginalContent = getSectionMarkdown(currentEditSlug);
     editArea.value = editOriginalContent;
     editArea.style.display = '';
@@ -1516,6 +1522,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   function onEditInput(){
     editDirty = true;
     showEditStatus('dirty');
+    if(editSaving){
+      editNeedsResave = true;
+      return;
+    }
     if(editAutoSaveTimer) clearTimeout(editAutoSaveTimer);
     editAutoSaveTimer = setTimeout(function(){
       saveEditContent(true);
@@ -1523,12 +1533,27 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function saveEditContent(isAutoSave){
+    if(editSaving){
+      editNeedsResave = true;
+      return;
+    }
     var editArea = document.querySelector('.modal-edit-area');
     var newContent = editArea.value;
-    if(newContent !== getSectionMarkdown(currentEditSlug)){
+    var currentSection = getSectionMarkdown(currentEditSlug);
+    if(newContent !== currentSection){
+      editSaving = true;
       showEditStatus('saving');
       updateMarkdownContent(currentEditSlug, newContent);
       editDirty = false;
+      if(isAutoSave) editHadAutoSave = true;
+      editSaving = false;
+      if(editNeedsResave){
+        editNeedsResave = false;
+        var latestContent = editArea.value;
+        if(latestContent !== newContent){
+          setTimeout(function(){ saveEditContent(isAutoSave); }, 100);
+        }
+      }
     }
     showEditStatus('saved');
     if(!isAutoSave){
@@ -1542,8 +1567,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 
   function cancelEdit(){
     if(editAutoSaveTimer) clearTimeout(editAutoSaveTimer);
-    if(editDirty){
-      if(!confirm('有未保存的修改，确定取消吗？')) return;
+    var msg = editDirty ? '有未保存的修改，确定取消吗？' : 
+              editHadAutoSave ? '已自动保存，取消将恢复到编辑前的内容，确定吗？' : '';
+    if(msg && !confirm(msg)) return;
+    if(editHadAutoSave && editOriginalContent !== undefined){
+      updateMarkdownContent(currentEditSlug, editOriginalContent);
+      var toast = document.getElementById('save-toast');
+      toast.textContent = '已恢复';
+      toast.classList.add('show');
+      setTimeout(function(){ toast.classList.remove('show'); }, 1500);
     }
     editDirty = false;
     exitEditMode();
@@ -1591,16 +1623,26 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var lines = markdownText.split('\n');
       var startLine = heading.line;
       var endLine = lines.length;
+      var preserveAfter = '';
       if(heading.isSummary){
         for(var k = startLine; k < lines.length; k++){
-          if(lines[k].trim() === '</details>'){endLine = k + 1; break;}
+          if(lines[k].trim() === '</details>'){
+            endLine = k;
+            preserveAfter = '\n</details>';
+            break;
+          }
         }
       } else {
         for(var i=0;i<headings.length;i++){
           if(headings[i].line>startLine && headings[i].level<=heading.level){endLine=headings[i].line;break;}
         }
       }
-      lines.splice(startLine, endLine-startLine, newContent);
+      var replacement = newContent;
+      if(preserveAfter){
+        if(!replacement.endsWith('\n')) replacement += '\n';
+        replacement += '</details>';
+      }
+      lines.splice(startLine, endLine-startLine, replacement);
       markdownText = lines.join('\n');
     }
     headings = parseHeadings(markdownText);
