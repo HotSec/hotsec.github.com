@@ -315,16 +315,19 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
           counter[base2]++;
           var slug2 = counter[base2] > 1 ? base2 + '-' + counter[base2] : base2;
           var mdLinks = [];
+          var contentLines = [];
           for(var k = idx + 1; k < lines.length; k++){
             var lk = lines[k];
             if(lk.trim() === '</details>') break;
+            contentLines.push(lk);
             var linkRe = /\[📄[^\]]*\]\(([^)]+)\)/g;
             var lm;
             while((lm = linkRe.exec(lk)) !== null){
               mdLinks.push(lm[1]);
             }
           }
-          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true, mdLinks: mdLinks, parentText: lastHeadingText});
+          var fullContent = t2 + '\n' + contentLines.join('\n');
+          result.push({level: level2, text: t2, slug: slug2, line: idx, isSummary: true, mdLinks: mdLinks, parentText: lastHeadingText, fullContent: fullContent});
         }
       }
     });
@@ -1404,7 +1407,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     input.addEventListener('input', function(){
       var query = input.value.trim().toLowerCase();
       if(!query){ dropdown.classList.remove('show'); dropdown.innerHTML=''; highlightedSlug=null; update(rootHierarchy); return; }
-      var matches = headings.filter(function(h){ return h.text.toLowerCase().indexOf(query)!==-1; });
+      var matches = headings.filter(function(h){
+        var searchText = h.isSummary && h.fullContent ? h.fullContent : h.text;
+        return searchText.toLowerCase().indexOf(query)!==-1;
+      });
       if(matches.length===0){ dropdown.innerHTML='<div class="search-empty">未找到匹配项</div>'; dropdown.classList.add('show'); return; }
       var html = '';
       matches.slice(0,20).forEach(function(h){
