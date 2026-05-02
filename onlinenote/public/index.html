@@ -362,14 +362,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     var endLine = markdownText.split('\n').length;
     if(heading.isSummary){
       var lines = markdownText.split('\n');
-      var inDetails = false;
       var contentLines = [];
       for(var i = startLine + 1; i < lines.length; i++){
         var l = lines[i];
         if(l.trim() === '</details>') break;
         contentLines.push(l);
       }
-      var section = lines[startLine] + '\n' + contentLines.join('\n');
+      var section = lines[startLine] + '\n' + contentLines.join('\n') + '\n</details>';
       return renderMarkdown(section);
     }
     for(var j = 0; j < headings.length; j++){
