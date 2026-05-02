@@ -212,11 +212,11 @@ export class Editor {
     if (!this.cm) return;
     const pos = this.cm.state.selection.main.head;
     const line = this.cm.state.doc.lineAt(pos);
+    const existing = line.text.match(/^(#{1,6}\s*|- |\d+\. |\> |- \[[ x]\] )/);
+    const from = line.from;
+    const to = existing ? from + existing[0].length : from;
     this.cm.dispatch({
-      changes: {
-        from: line.from,
-        insert: prefix,
-      },
+      changes: { from, to: existing ? to : from, insert: prefix },
     });
     this.cm.focus();
   }
