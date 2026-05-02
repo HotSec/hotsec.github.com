@@ -152,12 +152,11 @@ export class Editor {
 
   setContent(content) {
     if (!this.cm) return;
+    const pos = this.cm.state.selection.main.head;
+    const oldLen = this.cm.state.doc.length;
     this.cm.dispatch({
-      changes: {
-        from: 0,
-        to: this.cm.state.doc.length,
-        insert: content,
-      },
+      changes: { from: 0, to: oldLen, insert: content },
+      selection: { anchor: Math.min(pos, content.length) },
     });
   }
 
