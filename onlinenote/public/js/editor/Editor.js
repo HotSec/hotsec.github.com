@@ -146,18 +146,18 @@ export class Editor {
   scheduleChange() {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
-      this.onChange(this.getContent());
+      const content = this.getContent();
+      this.onChange(content);
       if (this.pendingChanges.length > 0) {
         const changes = this.pendingChanges.map(c => ({...c}));
         this.pendingChanges = [];
         this.onChanges(changes);
       }
+      clearTimeout(this.saveTimer);
+      this.saveTimer = setTimeout(() => {
+        this.onSave(this.getContent());
+      }, 2000);
     }, 300);
-
-    clearTimeout(this.saveTimer);
-    this.saveTimer = setTimeout(() => {
-      this.onSave(this.getContent());
-    }, 2000);
   }
 
   getContent() {
