@@ -216,6 +216,7 @@
       onContentChange(content) {
         this.preview.render(content);
         this.outline.update();
+        if (this.syncScroll) this.syncScroll.update();
         this.updateStats(content);
         this.setSaveStatus('unsaved');
       }
