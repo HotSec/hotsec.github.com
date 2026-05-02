@@ -139,6 +139,16 @@
 
         this.lastSavedContent = initialContent;
 
+        const draftKey = `onlinenote-draft-${docId}`;
+        const draft = localStorage.getItem(draftKey);
+        if (draft && draft !== initialContent) {
+          const useDraft = confirm('检测到未保存的草稿，是否恢复？');
+          if (useDraft) {
+            initialContent = draft;
+          }
+          localStorage.removeItem(draftKey);
+        }
+
         this.editor = new Editor(document.getElementById('editorContainer'), {
           content: initialContent,
           onChange: (content) => this.onContentChange(content),
@@ -323,7 +333,9 @@
             this.setSaveStatus('unsaved');
           }
         } catch (e) {
-          localStorage.setItem('onlinenote-draft', content);
+          const params = new URLSearchParams(window.location.search);
+          const docId = params.get('doc') || 'all-md';
+          localStorage.setItem(`onlinenote-draft-${docId}`, content);
           this.setSaveStatus('unsaved');
         }
       }
