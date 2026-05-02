@@ -110,6 +110,7 @@
       async init() {
         const params = new URLSearchParams(window.location.search);
         const docId = params.get('doc') || 'all-md';
+        const targetSlug = params.get('slug') || '';
 
         document.getElementById('docTitle').textContent = docId === 'all-md' ? 'ALL.md' : docId;
 
@@ -155,6 +156,10 @@
         this.initCollaboration(docId);
         this.setupUI();
         this.updateStats(initialContent);
+
+        if (targetSlug) {
+          this.navigateToSlug(initialContent, targetSlug);
+        }
       }
 
       initCollaboration(docId) {
@@ -201,6 +206,62 @@
 
       onCursorChange(pos) {
         document.getElementById('cursorInfo').textContent = `行 ${pos.line}, 列 ${pos.column}`;
+      }
+
+      navigateToSlug(content, slug) {
+        const lines = content.split('\n');
+        const slugify = (text) => text.trim().toLowerCase()
+          .replace(/[^\w\u4e00-\u9fff]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+
+        let targetLine = 0;
+        let lastHeadingLevel = 0;
+        let counter = {};
+
+        for (let i = 0; i < lines.length; i++) {
+          const m = lines[i].match(/^(#{1,6})\s+(.+)$/);
+          if (m) {
+            const level = m[1].length;
+            const text = m[2].trim();
+            lastHeadingLevel = level;
+            const base = slugify(text);
+            if (!counter[base]) counter[base] = 0;
+            counter[base]++;
+            const s = counter[base] > 1 ? base + '-' + counter[base] : base;
+            if (s === slug) {
+              targetLine = i + 1;
+              break;
+            }
+          } else {
+            const sm = lines[i].match(/^<summary>(.+?)<\/summary>/);
+            if (sm) {
+              const text = sm[1].trim();
+              const level = lastHeadingLevel + 1;
+              const base = slugify(text);
+              if (!counter[base]) counter[base] = 0;
+              counter[base]++;
+              const s = counter[base] > 1 ? base + '-' + counter[base] : base;
+              if (s === slug) {
+                targetLine = i + 1;
+                break;
+              }
+            }
+          }
+        }
+
+        if (targetLine > 0) {
+          setTimeout(() => {
+            this.editor.scrollToLine(targetLine);
+            this.showOutline();
+          }, 500);
+        }
+      }
+
+      showOutline() {
+        this.outlineVisible = true;
+        document.getElementById('editorOutline').style.display = '';
+        document.getElementById('btnOutline').classList.add('active');
+        this.outline.update();
       }
 
       updateStats(content) {

@@ -42,7 +42,7 @@ func main() {
 	}
 	defer db.Close()
 
-	docMgr := document.NewManager(cfg.DataDir)
+	docMgr := document.NewManager(cfg.DataDir, cfg.StaticDir)
 	hub := ws.NewHub()
 	go hub.Run()
 

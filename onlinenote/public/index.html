@@ -244,7 +244,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       <div class="modal-breadcrumb" id="modal-breadcrumb"></div>
       <div class="modal-actions">
         <button class="modal-action-btn" id="btn-fullscreen" title="全屏">⛶</button>
-        <button class="modal-action-btn" id="btn-edit" title="编辑">✎</button>
+        <button class="modal-action-btn" id="btn-open-in-editor" title="在编辑器中打开">✎</button>
+        <button class="modal-action-btn" id="btn-edit" title="快速编辑">✏</button>
       </div>
       <button class="modal-close" id="modal-close" title="关闭">✕</button>
     </div>
@@ -751,7 +752,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         delete clickTimers[id];
       }
       if(d.data.slug){
-        showModal(d.data.slug);
+        if(!d.children && !d._children){
+          window.open('editor.html?doc=all-md&slug=' + encodeURIComponent(d.data.slug), '_blank');
+        } else {
+          showModal(d.data.slug);
+        }
       }
     });
   }
@@ -1421,6 +1426,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       this.innerHTML = modal.classList.contains('fullscreen') ? '⊡' : '⛶';
     });
 
+    document.getElementById('btn-open-in-editor').addEventListener('click', function(){
+      if(currentEditSlug){
+        window.open('editor.html?doc=all-md&slug=' + encodeURIComponent(currentEditSlug), '_blank');
+      }
+    });
+
     document.getElementById('btn-edit').addEventListener('click', function(){
       var body = document.getElementById('modal-body');
       var mdBody = body.querySelector('.markdown-body');
@@ -1438,6 +1449,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         if(newContent !== getSectionMarkdown(currentEditSlug)){
           updateMarkdownContent(currentEditSlug, newContent);
           var toast = document.getElementById('save-toast');
+          toast.textContent = '已保存';
           toast.classList.add('show');
           setTimeout(function(){ toast.classList.remove('show'); }, 1500);
         }
@@ -1474,6 +1486,23 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     rootHierarchy.children.forEach(function(child){ if(child.children) child.children.forEach(collapseAll); });
     rootHierarchy.x0 = 0; rootHierarchy.y0 = 0;
     update(rootHierarchy);
+    saveToBackend();
+  }
+
+  var saveTimer = null;
+  function saveToBackend(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      fetch('/api/documents/all-md', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({content: markdownText})
+      }).then(function(resp){
+        if(!resp.ok) console.error('Save failed:', resp.status);
+      }).catch(function(err){
+        console.error('Save error:', err);
+      });
+    }, 1000);
   }
 
   function setupTheme(){
@@ -1510,9 +1539,23 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         }
       }catch(e){ console.warn('config.json load failed, using defaults:', e); }
 
-      var resp = await fetch('ALL.md');
-      if(!resp.ok) throw new Error('Failed to load ALL.md: ' + resp.status);
-      markdownText = await resp.text();
+      var loaded = false;
+      try{
+        var apiResp = await fetch('/api/documents/all-md');
+        if(apiResp.ok){
+          var apiData = await apiResp.json();
+          if(apiData.content){
+            markdownText = apiData.content;
+            loaded = true;
+          }
+        }
+      }catch(e){ console.warn('API load failed, falling back to ALL.md:', e); }
+
+      if(!loaded){
+        var resp = await fetch('ALL.md');
+        if(!resp.ok) throw new Error('Failed to load ALL.md: ' + resp.status);
+        markdownText = await resp.text();
+      }
       headings = parseHeadings(markdownText);
       setupTheme();
       document.querySelectorAll('.layout-btn').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.layout===currentLayout); });
@@ -1520,10 +1563,73 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       setupToolbar();
       setupModal();
       setupSearch();
+      setupSync();
     } catch(err){
       document.getElementById('loading').textContent = '加载失败: ' + err.message;
       document.getElementById('status-info').textContent = '错误';
       console.error(err);
+    }
+  }
+
+  var syncWs = null;
+  var syncPollTimer = null;
+  var lastSyncVersion = 0;
+
+  function setupSync(){
+    try{
+      var wsUrl = (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.host + '/ws?docId=all-md';
+      syncWs = new WebSocket(wsUrl);
+      syncWs.onmessage = function(evt){
+        try{
+          var msg = JSON.parse(evt.data);
+          if(msg.type === 'document-saved' && msg.docId === 'all-md'){
+            reloadFromBackend();
+          }
+        }catch(e){}
+      };
+      syncWs.onerror = function(){ startPolling(); };
+      syncWs.onclose = function(){ startPolling(); };
+    }catch(e){
+      startPolling();
+    }
+  }
+
+  function startPolling(){
+    if(syncPollTimer) return;
+    syncPollTimer = setInterval(function(){
+      fetch('/api/documents/all-md').then(function(r){ return r.json(); }).then(function(d){
+        if(d.version && d.version !== lastSyncVersion && d.content !== markdownText){
+          lastSyncVersion = d.version;
+          reloadContent(d.content);
+        }
+      }).catch(function(){});
+    }, 30000);
+  }
+
+  function reloadFromBackend(){
+    fetch('/api/documents/all-md').then(function(r){ return r.json(); }).then(function(d){
+      if(d.content && d.content !== markdownText){
+        lastSyncVersion = d.version;
+        reloadContent(d.content);
+      }
+    }).catch(function(){});
+  }
+
+  function reloadContent(newText){
+    markdownText = newText;
+    headings = parseHeadings(markdownText);
+    treeData = buildHeadingTree(headings);
+    rootHierarchy = d3.hierarchy(treeData);
+    expandAll(rootHierarchy);
+    rootHierarchy.children.forEach(function(child){ if(child.children) child.children.forEach(collapseAll); });
+    rootHierarchy.x0 = 0; rootHierarchy.y0 = 0;
+    update(rootHierarchy);
+    if(currentEditSlug){
+      var body = document.getElementById('modal-body');
+      var mdBody = body.querySelector('.markdown-body');
+      if(mdBody && mdBody.style.display !== 'none'){
+        mdBody.innerHTML = getSectionContent(currentEditSlug);
+      }
     }
   }
 

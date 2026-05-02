@@ -22,13 +22,34 @@ type Manager struct {
 	mu      sync.RWMutex
 }
 
-func NewManager(dataDir string) *Manager {
+func NewManager(dataDir string, staticDir string) *Manager {
 	docDir := filepath.Join(dataDir, "documents")
 	os.MkdirAll(docDir, 0755)
 
-	return &Manager{
+	m := &Manager{
 		docs:    make(map[string]*Document),
 		dataDir: dataDir,
+	}
+
+	m.seedFromStatic(staticDir)
+
+	return m
+}
+
+func (m *Manager) seedFromStatic(staticDir string) {
+	allMdPath := filepath.Join(staticDir, "ALL.md")
+	content, err := os.ReadFile(allMdPath)
+	if err != nil {
+		return
+	}
+
+	doc, err := m.Load("all-md")
+	if err != nil {
+		return
+	}
+
+	if doc.Content == "" {
+		m.Save("all-md", string(content))
 	}
 }
 
