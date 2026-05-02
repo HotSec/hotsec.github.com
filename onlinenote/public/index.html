@@ -405,7 +405,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     if(heading.isSummary){
       var lines = markdownText.split('\n');
       var contentLines = [];
-      for(var i = startLine; i < lines.length; i++){
+      var i = startLine;
+      if(i < lines.length && lines[i].trim() === '<details>') i++;
+      if(i < lines.length && lines[i].trim().match(/^<summary>.+<\/summary>$/)) i++;
+      for(; i < lines.length; i++){
         if(lines[i].trim() === '</details>') break;
         contentLines.push(lines[i]);
       }
@@ -1546,14 +1549,21 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       updateMarkdownContent(currentEditSlug, newContent);
       editDirty = false;
       if(isAutoSave) editHadAutoSave = true;
-      editSaving = false;
-      if(editNeedsResave){
-        editNeedsResave = false;
-        var latestContent = editArea.value;
-        if(latestContent !== newContent){
-          setTimeout(function(){ saveEditContent(isAutoSave); }, 100);
+      saveToBackend(true).then(function(){
+        editSaving = false;
+        if(editNeedsResave){
+          editNeedsResave = false;
+          var latestContent = editArea.value;
+          if(latestContent !== newContent){
+            setTimeout(function(){ saveEditContent(isAutoSave); }, 100);
+          }
         }
-      }
+        showEditStatus('saved');
+      }).catch(function(){
+        editSaving = false;
+        showEditStatus('dirty');
+      });
+      return;
     }
     showEditStatus('saved');
     if(!isAutoSave){
@@ -1624,25 +1634,37 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       var startLine = heading.line;
       var endLine = lines.length;
       var preserveAfter = '';
+      var contentStartLine = startLine;
       if(heading.isSummary){
-        for(var k = startLine; k < lines.length; k++){
+        if(contentStartLine < lines.length && lines[contentStartLine].trim() === '<details>') contentStartLine++;
+        if(contentStartLine < lines.length && lines[contentStartLine].trim().match(/^<summary>.+<\/summary>$/)) contentStartLine++;
+        for(var k = contentStartLine; k < lines.length; k++){
           if(lines[k].trim() === '</details>'){
             endLine = k;
             preserveAfter = '\n</details>';
             break;
           }
         }
+        var headerLines = lines.slice(startLine, contentStartLine);
+        var replacement = headerLines.join('\n');
+        if(replacement && newContent){
+          if(!replacement.endsWith('\n')) replacement += '\n';
+        }
+        replacement += newContent;
+        if(preserveAfter){
+          var trimmed = replacement.trim();
+          if(!trimmed.endsWith('</details>')){
+            if(!replacement.endsWith('\n')) replacement += '\n';
+            replacement += '</details>';
+          }
+        }
+        lines.splice(startLine, endLine-startLine, replacement);
       } else {
         for(var i=0;i<headings.length;i++){
           if(headings[i].line>startLine && headings[i].level<=heading.level){endLine=headings[i].line;break;}
         }
+        lines.splice(startLine, endLine-startLine, newContent);
       }
-      var replacement = newContent;
-      if(preserveAfter){
-        if(!replacement.endsWith('\n')) replacement += '\n';
-        replacement += '</details>';
-      }
-      lines.splice(startLine, endLine-startLine, replacement);
       markdownText = lines.join('\n');
     }
     headings = parseHeadings(markdownText);
@@ -1656,8 +1678,23 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   var saveTimer = null;
-  function saveToBackend(){
+  var savePromise = null;
+  var saveResolve = null;
+  function saveToBackend(immediate){
     if(saveTimer) clearTimeout(saveTimer);
+    if(immediate){
+      return fetch('/api/documents/all-md', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({content: markdownText})
+      }).then(function(resp){
+        if(!resp.ok) throw new Error('Save failed: ' + resp.status);
+      }).catch(function(err){
+        console.error('Save error:', err);
+        throw err;
+      });
+    }
+    savePromise = new Promise(function(resolve){ saveResolve = resolve; });
     saveTimer = setTimeout(function(){
       fetch('/api/documents/all-md', {
         method: 'PUT',
@@ -1665,10 +1702,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         body: JSON.stringify({content: markdownText})
       }).then(function(resp){
         if(!resp.ok) console.error('Save failed:', resp.status);
+        if(saveResolve) saveResolve();
       }).catch(function(err){
         console.error('Save error:', err);
+        if(saveResolve) saveResolve();
       });
     }, 1000);
+    return savePromise;
   }
 
   function setupTheme(){
