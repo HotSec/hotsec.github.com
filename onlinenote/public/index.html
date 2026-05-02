@@ -368,7 +368,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
         if(l.trim() === '</details>') break;
         contentLines.push(l);
       }
-      var section = lines[startLine] + '\n' + contentLines.join('\n') + '\n</details>';
+      var section = lines[startLine] + '\n' + contentLines.join('\n') + '\n';
       return renderMarkdown(section);
     }
     for(var j = 0; j < headings.length; j++){
@@ -639,9 +639,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function getSummaryDisplayName(d){
-    if(d.data.isSummary && d.data.parentText){
-      return d.data.parentText + ' - ' + d.data.name;
-    }
     return d.data.name;
   }
 
@@ -1411,7 +1408,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       if(matches.length===0){ dropdown.innerHTML='<div class="search-empty">未找到匹配项</div>'; dropdown.classList.add('show'); return; }
       var html = '';
       matches.slice(0,20).forEach(function(h){
-        var displayText = h.isSummary && h.parentText ? h.parentText + ' - ' + h.text : h.text;
+        var displayText = h.text;
         html += '<div class="search-item" data-slug="'+h.slug+'">'
           + '<span class="search-item-level">'+(h.isSummary?'S':'H'+h.level)+'</span>'
           + '<span class="search-item-text">'+displayText+'</span></div>';
