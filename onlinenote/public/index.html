@@ -153,6 +153,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
 .save-toast{position:absolute;top:12px;right:12px;background:var(--h3-color);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none}
 .save-toast.show{opacity:1}
 
+.modal-edit-status{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;color:var(--text-dim)}
+.modal-edit-status .edit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.modal-edit-status .edit-dot.saving{background:#e0af68;animation:pulse 1s infinite}
+.modal-edit-status .edit-dot.saved{background:#9ece6a}
+.modal-edit-status .edit-dot.dirty{background:#f7768e}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
 .statusbar{display:flex;align-items:center;padding:4px 16px;background:var(--bg-secondary);border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);flex-shrink:0;min-height:28px;gap:16px;transition:background .3s}
 .statusbar-item{display:flex;align-items:center;gap:4px}
 .statusbar-dot{width:6px;height:6px;border-radius:50%;background:var(--h3-color)}
@@ -242,10 +249,14 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   <div class="modal" id="modal">
     <div class="modal-header">
       <div class="modal-breadcrumb" id="modal-breadcrumb"></div>
-      <div class="modal-actions">
+      <div class="modal-actions" id="modal-actions-view">
         <button class="modal-action-btn" id="btn-fullscreen" title="全屏">⛶</button>
         <button class="modal-action-btn" id="btn-open-in-editor" title="在编辑器中打开">✎</button>
         <button class="modal-action-btn" id="btn-edit" title="快速编辑">✏</button>
+      </div>
+      <div class="modal-actions" id="modal-actions-edit" style="display:none">
+        <button class="modal-action-btn" id="btn-save" title="保存">💾</button>
+        <button class="modal-action-btn" id="btn-cancel" title="取消">✕</button>
       </div>
       <button class="modal-close" id="modal-close" title="关闭">✕</button>
     </div>
@@ -497,9 +508,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     mdBody.style.display = '';
     body.querySelector('.modal-edit-area').style.display = 'none';
     isEditing = false;
+    editDirty = false;
+    if(editAutoSaveTimer) clearTimeout(editAutoSaveTimer);
     currentEditSlug = slug;
-    document.getElementById('btn-edit').classList.remove('active');
-    document.getElementById('btn-edit').innerHTML = '✎';
+    document.getElementById('modal-actions-view').style.display = '';
+    document.getElementById('modal-actions-edit').style.display = 'none';
+    var statusEl = document.getElementById('modal-edit-status');
+    if(statusEl) statusEl.remove();
 
     var path = findPathToSlug(slug);
     var bcHTML = '';
@@ -529,15 +544,17 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function hideModal(){
+    if(isEditing){
+      if(editDirty){
+        if(!confirm('有未保存的修改，确定关闭吗？')) return;
+      }
+      if(editAutoSaveTimer) clearTimeout(editAutoSaveTimer);
+      exitEditMode();
+    }
     document.getElementById('modal-overlay').classList.remove('active');
     var modal = document.getElementById('modal');
     modal.classList.remove('fullscreen');
     document.getElementById('btn-fullscreen').innerHTML = '⛶';
-    if(isEditing){
-      isEditing = false;
-      document.getElementById('btn-edit').classList.remove('active');
-      document.getElementById('btn-edit').innerHTML = '✎';
-    }
   }
 
   function getNodeColor(d){
@@ -1442,7 +1459,13 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   function setupModal(){
     document.getElementById('modal-close').addEventListener('click', hideModal);
     document.getElementById('modal-overlay').addEventListener('click', function(e){ if(e.target===this) hideModal(); });
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape') hideModal(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') hideModal();
+      if(e.key === 's' && (e.ctrlKey || e.metaKey) && isEditing){
+        e.preventDefault();
+        saveEditContent();
+      }
+    });
 
     document.getElementById('btn-fullscreen').addEventListener('click', function(){
       var modal = document.getElementById('modal');
@@ -1457,35 +1480,106 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     });
 
     document.getElementById('btn-edit').addEventListener('click', function(){
-      var body = document.getElementById('modal-body');
-      var mdBody = body.querySelector('.markdown-body');
-      var editArea = body.querySelector('.modal-edit-area');
-      if(!isEditing){
-        isEditing = true;
-        this.classList.add('active');
-        this.innerHTML = '👁';
-        this.title = '预览';
-        editArea.value = getSectionMarkdown(currentEditSlug);
-        editArea.style.display = '';
-        mdBody.style.display = 'none';
-      } else {
-        var newContent = editArea.value;
-        if(newContent !== getSectionMarkdown(currentEditSlug)){
-          updateMarkdownContent(currentEditSlug, newContent);
-          var toast = document.getElementById('save-toast');
-          toast.textContent = '已保存';
-          toast.classList.add('show');
-          setTimeout(function(){ toast.classList.remove('show'); }, 1500);
-        }
-        isEditing = false;
-        this.classList.remove('active');
-        this.innerHTML = '✎';
-        this.title = '编辑';
-        mdBody.innerHTML = getSectionContent(currentEditSlug);
-        editArea.style.display = 'none';
-        mdBody.style.display = '';
-      }
+      enterEditMode();
     });
+
+    document.getElementById('btn-save').addEventListener('click', function(){
+      saveEditContent();
+    });
+
+    document.getElementById('btn-cancel').addEventListener('click', function(){
+      cancelEdit();
+    });
+  }
+
+  var editOriginalContent = '';
+  var editAutoSaveTimer = null;
+  var editDirty = false;
+
+  function enterEditMode(){
+    var body = document.getElementById('modal-body');
+    var mdBody = body.querySelector('.markdown-body');
+    var editArea = body.querySelector('.modal-edit-area');
+    isEditing = true;
+    editDirty = false;
+    editOriginalContent = getSectionMarkdown(currentEditSlug);
+    editArea.value = editOriginalContent;
+    editArea.style.display = '';
+    mdBody.style.display = 'none';
+    document.getElementById('modal-actions-view').style.display = 'none';
+    document.getElementById('modal-actions-edit').style.display = '';
+    showEditStatus('saved');
+    editArea.focus();
+    editArea.addEventListener('input', onEditInput);
+  }
+
+  function onEditInput(){
+    editDirty = true;
+    showEditStatus('dirty');
+    if(editAutoSaveTimer) clearTimeout(editAutoSaveTimer);
+    editAutoSaveTimer = setTimeout(function(){
+      saveEditContent(true);
+    }, 3000);
+  }
+
+  function saveEditContent(isAutoSave){
+    var editArea = document.querySelector('.modal-edit-area');
+    var newContent = editArea.value;
+    if(newContent !== getSectionMarkdown(currentEditSlug)){
+      showEditStatus('saving');
+      updateMarkdownContent(currentEditSlug, newContent);
+      editDirty = false;
+    }
+    showEditStatus('saved');
+    if(!isAutoSave){
+      exitEditMode();
+      var toast = document.getElementById('save-toast');
+      toast.textContent = '已保存';
+      toast.classList.add('show');
+      setTimeout(function(){ toast.classList.remove('show'); }, 1500);
+    }
+  }
+
+  function cancelEdit(){
+    if(editAutoSaveTimer) clearTimeout(editAutoSaveTimer);
+    if(editDirty){
+      if(!confirm('有未保存的修改，确定取消吗？')) return;
+    }
+    editDirty = false;
+    exitEditMode();
+  }
+
+  function exitEditMode(){
+    var body = document.getElementById('modal-body');
+    var mdBody = body.querySelector('.markdown-body');
+    var editArea = body.querySelector('.modal-edit-area');
+    isEditing = false;
+    editArea.removeEventListener('input', onEditInput);
+    editArea.style.display = 'none';
+    mdBody.innerHTML = getSectionContent(currentEditSlug);
+    mdBody.style.display = '';
+    document.getElementById('modal-actions-view').style.display = '';
+    document.getElementById('modal-actions-edit').style.display = 'none';
+    var statusEl = document.getElementById('modal-edit-status');
+    if(statusEl) statusEl.remove();
+  }
+
+  function showEditStatus(state){
+    var body = document.getElementById('modal-body');
+    var statusEl = document.getElementById('modal-edit-status');
+    if(!statusEl){
+      statusEl = document.createElement('div');
+      statusEl.id = 'modal-edit-status';
+      statusEl.className = 'modal-edit-status';
+      statusEl.innerHTML = '<span class="edit-dot"></span><span class="edit-label"></span>';
+      body.insertBefore(statusEl, body.querySelector('.modal-edit-area'));
+    }
+    var dot = statusEl.querySelector('.edit-dot');
+    var label = statusEl.querySelector('.edit-label');
+    dot.className = 'edit-dot ' + state;
+    var labels = {saving: '自动保存中...', saved: '已保存', dirty: '未保存'};
+    label.textContent = labels[state] || '';
+    statusEl.style.display = '';
   }
 
   function updateMarkdownContent(slug, newContent){
@@ -1494,12 +1588,18 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
     } else {
       var heading = headings.find(function(h){return h.slug===slug;});
       if(!heading) return;
-      var startLine = heading.line;
-      var endLine = markdownText.split('\n').length;
-      for(var i=0;i<headings.length;i++){
-        if(headings[i].line>startLine && headings[i].level<=heading.level){endLine=headings[i].line;break;}
-      }
       var lines = markdownText.split('\n');
+      var startLine = heading.line;
+      var endLine = lines.length;
+      if(heading.isSummary){
+        for(var k = startLine; k < lines.length; k++){
+          if(lines[k].trim() === '</details>'){endLine = k + 1; break;}
+        }
+      } else {
+        for(var i=0;i<headings.length;i++){
+          if(headings[i].line>startLine && headings[i].level<=heading.level){endLine=headings[i].line;break;}
+        }
+      }
       lines.splice(startLine, endLine-startLine, newContent);
       markdownText = lines.join('\n');
     }
