@@ -267,11 +267,34 @@ func (s *Server) handleGetDocument(c *gin.Context) {
 
 func (s *Server) handleSaveDocument(c *gin.Context) {
 	docID := c.Param("id")
+	src := c.Query("src")
 	var req struct {
 		Content string `json:"content" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if src != "" {
+		resolved := src
+		if len(resolved) >= 2 && resolved[:2] == "./" {
+			resolved = resolved[2:]
+		}
+		filePath := filepath.Join(s.Config.StaticDir, resolved)
+		if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		if err := os.WriteFile(filePath, []byte(req.Content), 0644); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"id":      docID,
+			"version": 1,
+			"src":     src,
+		})
 		return
 	}
 

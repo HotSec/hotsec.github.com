@@ -307,7 +307,10 @@
         try {
           const params = new URLSearchParams(window.location.search);
           const docId = params.get('doc') || 'all-md';
-          const resp = await fetch(`/api/documents/${docId}`, {
+          const srcPath = params.get('src') || '';
+          let apiUrl = `/api/documents/${docId}`;
+          if (srcPath) apiUrl += `?src=${encodeURIComponent(srcPath)}`;
+          const resp = await fetch(apiUrl, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content }),
