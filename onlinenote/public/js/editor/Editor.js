@@ -15,23 +15,31 @@ export class Editor {
     const sharedDeps = '?deps=@codemirror/state@6.5.2,@codemirror/view@6.36.4,@codemirror/language@6.11.0';
 
     const [
-      { EditorView, keymap },
+      { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine },
       { markdown, markdownLanguage },
       { languages },
       { defaultKeymap, history, historyKeymap, indentWithTab },
-      { basicSetup },
       { EditorState },
     ] = await Promise.all([
       import(`https://esm.sh/@codemirror/view@6.36.4`),
       import(`https://esm.sh/@codemirror/lang-markdown@6.3.2${sharedDeps}`),
       import(`https://esm.sh/@codemirror/language-data@6.5.1${sharedDeps}`),
       import(`https://esm.sh/@codemirror/commands@6.8.0${sharedDeps}`),
-      import(`https://esm.sh/codemirror@6.0.1${sharedDeps}`),
       import(`https://esm.sh/@codemirror/state@6.5.2`),
     ]);
 
     this.EditorView = EditorView;
     this.EditorState = EditorState;
+
+    const basicSetup = [
+      lineNumbers(),
+      highlightActiveLineGutter(),
+      highlightSpecialChars(),
+      history(),
+      drawSelection(),
+      highlightActiveLine(),
+      keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+    ];
 
     const customTheme = EditorView.theme({
       '&': {
@@ -107,10 +115,8 @@ export class Editor {
       state: EditorState.create({
         doc: this.options.content || '',
         extensions: [
-          basicSetup,
+          ...basicSetup,
           markdown({ base: markdownLanguage, codeLanguages: languages }),
-          history(),
-          keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
           saveKeymap,
           customTheme,
           EditorView.updateListener.of((update) => {
