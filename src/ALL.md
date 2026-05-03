@@ -9,6 +9,28 @@
 #### 基础语法
 
 <details>
+<summary>介绍与环境搭建</summary>
+
+- Go 历史：2007年设计，2009年开源，2012年 Go 1.0
+- 设计哲学：追求简单、原生并发、面向工程
+- 开发环境：安装、GOPATH/GOROOT、IDE配置
+
+
+> [📄 01_介绍与环境搭建.md](./mybook/go/01_语言基础/01_介绍与环境搭建.md)
+</details>
+
+<details>
+<summary>入门示例</summary>
+
+- Hello World
+- 基本程序结构
+- 编译运行
+
+
+> [📄 02_入门示例.md](./mybook/go/01_语言基础/02_入门示例.md)
+</details>
+
+<details>
 <summary>数据类型</summary>
 
 - 基本类型：int8~int64/uint8~uint64/float32/float64/complex64/complex128/bool/string/byte/rune
@@ -19,37 +41,75 @@
 - 类型别名：type NewType OldType vs type Alias = OldType
 
 
-> [📄 2_数据类型.md](./mybook/go/2_核心概念/2_数据类型.md)
+> [📄 03_数据类型.md](./mybook/go/01_语言基础/03_数据类型.md)
 </details>
 
 <details>
-<summary>变量声明与控制结构</summary>
+<summary>变量、常量与运算符</summary>
 
 - var / := 短变量声明 / 批量声明 / 匿名变量 _
 - 常量与 iota：枚举/跳过值/中间插队/数量级定义
 - 运算符：算术/关系/逻辑/位(&|^&^<</>>)/赋值/优先级
+
+
+> [📄 04_变量常量与运算符.md](./mybook/go/01_语言基础/04_变量常量与运算符.md)
+</details>
+
+<details>
+<summary>类型系统</summary>
+
+- 类型断言
+- type switch
+- 底层类型
+
+
+> [📄 04_类型系统.md](./mybook/go/01_语言基础/04_类型系统.md)
+</details>
+
+<details>
+<summary>控制语句</summary>
+
 - if / for / switch（默认不穿透/fallthrough）/ select
 - defer / panic / recover
 - goto / break(标签) / continue
 
 
-> [📄 3_语句.md](./mybook/go/1_语言基础/3_语句.md)
+> [📄 05_控制语句.md](./mybook/go/01_语言基础/05_控制语句.md)
 </details>
 
 <details>
-<summary>函数与方法</summary>
+<summary>函数</summary>
 
 - 多返回值、命名返回值、可变参数(...语法)
 - 高阶函数：函数作为参数/返回值
 - 匿名函数与闭包（捕获变量引用）
 - defer 详解：LIFO/参数确定时机/执行时机/修改返回值
 - 内置函数：len/cap/append/copy/delete/new/make/close/panic/recover
-- 递归：阶乘/斐波那契/分金币问题
+
+
+> [📄 06_函数.md](./mybook/go/01_语言基础/06_函数.md)
+</details>
+
+<details>
+<summary>结构体与方法</summary>
+
+- 结构体详解：自定义类型/实例化/构造函数/匿名字段(嵌入)/嵌套/JSON序列化Tag
 - 方法接收者选择（值接收者 vs 指针接收者）
-- 结构体详解：自定义类型/实例化/构造函数/匿名字段(嵌入)/嵌套/JSON序列化Tag/方法继承与重写
+- 方法继承与重写
 
 
-> [📄 4_函数.md](./mybook/go/1_语言基础/4_函数.md) · [📄 5_方法.md](./mybook/go/1_语言基础/5_方法.md)
+> [📄 07_结构体与方法.md](./mybook/go/01_语言基础/07_结构体与方法.md)
+</details>
+
+<details>
+<summary>组合与继承</summary>
+
+- 结构体嵌入
+- 方法提升
+- 组合 vs 继承
+
+
+> [📄 08_组合与继承.md](./mybook/go/01_语言基础/08_组合与继承.md)
 </details>
 
 <details>
@@ -59,83 +119,10 @@
 - 类型断言与 type switch
 - 空接口 interface{}
 - nil 接口陷阱
+- 接口设计模式
 
 
-> [📄 7_接口.md](./mybook/go/1_语言基础/7_接口.md)
-</details>
-
-#### 工程实践
-
-<details>
-<summary>包-模块-库</summary>
-
-- 包定义/标识符可见性(大写导出/小写私有)/包引入/别名导入/空白导入
-- init 函数：执行顺序/多个 init/注册驱动
-- go mod 包管理
-- 常用命令：go mod init/tidy/download/vendor/graph/why
-- GOPROXY 模块代理（goproxy.cn/goproxy.io/athens）
-- go.sum 校验与模块完整性
-- replace / exclude / retract 指令
-- 私有仓库配置（GOPRIVATE/GONOSUMCHECK）
-- Go Workspace（go.work）：多模块开发
-- 版本号规则：语义化版本/v2+ 路径后缀/伪版本
-
-
-> [📄 11_包-模块-库.md](./mybook/go/1_语言基础/11_包-模块-库.md)
-</details>
-
-<details>
-<summary>测试</summary>
-
-- 单元测试（go test）/ 子测试(t.Run) / 表驱动测试
-- 覆盖率：-cover/-covermode/-coverprofile
-- 性能/基准测试（Benchmark）
-- 模糊测试（Fuzzing）
-- Mock 接口：手动 Mock / gomock
-- monkey 打桩：gomonkey
-- goconvey：BDD 风格/Web 界面
-- 测试 MySQL（sqlmock）/ Redis（redismock）
-
-
-> [📄 12_测试.md](./mybook/go/1_语言基础/12_测试.md)
-</details>
-
-<details>
-<summary>项目结构与代码风格</summary>
-
-- gofmt 格式化
-- 标识符命名规范（驼峰、导出规则）
-- 推荐项目目录结构
-
-
-> [📄 13_项目结构代码风格与标识符命名.md](./mybook/go/1_语言基础/13_项目结构代码风格与标识符命名.md)
-</details>
-
-<details>
-<summary>错误处理</summary>
-
-- error 接口
-- panic & recover
-- errors.Is / errors.As / fmt.Errorf + %w
-
-
-> [📄 10_错误和异常.md](./mybook/go/1_语言基础/10_错误和异常.md)
-</details>
-
-#### 进阶特性
-
-<details>
-<summary>设计模式</summary>
-
-- 函数选项模式（Functional Options）：解决多参数构造问题
-- 单例模式：sync.Once 保证只执行一次
-- 工厂模式：根据类型创建不同实例
-- 策略模式：接口+组合实现算法切换
-- 装饰器模式：中间件链式调用
-- 构建者模式：链式调用构建复杂对象
-
-
-> [📄 16_设计模式.md](./mybook/go/1_语言基础/16_设计模式.md)
+> [📄 09_接口.md](./mybook/go/01_语言基础/09_接口.md)
 </details>
 
 <details>
@@ -147,81 +134,166 @@
 - 标准库泛型容器：cmp / slices / maps（Go 1.21+）
 
 
-> [📄 8_泛型.md](./mybook/go/1_语言基础/8_泛型.md)
+> [📄 10_泛型.md](./mybook/go/01_语言基础/10_泛型.md)
 </details>
 
 <details>
-<summary>版本新特性</summary>
-
-- **Go 1.18**：泛型/模糊测试/工作区模式（workspace）/Any 别名
-- **Go 1.19**：修订内存模型/Doc Comment 新格式
-- **Go 1.20**：切片转数组/PWRAP 错误包装/coverage 集成测试
-- **Go 1.21**：slog 结构化日志/slices/maps/cmp 标准库/min-max 内建/PGO 优化
-- **Go 1.22**：range over integer/循环变量语义修复（每次迭代新变量）/net/http 路由增强
-- **Go 1.23**：iterator 支持（range over func）/unique 包/osroot
-- **Go 1.24**：弱指针（weak pointer）/finalizer 改进/工具链管理 go version
-- **Go 1.25**：Container-aware GOMAXPROCS（cgroup CPU 配额自动适配）/实验性 GreenTea GC/实验性 encoding/json v2/testing/synctest 并发测试/sync.WaitGroup.Go()/Core Types 移除/go doc -http/go vet 新分析器（waitgroup/hostport）
-- **Go 1.26**：new(expr) 表达式初始化/泛型类型自引用/GreenTea GC 默认启用/SIMD 加速扫描/实验性 simd/archsimd 包/实验性 runtime/secret 包/crypto/hpke/errors.AsType/go fix 现代化修复器/实验性 goroutine leak profile/cgo 调用开销降低 ~30%/堆基地址随机化
-
-
-> [📄 15_版本新特性.md](./mybook/go/1_语言基础/15_版本新特性.md)
-</details>
-
-<details>
-<summary>内部实现原理</summary>
-
-- **Slice 内部**：reflect.SliceHeader（Data/Len/Cap）；扩容策略（<256 双倍，>256 1.25x+）
-- **String 内部**：reflect.StringHeader（Data/Len），不可变字节切片
-- **Interface 内部**：eface（无方法）= type+data / iface（有方法）= tab+data；itab 缓存
-- **Channel 内部**：hchan 结构（buf/sendx/recvx/qcount/dataqsiz/mutex）；有缓冲=环形队列，无缓冲=sendq/recvq 等待队列
-- **Map 内部**：hmap 结构（buckets/oldbuckets/count/overflow）；渐进式扩容（等量/翻倍）；桶内 8 key-value + overflow 指针
-- **defer 内部**：_defer 结构链表；栈上 defer（1.14+）/开放编码优化（1.14+）
-- **内存对齐**：struct padding 规则；unsafe.Sizeof/Alignof/Offsetof
-
-
-> [📄 14_内部实现原理.md](./mybook/go/1_语言基础/14_内部实现原理.md)
-</details>
-
-### 1.2 核心概念
-
-#### 核心概念
-
-<details>
-<summary>Slice vs Array</summary>
-
-- Array：固定长度，值类型
-- Slice：动态长度，引用类型（ptr + len + cap）
-- append 扩容机制
-
-
-> [📄 2_数据类型.md](./mybook/go/2_核心概念/2_数据类型.md)
-</details>
-
-<details>
-<summary>Map</summary>
-
-- 底层实现（哈希表）
-- 并发不安全 → sync.Map 或加锁
-
-
-> [📄 2_数据类型.md](./mybook/go/2_核心概念/2_数据类型.md)
-</details>
-
-<details>
-<summary>指针 & make vs new</summary>
+<summary>指针、make 与 new</summary>
 
 - & / * 操作，Go 指针不能运算
 - 指针传值：值传递 vs 指针传递
 - 指针使用场景：修改外部变量/避免大结构体拷贝/修改接收者
 - new：分配零值返回指针
 - make：只用于 slice/map/chan，返回初始化后的引用
-- make vs new 对比
 
 
-> [📄 13_make与new.md](./mybook/go/2_核心概念/13_make与new.md)
+> [📄 11_指针-make-new.md](./mybook/go/01_语言基础/11_指针-make-new.md)
 </details>
 
-### 1.3 并发编程（重点）
+<details>
+<summary>错误处理</summary>
+
+- error 接口
+- panic & recover
+- errors.Is / errors.As / fmt.Errorf + %w
+
+
+> [📄 12_错误处理.md](./mybook/go/01_语言基础/12_错误处理.md)
+</details>
+
+<details>
+<summary>包与模块</summary>
+
+- 包定义/标识符可见性(大写导出/小写私有)/包引入/别名导入/空白导入
+- init 函数：执行顺序/多个 init/注册驱动
+- go mod 包管理
+- 常用命令：go mod init/tidy/download/vendor/graph/why
+- GOPROXY 模块代理
+- 私有仓库配置（GOPRIVATE/GONOSUMCHECK）
+- Go Workspace（go.work）：多模块开发
+
+
+> [📄 13_包与模块.md](./mybook/go/01_语言基础/13_包与模块.md)
+</details>
+
+<details>
+<summary>类型系统</summary>
+
+- 类型断言
+- type switch
+- 底层类型
+
+
+> [📄 14_类型系统.md](./mybook/go/01_语言基础/14_类型系统.md)
+</details>
+
+<details>
+<summary>反射基础</summary>
+
+- reflect.Type / reflect.Value
+- 反射三定律
+- 结构体反射：NumField/Field/Tag.Get
+- 动态调用方法
+- 性能注意事项
+
+
+> [📄 15_反射基础.md](./mybook/go/01_语言基础/15_反射基础.md)
+</details>
+
+<details>
+<summary>unsafe 与内存对齐</summary>
+
+- unsafe.Pointer 四大规则
+- unsafe.Sizeof/Offsetof/Alignof
+- 内存对齐规则
+- 字段顺序优化
+
+
+> [📄 16_unsafe与内存对齐.md](./mybook/go/01_语言基础/16_unsafe与内存对齐.md)
+</details>
+
+#### 工程实践
+
+<details>
+<summary>测试</summary>
+
+- 单元测试（go test）/ 子测试(t.Run) / 表驱动测试
+- 覆盖率：-cover/-covermode/-coverprofile
+- 性能/基准测试（Benchmark）
+- 模糊测试（Fuzzing）
+- Mock 接口：手动 Mock / gomock
+
+
+> [📄 17_测试.md](./mybook/go/01_语言基础/17_测试.md)
+</details>
+
+<details>
+<summary>项目结构与规范</summary>
+
+- gofmt 格式化
+- 标识符命名规范（驼峰、导出规则）
+- 推荐项目目录结构
+
+
+> [📄 18_项目结构与规范.md](./mybook/go/01_语言基础/18_项目结构与规范.md)
+</details>
+
+<details>
+<summary>内部实现原理</summary>
+
+- **Slice 内部**：reflect.SliceHeader（Data/Len/Cap）；扩容策略
+- **String 内部**：reflect.StringHeader（Data/Len）
+- **Interface 内部**：eface / iface；itab 缓存
+- **Channel 内部**：hchan 结构
+- **Map 内部**：hmap 结构；渐进式扩容
+- **defer 内部**：_defer 结构链表；开放编码优化
+
+
+> [📄 19_内部实现原理.md](./mybook/go/01_语言基础/19_内部实现原理.md)
+</details>
+
+<details>
+<summary>设计模式</summary>
+
+- 函数选项模式（Functional Options）
+- 单例模式：sync.Once
+- 工厂模式
+- 策略模式
+- 装饰器模式
+- 构建者模式
+
+
+> [📄 20_设计模式.md](./mybook/go/01_语言基础/20_设计模式.md)
+</details>
+
+<details>
+<summary>版本新特性</summary>
+
+- **Go 1.18**：泛型/模糊测试/工作区模式/Any 别名
+- **Go 1.21**：slog 结构化日志/slices/maps/cmp 标准库/min-max 内建
+- **Go 1.22**：range over integer/循环变量语义修复
+- **Go 1.23**：iterator 支持（range over func）
+- **Go 1.24**：弱指针/finalizer 改进/工具链管理
+- **Go 1.25**：Container-aware GOMAXPROCS/实验性 GreenTea GC
+- **Go 1.26**：new(expr) 表达式初始化/GreenTea GC 默认启用
+
+
+> [📄 21_版本新特性.md](./mybook/go/01_语言基础/21_版本新特性.md)
+</details>
+
+<details>
+<summary>CGO 编程</summary>
+
+- cgo 基础
+- Go 调用 C
+- C 调用 Go
+- 回调函数
+
+
+> [📄 22_CGO编程.md](./mybook/go/01_语言基础/22_CGO编程.md)
+</details>
+
+### 1.2 并发编程
 
 #### 调度模型
 
@@ -232,33 +304,58 @@
 - P 的价值：限制并发数、本地队列减少锁竞争
 - m0（主线程）g0（调度 goroutine）
 - M 寻找 G 的流程
+- 调度策略
 
 
-> [📄 7_Golang协程调度器原理-GMP模型.md](./mybook/go/3_并发编程/7_Golang协程调度器原理-GMP模型.md)
+> [📄 04_GMP调度模型.md](./mybook/go/02_并发编程/04_GMP调度模型.md)
 </details>
 
 #### 并发原语
 
 <details>
-<summary>Goroutine & Channel</summary>
+<summary>Goroutine</summary>
 
 - Goroutine 轻量线程（~2KB 栈）
-- Channel：无缓冲/有缓冲，方向（只读/只写/双向）
-- select 多路复用
-- 关闭 channel 注意点（只有发送方关闭；用 WaitGroup 或 Context 协调）
+- goroutine 生命周期
+- goroutine 泄漏排查
 
 
-> [📄 9_并发.md](./mybook/go/3_并发编程/9_并发.md)
+> [📄 01_Goroutine.md](./mybook/go/02_并发编程/01_Goroutine.md)
 </details>
 
 <details>
-<summary>sync 包</summary>
+<summary>Channel</summary>
 
-- Mutex / RWMutex / WaitGroup / Once
-- sync.Map / Cond / Pool
+- Channel：无缓冲/有缓冲
+- 方向（只读/只写/双向）
+- 关闭 channel 注意点
+- 常见模式
 
 
-> [📄 9_并发.md](./mybook/go/3_并发编程/9_并发.md)
+> [📄 02_Channel.md](./mybook/go/02_并发编程/02_Channel.md)
+</details>
+
+<details>
+<summary>select 详解</summary>
+
+- select 多路复用
+- 超时控制
+- 非阻塞操作
+- 常见模式
+
+
+> [📄 03_select详解.md](./mybook/go/02_并发编程/03_select详解.md)
+</details>
+
+<details>
+<summary>并发原语</summary>
+
+- Mutex / RWMutex
+- WaitGroup / Once
+- atomic 原子操作
+
+
+> [📄 05_并发原语.md](./mybook/go/02_并发编程/05_并发原语.md)
 </details>
 
 <details>
@@ -269,7 +366,19 @@
 - 原理与最佳实践
 
 
-> [📄 20_context.md](./mybook/go/6_常用标准库/20_context.md)
+> [📄 06_Context.md](./mybook/go/02_并发编程/06_Context.md)
+</details>
+
+<details>
+<summary>并发安全与竞态检测</summary>
+
+- 竞态条件（Race Condition）
+- go run -race 检测
+- Go 内存模型
+- Happens-Before 关系
+
+
+> [📄 07_并发安全与竞态检测.md](./mybook/go/02_并发编程/07_并发安全与竞态检测.md)
 </details>
 
 #### 并发模式
@@ -282,10 +391,9 @@
 - 扇出/扇入模式
 - Pipeline 模式
 - 发布订阅模型
-- 三个协程按顺序打印
 
 
-> [📄 14_并发模式详解.md](./mybook/go/3_并发编程/14_并发模式详解.md)
+> [📄 08_并发模式详解.md](./mybook/go/02_并发编程/08_并发模式详解.md)
 </details>
 
 <details>
@@ -295,7 +403,19 @@
 - ants 等第三方库
 
 
-> [📄 11_协程池.md](./mybook/go/3_并发编程/11_协程池.md)
+> [📄 09_协程池.md](./mybook/go/02_并发编程/09_协程池.md)
+</details>
+
+<details>
+<summary>errgroup</summary>
+
+- errgroup 基本用法
+- WithContext 自动取消
+- SetLimit 并发控制
+- 与 sync.WaitGroup 对比
+
+
+> [📄 10_errgroup.md](./mybook/go/02_并发编程/10_errgroup.md)
 </details>
 
 <details>
@@ -306,121 +426,107 @@
 - 熔断器模式
 
 
-> [📄 15_限流与熔断.md](./mybook/go/3_并发编程/15_限流与熔断.md)
+> [📄 11_限流与熔断.md](./mybook/go/02_并发编程/11_限流与熔断.md)
 </details>
 
 <details>
-<summary>并发安全退出</summary>
+<summary>conc 并发库</summary>
 
-- Context 取消 / Channel 通知 / errgroup 错误处理
-- conc 并发库：pool(并发池)/stream(流式)/iter(迭代器)/泛型支持/对比errgroup
+- pool(并发池)/stream(流式)/iter(迭代器)
+- 泛型支持
+- 对比 errgroup
 
 
-> [📄 16_conc.md](./mybook/go/3_并发编程/16_conc.md)
+> [📄 12_conc并发库.md](./mybook/go/02_并发编程/12_conc并发库.md)
 </details>
 
-### 1.4 内存管理（重点）
+<details>
+<summary>网络 IO 并发模型</summary>
+
+- BIO / NIO / IO多路复用
+- Go netpoller
+- 网络编程模式
+
+
+> [📄 13_网络IO并发模型.md](./mybook/go/02_并发编程/13_网络IO并发模型.md)
+</details>
+
+### 1.3 内存管理
 
 #### 内存分配
 
 <details>
-<summary>内存模型与分配</summary>
+<summary>内存分配原理</summary>
 
 - Go 内存模型（happens-before）
 - 对象分配流程（微小对象 → mcache → mcentral → mheap）
+- 内存分配器设计
 
 
-> [📄 9_内存管理.md](./mybook/go/4_内存管理/9_内存管理.md)
+> [📄 01_内存分配原理.md](./mybook/go/03_内存管理/01_内存分配原理.md)
 </details>
 
 <details>
-<summary>逃逸分析</summary>
+<summary>栈内存管理</summary>
+
+- 栈增长与收缩
+- 连续栈
+- 栈拷贝
+
+
+> [📄 02_栈内存管理.md](./mybook/go/03_内存管理/02_栈内存管理.md)
+</details>
+
+<details>
+<summary>内存逃逸分析</summary>
 
 - 逃逸原因（返回指针、接口、闭包、大对象）
 - 检测方法：go build -gcflags="-m"
 - 如何避免逃逸
 
 
-> [📄 12_Go内存逃逸.md](./mybook/go/4_内存管理/12_Go内存逃逸.md)
+> [📄 05_内存逃逸分析.md](./mybook/go/03_内存管理/05_内存逃逸分析.md)
 </details>
 
 #### 垃圾回收
 
 <details>
-<summary>垃圾回收（GC）</summary>
+<summary>GC 垃圾回收</summary>
 
 - 三色并发标记算法
-- 混合写屏障（Hybrid Write Barrier）— 1.8+ 默认
 - 触发时机（内存翻倍 / 定时 / 手动 runtime.GC()）
-- Go 1.19+ 分代扫描（实验性）/ Go 1.25 实验性 GreenTea GC / Go 1.26 GreenTea GC 默认启用（10-40% GC 开销降低）
 - GC 优化策略
+- Go 1.25+ GreenTea GC
 
 
-> [📄 8_GC-垃圾回收.md](./mybook/go/4_内存管理/8_GC-垃圾回收.md)
+> [📄 03_GC垃圾回收.md](./mybook/go/03_内存管理/03_GC垃圾回收.md)
 </details>
 
 <details>
-<summary>混合写屏障详解</summary>
+<summary>混合写屏障</summary>
 
 - 演进：Dijkstra 插入屏障 → Yuasa 删除屏障 → 混合写屏障
 - 4 条规则（栈上不开启写屏障）
-- = 插入屏障 + 删除屏障
 - 三色不变式
 
 
-> [📄 10086_混合写屏障.md](./mybook/go/4_内存管理/10086_混合写屏障.md)
-</details>
-
-### 1.5 常见陷阱
-
-#### 常见陷阱
-
-<details>
-<summary>循环与变量陷阱</summary>
-
-- for range 陷阱（循环变量复用）
-- 短变量声明作用域
-- 循环中 defer（延迟到函数退出才执行）
-
-
-> [📄 1_常见陷阱.md](./mybook/go/5_常见陷阱/1_常见陷阱.md)
+> [📄 04_混合写屏障.md](./mybook/go/03_内存管理/04_混合写屏障.md)
 </details>
 
 <details>
-<summary>类型与接口陷阱</summary>
+<summary>内存泄漏排查</summary>
 
-- nil 接口 ≠ nil 具体类型（类型断言前必须判断）
-- 方法接收者为 nil 时的行为
+- 常见泄漏场景：goroutine 泄漏、无限增长切片、未关闭资源
+- pprof 内存分析
+- 排查流程与案例
 
 
-> [📄 1_常见陷阱.md](./mybook/go/5_常见陷阱/1_常见陷阱.md)
+> [📄 06_内存泄漏排查实战.md](./mybook/go/03_内存管理/06_内存泄漏排查实战.md)
 </details>
 
-<details>
-<summary>Slice 与 Map 陷阱</summary>
+### 1.4 标准库
 
-- slice 为 nil 与 empty 混淆
-- slice append 副作用（共享底层数组）
-- slice 和内存泄漏（大数组切片引用）
-- Map 遍历顺序不确定
-
-
-> [📄 1_常见陷阱.md](./mybook/go/5_常见陷阱/1_常见陷阱.md)
-</details>
-
-<details>
-<summary>性能与标准库误用</summary>
-
-- 字符串拼接低效（应用 strings.Builder）
-- time / encoding/json / net/http 常见误用
-
-
-> [📄 1_常见陷阱.md](./mybook/go/5_常见陷阱/1_常见陷阱.md)
-</details>
-
-### 1.6 常用标准库
-
-#### 格式化与时间
+#### 基础包
 
 <details>
 <summary>fmt 格式化</summary>
@@ -433,7 +539,7 @@
 - Sprint/Sprintf/Fprint/Fprintf
 
 
-> [📄 12_fmt.md](./mybook/go/6_常用标准库/12_fmt.md)
+> [📄 fmt.md](./mybook/go/04_标准库/01_基础/fmt.md)
 </details>
 
 <details>
@@ -446,7 +552,7 @@
 - Duration：常量(Nanosecond~Hour)/方法(Seconds/Milliseconds)
 
 
-> [📄 13_time.md](./mybook/go/6_常用标准库/13_time.md)
+> [📄 time.md](./mybook/go/04_标准库/01_基础/time.md)
 </details>
 
 <details>
@@ -456,10 +562,21 @@
 - flag：StringVar/IntVar/BoolVar/Parse/子命令(NewFlagSet)
 
 
-> [📄 14_strconv.md](./mybook/go/6_常用标准库/14_strconv.md) · [📄 15_flag.md](./mybook/go/6_常用标准库/15_flag.md)
+> [📄 strconv.md](./mybook/go/04_标准库/01_基础/strconv.md) · [📄 flag.md](./mybook/go/04_标准库/01_基础/flag.md)
 </details>
 
-#### I/O与编码
+#### I/O与文件
+
+<details>
+<summary>io 与 bufio</summary>
+
+- io.Reader / io.Writer 接口
+- bufio 缓冲读写
+- io.Copy / io.ReadAll / io.TeeReader
+
+
+> [📄 io与bufio.md](./mybook/go/04_标准库/02_IO与文件/io与bufio.md)
+</details>
 
 <details>
 <summary>文件操作（os/io）</summary>
@@ -469,10 +586,9 @@
 - 文件信息：Stat/Name/Size/IsDir/Mode/ModTime
 - 目录：Mkdir/MkdirAll/Remove/RemoveAll/ReadDir/Walk
 - 临时文件：MkdirTemp/CreateTemp
-- io 工具：ReadAll/Copy
 
 
-> [📄 16_文件操作.md](./mybook/go/6_常用标准库/16_文件操作.md)
+> [📄 文件操作.md](./mybook/go/04_标准库/02_IO与文件/文件操作.md)
 </details>
 
 <details>
@@ -490,8 +606,47 @@
 - 安全处理：自动转义/template.HTML
 
 
-> [📄 17_template.md](./mybook/go/6_常用标准库/17_template.md)
+> [📄 template.md](./mybook/go/04_标准库/02_IO与文件/template.md)
 </details>
+
+#### 网络
+
+<details>
+<summary>net/http 标准库</summary>
+
+- HTTP 客户端/服务端
+- Handler/HandlerFunc
+- 中间件模式
+- 文件服务
+- 优雅关闭
+
+
+> [📄 http标准库.md](./mybook/go/04_标准库/03_网络/http标准库.md)
+</details>
+
+<details>
+<summary>net/url URL处理</summary>
+
+- URL 解析与构建
+- Query 参数处理
+- URL 编码解码
+
+
+> [📄 net-url.md](./mybook/go/04_标准库/03_网络/net-url.md)
+</details>
+
+<details>
+<summary>httprouter</summary>
+
+- 高性能路由
+- 路由参数
+- 路由优先级
+
+
+> [📄 httprouter.md](./mybook/go/04_标准库/03_网络/httprouter.md)
+</details>
+
+#### 编码与反射
 
 <details>
 <summary>encoding/json 详解</summary>
@@ -506,7 +661,7 @@
 - 空切片 vs nil 的 JSON 差异
 
 
-> [📄 18_json.md](./mybook/go/6_常用标准库/18_json.md)
+> [📄 json.md](./mybook/go/04_标准库/04_编码与反射/json.md)
 </details>
 
 <details>
@@ -520,10 +675,43 @@
 - 注意事项：性能/类型安全/可维护性
 
 
-> [📄 19_reflect.md](./mybook/go/6_常用标准库/19_reflect.md)
+> [📄 reflect.md](./mybook/go/04_标准库/04_编码与反射/reflect.md)
 </details>
 
-#### 并发与底层
+#### 并发与同步
+
+<details>
+<summary>sync 详解</summary>
+
+- Mutex / RWMutex
+- WaitGroup / Once
+- Map / Pool / Cond
+
+
+> [📄 sync详解.md](./mybook/go/04_标准库/05_并发与同步/sync详解.md)
+</details>
+
+<details>
+<summary>atomic 原子操作</summary>
+
+- 原子操作：Add/Load/Store/Swap/CompareAndSwap
+- atomic.Value
+
+
+> [📄 atomic详解.md](./mybook/go/04_标准库/05_并发与同步/atomic详解.md)
+</details>
+
+<details>
+<summary>singleflight</summary>
+
+- 防缓存击穿
+- Do/DoChan/Forget
+
+
+> [📄 singleflight.md](./mybook/go/04_标准库/05_并发与同步/singleflight.md)
+</details>
+
+#### 系统与信号
 
 <details>
 <summary>context 详解</summary>
@@ -535,42 +723,45 @@
 - 常见模式：HTTP请求超时/数据库查询超时/优雅关闭
 
 
-> [📄 20_context.md](./mybook/go/6_常用标准库/20_context.md)
+> [📄 context.md](./mybook/go/04_标准库/06_系统与信号/context.md)
 </details>
 
 <details>
-<summary>并发与同步</summary>
+<summary>os/signal 信号处理</summary>
 
-- sync / sync/atomic：Mutex / RWMutex / WaitGroup / Once / Map / Pool / Cond
-- singleflight：防缓存击穿/Do/DoChan/Forget
+- signal.Notify
+- 优雅关机基础
 
 
-> [📄 9_并发.md](./mybook/go/3_并发编程/9_并发.md) · [📄 27_singleflight.md](./mybook/go/6_常用标准库/27_singleflight.md)
+> [📄 os-signal.md](./mybook/go/04_标准库/06_系统与信号/os-signal.md)
 </details>
 
 <details>
-<summary>网络与 I/O</summary>
+<summary>embed 嵌入文件</summary>
 
-- net/http：HTTP 客户端/服务端、Handler/HandlerFunc、中间件模式、文件服务、优雅关闭
-- io / bufio / os：文件读写、缓冲 I/O、路径操作
+- Go 1.16 嵌入文件
+- embed.FS
+- 静态资源打包
 
 
-> [📄 5_http标准库.md](./mybook/go/6_常用标准库/5_http标准库.md)
+> [📄 embed.md](./mybook/go/04_标准库/06_系统与信号/embed.md)
 </details>
 
-#### 第三方库
+#### 日志
 
 <details>
-<summary>日志</summary>
+<summary>log 标准日志</summary>
 
 - 标准库 log
-- slog（Go 1.21+）：结构化日志/JSONHandler
-- Zap：Logger/SugaredLogger/自定义配置/Gin集成
-- lumberjack：日志轮转(MaxSize/MaxBackups/MaxAge/Compress)
+- 基本日志输出
 
 
-> [📄 1_log.md](./mybook/go/6_常用标准库/1_log.md)
+> [📄 log.md](./mybook/go/04_标准库/07_日志/log.md)
 </details>
+
+### 1.5 第三方库
+
+#### 配置管理
 
 <details>
 <summary>Viper 配置管理</summary>
@@ -585,60 +776,10 @@
 - 写入配置：WriteConfig/SafeWriteConfig
 
 
-> [📄 21_viper.md](./mybook/go/6_常用标准库/21_viper.md)
+> [📄 viper.md](./mybook/go/05_第三方库/01_配置管理/viper.md)
 </details>
 
-<details>
-<summary>validator 参数校验</summary>
-
-- 常用标签：required/omitempty/min/max/len/gte/lte/email/url/ip/oneof
-- 跨字段验证：eqfield/nefield/gtfield
-- 自定义验证器：RegisterValidation
-- 中文错误信息：locales/ut/translations
-- Gin 集成：binding tag
-
-
-> [📄 22_validator.md](./mybook/go/6_常用标准库/22_validator.md)
-</details>
-
-<details>
-<summary>sqlx 数据库操作</summary>
-
-- 连接：sqlx.Connect/Connect设置
-- 查询：Get/Select/Queryx/StructScan/MapScan
-- 增删改：Exec/NamedExec/批量插入
-- 事务：Beginx/Commit/Rollback/BeginTxFunc
-- 结构体映射：db tag
-
-
-> [📄 23_sqlx.md](./mybook/go/6_常用标准库/23_sqlx.md)
-</details>
-
-<details>
-<summary>Cobra CLI 开发</summary>
-
-- 命令结构：Command/Use/Short/Long/Run
-- 子命令：AddCommand
-- 标志：PersistentFlags/Flags/IntP/StringP
-- 必填标志：MarkFlagRequired
-- 生命周期：PreRun/Run/PostRun
-- 脚手架：cobra-cli
-
-
-> [📄 26_cobra.md](./mybook/go/6_常用标准库/26_cobra.md)
-</details>
-
-<details>
-<summary>Swagger / Air</summary>
-
-- **Swagger**：swag init/主入口注解/接口注解(@Summary/@Param/@Success/@Router)/Gin集成
-- **Air**：热重载/air init/.air.toml配置/Docker中使用
-
-
-> [📄 25_swagger.md](./mybook/go/6_常用标准库/25_swagger.md) · [📄 24_air.md](./mybook/go/6_常用标准库/24_air.md)
-</details>
-
-#### 数据库操作
+#### 数据库
 
 <details>
 <summary>GORM</summary>
@@ -652,7 +793,20 @@
 - GORM Gen：类型安全ORM/代码生成
 
 
-> [📄 3_gorm.md](./mybook/go/6_常用标准库/3_gorm.md)
+> [📄 gorm.md](./mybook/go/05_第三方库/02_数据库/gorm.md)
+</details>
+
+<details>
+<summary>sqlx 数据库操作</summary>
+
+- 连接：sqlx.Connect/Connect设置
+- 查询：Get/Select/Queryx/StructScan/MapScan
+- 增删改：Exec/NamedExec/批量插入
+- 事务：Beginx/Commit/Rollback/BeginTxFunc
+- 结构体映射：db tag
+
+
+> [📄 sqlx.md](./mybook/go/05_第三方库/02_数据库/sqlx.md)
 </details>
 
 <details>
@@ -666,7 +820,7 @@
 - 发布订阅：Subscribe/Publish
 
 
-> [📄 28_redis.md](./mybook/go/6_常用标准库/28_redis.md)
+> [📄 redis.md](./mybook/go/05_第三方库/02_数据库/redis.md)
 </details>
 
 <details>
@@ -678,8 +832,32 @@
 - 索引：Indexes().CreateOne/CreateMany
 
 
-> [📄 29_mongodb.md](./mybook/go/6_常用标准库/29_mongodb.md)
+> [📄 mongodb.md](./mybook/go/05_第三方库/02_数据库/mongodb.md)
 </details>
+
+<details>
+<summary>ClickHouse</summary>
+
+- ClickHouse 连接
+- 批量写入
+- 查询优化
+
+
+> [📄 ClickHouse.md](./mybook/go/05_第三方库/02_数据库/ClickHouse.md)
+</details>
+
+<details>
+<summary>分库分表</summary>
+
+- 分库分表策略
+- 中间件选择
+- 数据迁移
+
+
+> [📄 分库分表.md](./mybook/go/05_第三方库/02_数据库/分库分表.md)
+</details>
+
+#### 消息队列
 
 <details>
 <summary>Go 操作 Kafka / NSQ / RabbitMQ</summary>
@@ -689,35 +867,114 @@
 - **RabbitMQ**：amqp091-go/工作队列/发布订阅(Fanout)/路由(Direct)/主题(Topic)
 
 
-> [📄 30_kafka.md](./mybook/go/6_常用标准库/30_kafka.md) · [📄 31_nsq.md](./mybook/go/6_常用标准库/31_nsq.md) · [📄 32_rabbitmq.md](./mybook/go/6_常用标准库/32_rabbitmq.md)
+> [📄 kafka.md](./mybook/go/05_第三方库/03_消息队列/kafka.md) · [📄 nsq.md](./mybook/go/05_第三方库/03_消息队列/nsq.md) · [📄 rabbitmq.md](./mybook/go/05_第三方库/03_消息队列/rabbitmq.md)
 </details>
 
-#### 可观测性
+#### 日志
 
 <details>
-<summary>OpenTelemetry / Jaeger / Prometheus</summary>
+<summary>Zap 日志库</summary>
 
-- **OpenTelemetry**：TracerProvider/Span/属性/事件/错误记录/HTTP(gin)集成/gRPC集成
-- **Jaeger**：部署(all-in-one)/Go集成/采样策略(AlwaysSample/TraceIDRatioBased)/Web UI
-- **Prometheus Go**：Counter/Gauge/Histogram/Summary/Gin中间件/PromQL查询
+- Logger/SugaredLogger
+- 自定义配置
+- Gin 集成
+- lumberjack 日志轮转
 
 
-> [📄 35_opentelemetry.md](./mybook/go/6_常用标准库/35_opentelemetry.md) · [📄 36_jaeger.md](./mybook/go/6_常用标准库/36_jaeger.md) · [📄 37_prometheus.md](./mybook/go/6_常用标准库/37_prometheus.md)
+> [📄 zap.md](./mybook/go/05_第三方库/04_日志/zap.md)
+</details>
+
+#### 命令行
+
+<details>
+<summary>Cobra CLI 开发</summary>
+
+- 命令结构：Command/Use/Short/Long/Run
+- 子命令：AddCommand
+- 标志：PersistentFlags/Flags/IntP/StringP
+- 必填标志：MarkFlagRequired
+- 生命周期：PreRun/Run/PostRun
+- 脚手架：cobra-cli
+
+
+> [📄 cobra.md](./mybook/go/05_第三方库/05_命令行/cobra.md)
+</details>
+
+#### 验证与文档
+
+<details>
+<summary>validator 参数校验</summary>
+
+- 常用标签：required/omitempty/min/max/len/gte/lte/email/url/ip/oneof
+- 跨字段验证：eqfield/nefield/gtfield
+- 自定义验证器：RegisterValidation
+- 中文错误信息：locales/ut/translations
+- Gin 集成：binding tag
+
+
+> [📄 validator.md](./mybook/go/05_第三方库/06_验证与文档/validator.md)
 </details>
 
 <details>
-<summary>优雅关机与部署</summary>
+<summary>Swagger</summary>
 
-- **优雅关机**：signal.Notify/srv.Shutdown/超时控制
-- **优雅重启**：SIGHUP 信号处理
-- **部署方式**：二进制/Systemd/Docker/K8s
-- **编译优化**：-ldflags="-s -w"/版本信息注入(-X)
+- swag init
+- 主入口注解
+- 接口注解(@Summary/@Param/@Success/@Router)
+- Gin 集成
 
 
-> [📄 33_优雅关机.md](./mybook/go/6_常用标准库/33_优雅关机.md) · [📄 3_部署.md](./mybook/go/11_工具与调试/3_部署.md)
+> [📄 swagger.md](./mybook/go/05_第三方库/06_验证与文档/swagger.md)
 </details>
 
-### 1.7 常用框架
+#### 缓存
+
+<details>
+<summary>gache 缓存库</summary>
+
+- 本地缓存
+- 缓存策略
+
+
+> [📄 gache.md](./mybook/go/05_第三方库/07_缓存/gache.md)
+</details>
+
+#### 系统工具
+
+<details>
+<summary>gopsutil 系统监控</summary>
+
+- CPU/内存/磁盘监控
+- 进程信息
+
+
+> [📄 gopsutil.md](./mybook/go/05_第三方库/08_系统工具/gopsutil.md)
+</details>
+
+<details>
+<summary>gopkg 常用工具</summary>
+
+- 常用工具集合
+
+
+> [📄 gopkg.md](./mybook/go/05_第三方库/08_系统工具/gopkg.md)
+</details>
+
+#### 开发工具
+
+<details>
+<summary>Air 热重载</summary>
+
+- 热重载
+- air init
+- .air.toml 配置
+- Docker 中使用
+
+
+> [📄 air.md](./mybook/go/05_第三方库/09_开发工具/air.md)
+</details>
+
+### 1.6 Web框架
 
 #### Web框架
 
@@ -736,7 +993,7 @@
 - 优雅关闭与重启 / Swagger / WebSocket / SSE
 
 
-> [📄 2_gin.md](./mybook/go/7_常用框架/2_gin.md)
+> [📄 01_Gin.md](./mybook/go/06_Web框架/01_Gin.md)
 </details>
 
 <details>
@@ -751,7 +1008,7 @@
 - 部署：Docker / K8s / 微服务拆分
 
 
-> [📄 1_go-zero.md](./mybook/go/7_常用框架/1_go-zero.md)
+> [� 02_go-zero/](./mybook/go/06_Web框架/02_go-zero/)
 </details>
 
 <details>
@@ -766,11 +1023,11 @@
 - **实例**：OmniWire 项目（WireGuard VPN + 端口转发网关）
 
 
-> [📄 6_GoFrame.md](./mybook/go/7_常用框架/6_GoFrame.md)
+> [📄 04_GoFrame.md](./mybook/go/06_Web框架/04_GoFrame.md)
 </details>
 
 <details>
-<summary>Gin vs go-zero 对比</summary>
+<summary>框架对比</summary>
 
 | 维度 | Gin | go-zero |
 |------|-----|---------|
@@ -781,7 +1038,7 @@
 | 适用 | 中小型API | 大型微服务体系 |
 
 
-> [📄 1003_gin_vs_go-zero.md](./mybook/go/7_常用框架/1003_gin_vs_go-zero.md)
+> [📄 10_框架对比.md](./mybook/go/06_Web框架/10_框架对比.md)
 </details>
 
 #### RPC与网络
@@ -799,44 +1056,31 @@
 - gRPC vs REST 对比
 
 
-> [📄 3_grpc.md](./mybook/go/7_常用框架/3_grpc.md)
+> [📄 03_gRPC.md](./mybook/go/06_Web框架/03_gRPC.md)
 </details>
 
 <details>
-<summary>Zinx / Etcd</summary>
+<summary>Zinx</summary>
 
 - **Zinx**：轻量 TCP 并发服务器框架
-- **Etcd**：分布式 KV / 分布式锁 / WAL / BoltDB / 高可用集群
 - **gnet**：高性能、轻量级网络框架（Go）；基于 epoll/kqueue 实现；支持 TCP/UDP/Unix Domain Socket；Event-Driven 架构；适用：TCP/UDP 服务器、端口转发网关、代理服务
 
 
-> [📄 4_zinx.md](./mybook/go/7_常用框架/4_zinx.md) · [📄 5_etcd.md](./mybook/go/7_常用框架/5_etcd.md)
+> [📄 05_zinx.md](./mybook/go/06_Web框架/05_zinx.md)
 </details>
 
-#### 依赖注入
+#### 服务发现
 
 <details>
-<summary>Wire & 依赖注入</summary>
+<summary>etcd</summary>
 
-- **Wire**：Google 出品的编译时依赖注入框架；Provider/Set/Injector/Build
-- 与运行时 DI 框架（dig/fx）对比：编译时检查 vs 运行时反射
-- 适用场景：大型项目结构化初始化
-
-
-> [📄 7_Wire依赖注入.md](./mybook/go/7_常用框架/7_Wire依赖注入.md)
-</details>
-
-#### 微服务
-
-<details>
-<summary>Go kit 微服务</summary>
-
-- 代码分层：Service(业务逻辑)/Endpoint(端点)/Transport(传输)
-- 中间件模式：日志/指标/链路追踪
-- 支持 HTTP/gRPC 传输
+- 分布式 KV
+- 分布式锁
+- WAL / BoltDB
+- 高可用集群
 
 
-> [📄 8_go-kit.md](./mybook/go/7_常用框架/8_go-kit.md)
+> [📄 08_etcd.md](./mybook/go/06_Web框架/08_etcd.md)
 </details>
 
 <details>
@@ -849,61 +1093,287 @@
 - 注销服务：ServiceDeregister
 
 
-> [📄 9_consul.md](./mybook/go/7_常用框架/9_consul.md)
+> [📄 09_consul.md](./mybook/go/06_Web框架/09_consul.md)
 </details>
 
-### 1.8 Web接口性能优化
+#### 依赖注入
+
+<details>
+<summary>Wire & 依赖注入</summary>
+
+- **Wire**：Google 出品的编译时依赖注入框架；Provider/Set/Injector/Build
+- 与运行时 DI 框架（dig/fx）对比：编译时检查 vs 运行时反射
+- 适用场景：大型项目结构化初始化
+
+
+> [📄 07_Wire依赖注入.md](./mybook/go/06_Web框架/07_Wire依赖注入.md)
+</details>
+
+#### 微服务
+
+<details>
+<summary>Go kit 微服务</summary>
+
+- 代码分层：Service(业务逻辑)/Endpoint(端点)/Transport(传输)
+- 中间件模式：日志/指标/链路追踪
+- 支持 HTTP/gRPC 传输
+
+
+> [📄 06_go-kit.md](./mybook/go/06_Web框架/06_go-kit.md)
+</details>
+
+### 1.7 性能优化
 
 #### 编码优化
 
 <details>
-<summary>编码层面</summary>
+<summary>编码层面优化</summary>
 
 - strings.Builder / bytes.Buffer 拼接
 - 切片/Map 预分配容量
 - 减少内存分配，避免逃逸到堆
 
 
-> [📄 3_性能优化实战.md](./mybook/go/8_Web接口性能优化/3_性能优化实战.md)
+> [📄 01_编码层面优化.md](./mybook/go/07_性能优化/01_编码层面优化.md)
 </details>
 
 <details>
-<summary>并发 & 数据库 & 缓存</summary>
+<summary>并发优化</summary>
 
 - errgroup 并发 / Worker Pool
 - 连接池配置 / 批量操作 / 查询优化
 - 多级缓存（本地 + Redis）/ singleflight 防击穿
 
 
-> [📄 3_性能优化实战.md](./mybook/go/8_Web接口性能优化/3_性能优化实战.md)
+> [📄 02_并发优化.md](./mybook/go/07_性能优化/02_并发优化.md)
 </details>
 
-#### HTTP与监控
+#### 性能分析
 
 <details>
-<summary>HTTP & JSON & 监控</summary>
+<summary>性能分析工具</summary>
 
-- Server 参数调优 / Keep-Alive / gzip 压缩
-- json-iterator / 流式处理大 JSON
-- pprof（CPU/Mem/Goroutine/Block）/ 火焰图 / go test -bench / Prometheus
+- pprof（CPU/Mem/Goroutine/Block）
+- 火焰图
+- go test -bench
 
 
-> [📄 4_pprof性能分析.md](./mybook/go/8_Web接口性能优化/4_pprof性能分析.md) · [📄 1001_web接口性能优化.md](./mybook/go/8_Web接口性能优化/1001_web接口性能优化.md)
+> [📄 03_性能分析工具.md](./mybook/go/07_性能优化/03_性能分析工具.md)
 </details>
 
-### 1.9 安全专题
+<details>
+<summary>trace 与火焰图</summary>
+
+- trace 详解
+- 火焰图解读
+
+
+> [📄 04_trace与火焰图.md](./mybook/go/07_性能优化/04_trace与火焰图.md)
+</details>
+
+<details>
+<summary>基准测试与压测</summary>
+
+- benchmark
+- 压测工具(wrk/hey/vegeta)
+
+
+> [📄 05_基准测试与压测.md](./mybook/go/07_性能优化/05_基准测试与压测.md)
+</details>
+
+<details>
+<summary>优化实战案例</summary>
+
+- 综合优化案例
+
+
+> [📄 06_优化实战案例.md](./mybook/go/07_性能优化/06_优化实战案例.md)
+</details>
+
+### 1.8 可观测性
+
+#### 可观测性
+
+<details>
+<summary>日志规范与结构化日志</summary>
+
+- slog/zap 规范
+- 日志级别策略
+
+
+> [📄 01_日志规范与结构化日志.md](./mybook/go/08_可观测性/01_日志规范与结构化日志.md)
+</details>
+
+<details>
+<summary>OpenTelemetry</summary>
+
+- TracerProvider/Span
+- 属性/事件/错误记录
+- HTTP(gin)集成/gRPC集成
+
+
+> [📄 opentelemetry.md](./mybook/go/08_可观测性/opentelemetry.md)
+</details>
+
+<details>
+<summary>Jaeger 链路追踪</summary>
+
+- 部署(all-in-one)
+- Go 集成
+- 采样策略(AlwaysSample/TraceIDRatioBased)
+- Web UI
+
+
+> [📄 jaeger.md](./mybook/go/08_可观测性/jaeger.md)
+</details>
+
+<details>
+<summary>Prometheus 指标监控</summary>
+
+- Counter/Gauge/Histogram/Summary
+- Gin 中间件
+- PromQL 查询
+
+
+> [📄 prometheus.md](./mybook/go/08_可观测性/prometheus.md)
+</details>
+
+<details>
+<summary>可观测性实战</summary>
+
+- 三大支柱整合
+- 生产实践
+
+
+> [📄 05_可观测性实战.md](./mybook/go/08_可观测性/05_可观测性实战.md)
+</details>
+
+### 1.9 分布式与微服务
+
+#### 分布式基础
+
+<details>
+<summary>分布式基础理论</summary>
+
+- ACID / CAP / BASE / Paxos / Raft
+- 分布式一致性：强一致/最终一致/因果一致
+- 分布式时钟：Lamport 时钟 / 向量时钟
+- Gossip 协议 / 一致性哈希 / 虚拟节点
+
+
+> [📄 01_分布式基础理论.md](./mybook/go/09_分布式与微服务/01_分布式基础理论.md)
+</details>
+
+<details>
+<summary>服务注册与发现</summary>
+
+- etcd/consul 整合
+- 服务注册
+- 健康检查
+
+
+> [📄 02_服务注册与发现.md](./mybook/go/09_分布式与微服务/02_服务注册与发现.md)
+</details>
+
+<details>
+<summary>分布式锁</summary>
+
+- Redis 锁
+- etcd 锁
+- zookeeper 锁
+
+
+> [📄 03_分布式锁.md](./mybook/go/09_分布式与微服务/03_分布式锁.md)
+</details>
+
+<details>
+<summary>分布式事务</summary>
+
+- 2PC / TCC / Saga
+- 本地消息表
+
+
+> [📄 04_分布式事务.md](./mybook/go/09_分布式与微服务/04_分布式事务.md)
+</details>
+
+<details>
+<summary>分布式 ID 生成</summary>
+
+- UUID
+- 雪花算法
+- Leaf
+
+
+> [📄 05_分布式ID生成.md](./mybook/go/09_分布式与微服务/05_分布式ID生成.md)
+</details>
+
+<details>
+<summary>配置中心</summary>
+
+- etcd 配置
+- nacos/apollo
+
+
+> [📄 06_配置中心.md](./mybook/go/09_分布式与微服务/06_配置中心.md)
+</details>
+
+<details>
+<summary>API 网关</summary>
+
+- 网关模式
+- 认证/限流/路由
+
+
+> [📄 07_API网关.md](./mybook/go/09_分布式与微服务/07_API网关.md)
+</details>
+
+<details>
+<summary>优雅关机与重启</summary>
+
+- signal.Notify
+- srv.Shutdown
+- 超时控制
+- SIGHUP 信号处理
+
+
+> [📄 08_优雅关机与重启.md](./mybook/go/09_分布式与微服务/08_优雅关机与重启.md)
+</details>
+
+### 1.10 安全专题
 
 #### 安全专题
 
 <details>
-<summary>SBOM</summary>
+<summary>TLS 与 HTTPS</summary>
+
+- 证书
+- TLS 握手
+- Go TLS 配置
+
+
+> [📄 01_TLS与HTTPS.md](./mybook/go/10_安全专题/01_TLS与HTTPS.md)
+</details>
+
+<details>
+<summary>JWT 认证</summary>
+
+- JWT
+- OAuth2
+- Session
+
+
+> [📄 02_JWT认证.md](./mybook/go/10_安全专题/02_JWT认证.md)
+</details>
+
+<details>
+<summary>SBOM 软件物料清单</summary>
 
 - 标准格式：SPDX / CycloneDX
 - 生成工具：Syft / Trivy
 - 各语言生成 / CI/CD 集成 / 漏洞扫描（Grype / Trivy）
 
 
-> [📄 1004_sbom.md](./mybook/go/9_安全专题/1004_sbom.md)
+> [📄 03_SBOM软件物料清单.md](./mybook/go/10_安全专题/03_SBOM软件物料清单.md)
 </details>
 
 <details>
@@ -914,59 +1384,161 @@
 - 实战：生成国密证书、SM4 加解密
 
 
-> [📄 1005_国密算法证书.md](./mybook/go/9_安全专题/1005_国密算法证书.md)
+> [📄 04_国密算法与证书.md](./mybook/go/10_安全专题/04_国密算法与证书.md)
 </details>
 
-### 1.10 开源项目
+<details>
+<summary>常见安全漏洞与防护</summary>
+
+- SQL 注入
+- XSS
+- CSRF
+- 命令注入
+
+
+> [📄 05_常见安全漏洞与防护.md](./mybook/go/10_安全专题/05_常见安全漏洞与防护.md)
+</details>
+
+### 1.11 工具与部署
+
+#### 工具链
+
+<details>
+<summary>开发工具链</summary>
+
+- go build / fmt / vet / lint / generate
+- golangci-lint
+
+
+> [📄 01_开发工具链.md](./mybook/go/11_工具与部署/01_开发工具链.md)
+</details>
+
+<details>
+<summary>性能调试工具</summary>
+
+- pprof / trace / gctrace
+
+
+> [📄 02_性能调试工具.md](./mybook/go/11_工具与部署/02_性能调试工具.md)
+</details>
+
+<details>
+<summary>交叉编译与构建优化</summary>
+
+- CGO 交叉编译
+- UPX 压缩
+- 构建缓存
+
+
+> [📄 03_交叉编译与构建优化.md](./mybook/go/11_工具与部署/03_交叉编译与构建优化.md)
+</details>
+
+#### 部署
+
+<details>
+<summary>Docker 部署</summary>
+
+- Dockerfile 编写
+- docker-compose
+- 多阶段构建
+
+
+> [📄 04_Docker部署.md](./mybook/go/11_工具与部署/04_Docker部署.md)
+</details>
+
+<details>
+<summary>Kubernetes 部署</summary>
+
+- Deployment / Service / ConfigMap
+- Helm Chart
+
+
+> [📄 05_Kubernetes部署.md](./mybook/go/11_工具与部署/05_Kubernetes部署.md)
+</details>
+
+<details>
+<summary>CI/CD 实践</summary>
+
+- GitHub Actions
+- GitLab CI
+
+
+> [📄 06_CI-CD实践.md](./mybook/go/11_工具与部署/06_CI-CD实践.md)
+</details>
+
+### 1.12 开源项目学习
 
 #### 开源项目
 
 <details>
 <summary>项目列表</summary>
 
-- Gin-vue-admin / Gin-api
-- Packetbeat（流量捕获与流程）
-- K3s（源码分析：编译/运行/build/server/agent/核心依赖）
-- K8s（Pod/Node/Service/Deployment/CNI/CSI/CRI/Scheduling Framework）
-- KSV 虚拟化 / Memos 笔记
-- **OmniWire**：基于 GoFrame + Vue 3 的网络安全网关；集成 WireGuard VPN 服务端 + TCP/UDP 端口转发；gnet 高性能网络框架实现端口转发；支持 JWT 鉴权/二维码配置/流量统计
+- **K3s**：源码分析（编译/运行/build/server/agent/核心依赖）
+- **K8s**：Pod/Node/Service/Deployment/CNI/CSI/CRI/Scheduling Framework
+- **Gin-vue-admin** / **Gin-api**
+- **Packetbeat**：流量捕获与流程
+- **KSV** 虚拟化 / **Memos** 笔记
+- **监控面板**
 
 
-> [📁 go/10_开源项目/](./mybook/go/10_开源项目/)
+> [📁 12_开源项目学习/](./mybook/go/12_开源项目学习/)
 </details>
 
-### 1.11 工具 & 调试
+### 1.13 常见陷阱与最佳实践
 
-#### 工具调试
+#### 陷阱与最佳实践
 
 <details>
-<summary>常用工具</summary>
+<summary>语言陷阱</summary>
 
-- go build / fmt / vet / test / doc / generate / embed / race
-- golangci-lint（多 Linter 聚合）/ gomvpkg（包迁移）/ Docker 多阶段构建
-- 性能调试：pprof（CPU/Mem/Goroutine/Block）/ 火焰图 / go test -bench / trace
-- 部署：二进制/Systemd/Docker(docker-compose)/K8s/编译优化(-ldflags)
+- 短变量声明
+- for-range
+- string
+- break
 
 
-> [📄 0_常用工具.md](./mybook/go/11_工具与调试/0_常用工具.md) · [📄 2_性能调试.md](./mybook/go/11_工具与调试/2_性能调试.md) · [📄 3_部署.md](./mybook/go/11_工具与调试/3_部署.md)
+> [📄 01_语言陷阱.md](./mybook/go/13_常见陷阱与最佳实践/01_语言陷阱.md)
 </details>
 
-### 1.12 分布式基础
+<details>
+<summary>并发陷阱</summary>
 
-#### 分布式基础
+- goroutine 泄漏
+- 竞态
+- 死锁
+
+
+> [📄 02_并发陷阱.md](./mybook/go/13_常见陷阱与最佳实践/02_并发陷阱.md)
+</details>
 
 <details>
-<summary>分布式理论 & 网络模型</summary>
+<summary>内存陷阱</summary>
 
-- ACID / CAP / BASE / Paxos / Raft
-- BIO / NIO / IO多路复用 / Go netpoller
-- 分布式一致性：强一致/最终一致/因果一致
-- 分布式时钟：Lamport 时钟 / 向量时钟
-- Gossip 协议 / 一致性哈希 / 虚拟节点
-- 分布式事务：2PC / 3PC / TCC / Saga / 本地消息表
+- 切片
+- Map
+- 内存泄漏
 
 
-> [📄 6_分布式.md](./mybook/go/12_分布式基础/6_分布式.md) · [📄 10_网络IO并发模型.md](./mybook/go/12_分布式基础/10_网络IO并发模型.md) · [📄 1000_golang知识点总结.md](./mybook/go/12_分布式基础/1000_golang知识点总结.md)
+> [📄 03_内存陷阱.md](./mybook/go/13_常见陷阱与最佳实践/03_内存陷阱.md)
+</details>
+
+<details>
+<summary>编码规范与最佳实践</summary>
+
+- Effective Go
+- 代码审查 checklist
+
+
+> [📄 04_编码规范与最佳实践.md](./mybook/go/13_常见陷阱与最佳实践/04_编码规范与最佳实践.md)
+</details>
+
+<details>
+<summary>速查手册</summary>
+
+- Go 知识点总结
+
+
+> [📄 05_速查手册.md](./mybook/go/13_常见陷阱与最佳实践/05_速查手册.md)
 </details>
 
 ---
