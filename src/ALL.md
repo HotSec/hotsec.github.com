@@ -286,13 +286,42 @@
 <details>
 <summary>CGO 编程</summary>
 
-- cgo 基础
-- Go 调用 C
-- C 调用 Go
-- 回调函数
+- 快速入门：最简 CGO 程序、调用 C 标准库、分离 C 代码、用 Go 实现 C 函数、面向 C 接口编程
+- CGO 基础：`import "C"` 规则、CGO_ENABLED 环境变量、C 代码放置方式、CGO 中的 Go 代码限制
+- 类型转换：数值类型(C.int/C.double)、字符串(CString/C.GoString)、切片与 C 数组、结构体与联合体、枚举、指针与 void*、数组
+- 函数调用：Go 调 C（直接调用）、C 调 Go（//export 导出）、回调函数、函数指针
+- 内部机制：CGO 生成中间文件、Go 调 C 桥接流程、C 调 Go 桥接流程、CGO 调用性能开销
+- 实战：封装 qsort（简单封装/类型安全封装/通用排序封装）
+- CGO 内存模型：Go 访问 C 内存、C 临时访问 Go 内存、C 长期持有 Go 指针、runtime.Pinner（Go 1.21+）、导出 C 函数不能返回 Go 内存
+- C++ 类封装：C++ 类到 Go 对象、Go 对象到 C++ 类、彻底解放 C++ this 指针
+- 静态库和动态库：源码直接使用、链接静态库/动态库、pkg-config、导出 C 静态库/动态库
+- 编译和链接参数：编译参数(CFLAGS/CXXFLAGS)、链接参数(LDFLAGS)、条件编译、${SRCDIR} 变量、CGO 编译流程
+- 性能优化：减少 CGO 调用次数、避免频繁内存分配、减少类型转换、CGO 与 Goroutine
+- 常见陷阱：CString 内存泄漏、Go 指针传入 C 后被移动、线程安全、交叉编译困难、构建缓存失效
+- 调试技巧：查看 CGO 生成代码、环境变量(GODEBUG/CGO_CFLAGS)、常见编译错误
 
 
 > [📄 22_CGO编程.md](./mybook/go/01_语言基础/22_CGO编程.md)
+</details>
+
+<details>
+<summary>Go 汇编语言</summary>
+
+- 快速入门：从 Go 代码看汇编输出、用汇编实现函数、编译与运行
+- 计算机结构：冯·诺伊曼体系结构、指令执行流程、寄存器、内存层次
+- 常量和全局变量：常量声明、全局变量、GLOBL 指令、DATA 指令、用 Go 定义变量
+- 函数：定义语法(TEXT)、函数标志(NOSPLIT/NOSPLIT)、伪寄存器(FP/PC/SB/SP)、参数与返回值访问、局部变量、调用其他函数、宏函数
+- 控制流：顺序执行、if/goto 跳转、for 循环
+- 再论函数：栈分裂(stack split)、递归函数、闭包、可变参数
+- 汇编语言的威力：系统调用、从汇编调用 C 函数、AVX2 高级指令(SIMD)、原子操作
+- 例子：获取 Goroutine ID（runtime.stack/直接访问 g 结构体/getg()）
+- Delve 调试器：安装、基本使用、常用命令、调试汇编代码
+- 常用指令速查：数据移动(MOVQ/MOVL)、算术运算(ADDQ/SUBQ/IMULQ)、逻辑与移位、浮点运算、比较与跳转
+- 条件编译：文件名后缀(_amd64.s/_arm64.s)、Build Tag
+- 常见陷阱：栈分裂遗漏、参数大小计算错误、寄存器保存、Go 汇编与 Plan 9 汇编差异
+
+
+> [📄 23_Go汇编语言.md](./mybook/go/01_语言基础/23_Go汇编语言.md)
 </details>
 
 ### 1.2 并发编程
