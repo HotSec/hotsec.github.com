@@ -55,16 +55,6 @@
 > [📄 04_变量常量与运算符.md](./mybook/go/01_语言基础/04_变量常量与运算符.md)
 </details>
 
-<details>
-<summary>类型系统</summary>
-
-- 类型断言
-- type switch
-- 底层类型
-
-
-> [📄 04_类型系统.md](./mybook/go/01_语言基础/04_类型系统.md)
-</details>
 
 <details>
 <summary>控制语句</summary>
@@ -508,17 +498,6 @@
 > [📄 02_栈内存管理.md](./mybook/go/03_内存管理/02_栈内存管理.md)
 </details>
 
-<details>
-<summary>内存逃逸分析</summary>
-
-- 逃逸原因（返回指针、接口、闭包、大对象）
-- 检测方法：go build -gcflags="-m"
-- 如何避免逃逸
-
-
-> [📄 05_内存逃逸分析.md](./mybook/go/03_内存管理/05_内存逃逸分析.md)
-</details>
-
 #### 垃圾回收
 
 <details>
@@ -542,6 +521,19 @@
 
 
 > [📄 04_混合写屏障.md](./mybook/go/03_内存管理/04_混合写屏障.md)
+</details>
+
+#### 内存分析与逃逸
+
+<details>
+<summary>内存逃逸分析</summary>
+
+- 逃逸原因（返回指针、接口、闭包、大对象）
+- 检测方法：go build -gcflags="-m"
+- 如何避免逃逸
+
+
+> [📄 05_内存逃逸分析.md](./mybook/go/03_内存管理/05_内存逃逸分析.md)
 </details>
 
 <details>
@@ -1243,7 +1235,7 @@
 - HTTP(gin)集成/gRPC集成
 
 
-> [📄 opentelemetry.md](./mybook/go/08_可观测性/opentelemetry.md)
+> [📄 03_OpenTelemetry可观测性.md](./mybook/go/08_可观测性/03_OpenTelemetry可观测性.md)
 </details>
 
 <details>
@@ -1255,7 +1247,7 @@
 - Web UI
 
 
-> [📄 jaeger.md](./mybook/go/08_可观测性/jaeger.md)
+> [📄 02_Jaeger链路追踪.md](./mybook/go/08_可观测性/02_Jaeger链路追踪.md)
 </details>
 
 <details>
@@ -1266,7 +1258,7 @@
 - PromQL 查询
 
 
-> [📄 prometheus.md](./mybook/go/08_可观测性/prometheus.md)
+> [📄 04_Prometheus指标监控.md](./mybook/go/08_可观测性/04_Prometheus指标监控.md)
 </details>
 
 <details>
@@ -2700,17 +2692,6 @@
 
 > [📄 用户登陆服务.md](./mybook/python/8_高并发设计/用户登陆服务.md)
 </details>
-
-<details>
-<summary>微服务</summary>
-
-- gin+grpc / 微服务框架选型
-
-
-> [📄 微服务.md](./mybook/python/6_Web开发/微服务.md)
-</details>
-
-### 3.9 面试题
 
 #### 面试题
 
