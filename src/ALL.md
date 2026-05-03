@@ -16,7 +16,7 @@
 - 开发环境：安装、GOPATH/GOROOT、IDE配置
 
 
-> [📄 01_介绍与环境搭建.md](./mybook/go/01_语言基础/01_介绍与环境搭建.md)
+> [📄 01_介绍与环境搭建.md](./mybook/01_go/01_语言基础/01_介绍与环境搭建.md)
 </details>
 
 <details>
@@ -27,7 +27,7 @@
 - 编译运行
 
 
-> [📄 02_入门示例.md](./mybook/go/01_语言基础/02_入门示例.md)
+> [📄 02_入门示例.md](./mybook/01_go/01_语言基础/02_入门示例.md)
 </details>
 
 <details>
@@ -41,7 +41,7 @@
 - 类型别名：type NewType OldType vs type Alias = OldType
 
 
-> [📄 03_数据类型.md](./mybook/go/01_语言基础/03_数据类型.md)
+> [📄 03_数据类型.md](./mybook/01_go/01_语言基础/03_数据类型.md)
 </details>
 
 <details>
@@ -52,7 +52,7 @@
 - 运算符：算术/关系/逻辑/位(&|^&^<</>>)/赋值/优先级
 
 
-> [📄 04_变量常量与运算符.md](./mybook/go/01_语言基础/04_变量常量与运算符.md)
+> [📄 04_变量常量与运算符.md](./mybook/01_go/01_语言基础/04_变量常量与运算符.md)
 </details>
 
 
@@ -66,7 +66,7 @@
 - **loopvar 语义调整**：循环变量作用域修复（Go 1.22+）
 
 
-> [📄 05_控制语句.md](./mybook/go/01_语言基础/05_控制语句.md)
+> [📄 05_控制语句.md](./mybook/01_go/01_语言基础/05_控制语句.md)
 </details>
 
 <details>
@@ -79,7 +79,7 @@
 - 内置函数：len/cap/append/copy/delete/new/make/close/panic/recover
 
 
-> [📄 06_函数.md](./mybook/go/01_语言基础/06_函数.md)
+> [📄 06_函数.md](./mybook/01_go/01_语言基础/06_函数.md)
 </details>
 
 <details>
@@ -90,7 +90,7 @@
 - 方法继承与重写
 
 
-> [📄 07_结构体与方法.md](./mybook/go/01_语言基础/07_结构体与方法.md)
+> [📄 07_结构体与方法.md](./mybook/01_go/01_语言基础/07_结构体与方法.md)
 </details>
 
 <details>
@@ -101,7 +101,7 @@
 - 组合 vs 继承
 
 
-> [📄 08_组合与继承.md](./mybook/go/01_语言基础/08_组合与继承.md)
+> [📄 08_组合与继承.md](./mybook/01_go/01_语言基础/08_组合与继承.md)
 </details>
 
 <details>
@@ -114,7 +114,7 @@
 - 接口设计模式
 
 
-> [📄 09_接口.md](./mybook/go/01_语言基础/09_接口.md)
+> [📄 09_接口.md](./mybook/01_go/01_语言基础/09_接口.md)
 </details>
 
 <details>
@@ -126,7 +126,7 @@
 - 标准库泛型容器：cmp / slices / maps（Go 1.21+）
 
 
-> [📄 10_泛型.md](./mybook/go/01_语言基础/10_泛型.md)
+> [📄 10_泛型.md](./mybook/01_go/01_语言基础/10_泛型.md)
 </details>
 
 <details>
@@ -139,7 +139,7 @@
 - make：只用于 slice/map/chan，返回初始化后的引用
 
 
-> [📄 11_指针-make-new.md](./mybook/go/01_语言基础/11_指针-make-new.md)
+> [📄 11_指针-make-new.md](./mybook/01_go/01_语言基础/11_指针-make-new.md)
 </details>
 
 <details>
@@ -150,7 +150,7 @@
 - errors.Is / errors.As / fmt.Errorf + %w
 
 
-> [📄 12_错误处理.md](./mybook/go/01_语言基础/12_错误处理.md)
+> [📄 12_错误处理.md](./mybook/01_go/01_语言基础/12_错误处理.md)
 </details>
 
 <details>
@@ -165,7 +165,7 @@
 - Go Workspace（go.work）：多模块开发
 
 
-> [📄 13_包与模块.md](./mybook/go/01_语言基础/13_包与模块.md)
+> [📄 13_包与模块.md](./mybook/01_go/01_语言基础/13_包与模块.md)
 </details>
 
 <details>
@@ -176,7 +176,7 @@
 - 底层类型
 
 
-> [📄 14_类型系统.md](./mybook/go/01_语言基础/14_类型系统.md)
+> [📄 14_类型系统.md](./mybook/01_go/01_语言基础/14_类型系统.md)
 </details>
 
 <details>
@@ -189,7 +189,7 @@
 - 性能注意事项
 
 
-> [📄 15_反射基础.md](./mybook/go/01_语言基础/15_反射基础.md)
+> [📄 15_反射基础.md](./mybook/01_go/01_语言基础/15_反射基础.md)
 </details>
 
 <details>
@@ -201,7 +201,7 @@
 - 字段顺序优化
 
 
-> [📄 16_unsafe与内存对齐.md](./mybook/go/01_语言基础/16_unsafe与内存对齐.md)
+> [📄 16_unsafe与内存对齐.md](./mybook/01_go/01_语言基础/16_unsafe与内存对齐.md)
 </details>
 
 #### 工程实践
@@ -216,7 +216,7 @@
 - Mock 接口：手动 Mock / gomock
 
 
-> [📄 17_测试.md](./mybook/go/01_语言基础/17_测试.md)
+> [📄 17_测试.md](./mybook/01_go/01_语言基础/17_测试.md)
 </details>
 
 <details>
@@ -227,7 +227,7 @@
 - 推荐项目目录结构
 
 
-> [📄 18_项目结构与规范.md](./mybook/go/01_语言基础/18_项目结构与规范.md)
+> [📄 18_项目结构与规范.md](./mybook/01_go/01_语言基础/18_项目结构与规范.md)
 </details>
 
 <details>
@@ -241,7 +241,7 @@
 - **defer 内部**：_defer 结构链表；开放编码优化
 
 
-> [📄 19_内部实现原理.md](./mybook/go/01_语言基础/19_内部实现原理.md)
+> [📄 19_内部实现原理.md](./mybook/01_go/01_语言基础/19_内部实现原理.md)
 </details>
 
 <details>
@@ -255,7 +255,7 @@
 - 构建者模式
 
 
-> [📄 20_设计模式.md](./mybook/go/01_语言基础/20_设计模式.md)
+> [📄 20_设计模式.md](./mybook/01_go/01_语言基础/20_设计模式.md)
 </details>
 
 <details>
@@ -270,7 +270,7 @@
 - **Go 1.26**：new(expr) 表达式初始化/GreenTea GC 默认启用
 
 
-> [📄 21_版本新特性.md](./mybook/go/01_语言基础/21_版本新特性.md)
+> [📄 21_版本新特性.md](./mybook/01_go/01_语言基础/21_版本新特性.md)
 </details>
 
 <details>
@@ -291,7 +291,7 @@
 - 调试技巧：查看 CGO 生成代码、环境变量(GODEBUG/CGO_CFLAGS)、常见编译错误
 
 
-> [📄 22_CGO编程.md](./mybook/go/01_语言基础/22_CGO编程.md)
+> [📄 22_CGO编程.md](./mybook/01_go/01_语言基础/22_CGO编程.md)
 </details>
 
 <details>
@@ -311,7 +311,7 @@
 - 常见陷阱：栈分裂遗漏、参数大小计算错误、寄存器保存、Go 汇编与 Plan 9 汇编差异
 
 
-> [📄 23_Go汇编语言.md](./mybook/go/01_语言基础/23_Go汇编语言.md)
+> [📄 23_Go汇编语言.md](./mybook/01_go/01_语言基础/23_Go汇编语言.md)
 </details>
 
 ### 1.2 并发编程
@@ -328,7 +328,7 @@
 - 调度策略
 
 
-> [📄 04_GMP调度模型.md](./mybook/go/02_并发编程/04_GMP调度模型.md)
+> [📄 04_GMP调度模型.md](./mybook/01_go/02_并发编程/04_GMP调度模型.md)
 </details>
 
 #### 并发原语
@@ -341,7 +341,7 @@
 - goroutine 泄漏排查
 
 
-> [📄 01_Goroutine.md](./mybook/go/02_并发编程/01_Goroutine.md)
+> [📄 01_Goroutine.md](./mybook/01_go/02_并发编程/01_Goroutine.md)
 </details>
 
 <details>
@@ -353,7 +353,7 @@
 - 常见模式
 
 
-> [📄 02_Channel.md](./mybook/go/02_并发编程/02_Channel.md)
+> [📄 02_Channel.md](./mybook/01_go/02_并发编程/02_Channel.md)
 </details>
 
 <details>
@@ -365,7 +365,7 @@
 - 常见模式
 
 
-> [📄 03_select详解.md](./mybook/go/02_并发编程/03_select详解.md)
+> [📄 03_select详解.md](./mybook/01_go/02_并发编程/03_select详解.md)
 </details>
 
 <details>
@@ -376,7 +376,7 @@
 - atomic 原子操作
 
 
-> [📄 05_并发原语.md](./mybook/go/02_并发编程/05_并发原语.md)
+> [📄 05_并发原语.md](./mybook/01_go/02_并发编程/05_并发原语.md)
 </details>
 
 <details>
@@ -387,7 +387,7 @@
 - 原理与最佳实践
 
 
-> [📄 06_Context.md](./mybook/go/02_并发编程/06_Context.md)
+> [📄 06_Context.md](./mybook/01_go/02_并发编程/06_Context.md)
 </details>
 
 <details>
@@ -399,7 +399,7 @@
 - Happens-Before 关系
 
 
-> [📄 07_并发安全与竞态检测.md](./mybook/go/02_并发编程/07_并发安全与竞态检测.md)
+> [📄 07_并发安全与竞态检测.md](./mybook/01_go/02_并发编程/07_并发安全与竞态检测.md)
 </details>
 
 #### 并发模式
@@ -414,7 +414,7 @@
 - 发布订阅模型
 
 
-> [📄 08_并发模式详解.md](./mybook/go/02_并发编程/08_并发模式详解.md)
+> [📄 08_并发模式详解.md](./mybook/01_go/02_并发编程/08_并发模式详解.md)
 </details>
 
 <details>
@@ -424,7 +424,7 @@
 - ants 等第三方库
 
 
-> [📄 09_协程池.md](./mybook/go/02_并发编程/09_协程池.md)
+> [📄 09_协程池.md](./mybook/01_go/02_并发编程/09_协程池.md)
 </details>
 
 <details>
@@ -436,7 +436,7 @@
 - 与 sync.WaitGroup 对比
 
 
-> [📄 10_errgroup.md](./mybook/go/02_并发编程/10_errgroup.md)
+> [📄 10_errgroup.md](./mybook/01_go/02_并发编程/10_errgroup.md)
 </details>
 
 <details>
@@ -447,7 +447,7 @@
 - 熔断器模式
 
 
-> [📄 11_限流与熔断.md](./mybook/go/02_并发编程/11_限流与熔断.md)
+> [📄 11_限流与熔断.md](./mybook/01_go/02_并发编程/11_限流与熔断.md)
 </details>
 
 <details>
@@ -458,7 +458,7 @@
 - 对比 errgroup
 
 
-> [📄 12_conc并发库.md](./mybook/go/02_并发编程/12_conc并发库.md)
+> [📄 12_conc并发库.md](./mybook/01_go/02_并发编程/12_conc并发库.md)
 </details>
 
 <details>
@@ -469,7 +469,7 @@
 - 网络编程模式
 
 
-> [📄 13_网络IO并发模型.md](./mybook/go/02_并发编程/13_网络IO并发模型.md)
+> [📄 13_网络IO并发模型.md](./mybook/01_go/02_并发编程/13_网络IO并发模型.md)
 </details>
 
 ### 1.3 内存管理
@@ -484,7 +484,7 @@
 - 内存分配器设计
 
 
-> [📄 01_内存分配原理.md](./mybook/go/03_内存管理/01_内存分配原理.md)
+> [📄 01_内存分配原理.md](./mybook/01_go/03_内存管理/01_内存分配原理.md)
 </details>
 
 <details>
@@ -495,7 +495,7 @@
 - 栈拷贝
 
 
-> [📄 02_栈内存管理.md](./mybook/go/03_内存管理/02_栈内存管理.md)
+> [📄 02_栈内存管理.md](./mybook/01_go/03_内存管理/02_栈内存管理.md)
 </details>
 
 #### 垃圾回收
@@ -509,7 +509,7 @@
 - Go 1.25+ GreenTea GC
 
 
-> [📄 03_GC垃圾回收.md](./mybook/go/03_内存管理/03_GC垃圾回收.md)
+> [📄 03_GC垃圾回收.md](./mybook/01_go/03_内存管理/03_GC垃圾回收.md)
 </details>
 
 <details>
@@ -520,7 +520,7 @@
 - 三色不变式
 
 
-> [📄 04_混合写屏障.md](./mybook/go/03_内存管理/04_混合写屏障.md)
+> [📄 04_混合写屏障.md](./mybook/01_go/03_内存管理/04_混合写屏障.md)
 </details>
 
 #### 内存分析与逃逸
@@ -533,7 +533,7 @@
 - 如何避免逃逸
 
 
-> [📄 05_内存逃逸分析.md](./mybook/go/03_内存管理/05_内存逃逸分析.md)
+> [📄 05_内存逃逸分析.md](./mybook/01_go/03_内存管理/05_内存逃逸分析.md)
 </details>
 
 <details>
@@ -544,7 +544,7 @@
 - 排查流程与案例
 
 
-> [📄 06_内存泄漏排查实战.md](./mybook/go/03_内存管理/06_内存泄漏排查实战.md)
+> [📄 06_内存泄漏排查实战.md](./mybook/01_go/03_内存管理/06_内存泄漏排查实战.md)
 </details>
 
 ### 1.4 标准库
@@ -562,7 +562,7 @@
 - Sprint/Sprintf/Fprint/Fprintf
 
 
-> [📄 fmt.md](./mybook/go/04_标准库/01_基础/fmt.md)
+> [📄 fmt.md](./mybook/01_go/04_标准库/01_基础/fmt.md)
 </details>
 
 <details>
@@ -575,7 +575,7 @@
 - Duration：常量(Nanosecond~Hour)/方法(Seconds/Milliseconds)
 
 
-> [📄 time.md](./mybook/go/04_标准库/01_基础/time.md)
+> [📄 time.md](./mybook/01_go/04_标准库/01_基础/time.md)
 </details>
 
 <details>
@@ -585,7 +585,7 @@
 - flag：StringVar/IntVar/BoolVar/Parse/子命令(NewFlagSet)
 
 
-> [📄 strconv.md](./mybook/go/04_标准库/01_基础/strconv.md) · [📄 flag.md](./mybook/go/04_标准库/01_基础/flag.md)
+> [📄 strconv.md](./mybook/01_go/04_标准库/01_基础/strconv.md) · [📄 flag.md](./mybook/01_go/04_标准库/01_基础/flag.md)
 </details>
 
 #### I/O与文件
@@ -598,7 +598,7 @@
 - io.Copy / io.ReadAll / io.TeeReader
 
 
-> [📄 io与bufio.md](./mybook/go/04_标准库/02_IO与文件/io与bufio.md)
+> [📄 io与bufio.md](./mybook/01_go/04_标准库/02_IO与文件/io与bufio.md)
 </details>
 
 <details>
@@ -611,7 +611,7 @@
 - 临时文件：MkdirTemp/CreateTemp
 
 
-> [📄 文件操作.md](./mybook/go/04_标准库/02_IO与文件/文件操作.md)
+> [📄 文件操作.md](./mybook/01_go/04_标准库/02_IO与文件/文件操作.md)
 </details>
 
 <details>
@@ -629,7 +629,7 @@
 - 安全处理：自动转义/template.HTML
 
 
-> [📄 template.md](./mybook/go/04_标准库/02_IO与文件/template.md)
+> [📄 template.md](./mybook/01_go/04_标准库/02_IO与文件/template.md)
 </details>
 
 #### 网络
@@ -644,7 +644,7 @@
 - 优雅关闭
 
 
-> [📄 http标准库.md](./mybook/go/04_标准库/03_网络/http标准库.md)
+> [📄 http标准库.md](./mybook/01_go/04_标准库/03_网络/http标准库.md)
 </details>
 
 <details>
@@ -655,7 +655,7 @@
 - URL 编码解码
 
 
-> [📄 net-url.md](./mybook/go/04_标准库/03_网络/net-url.md)
+> [📄 net-url.md](./mybook/01_go/04_标准库/03_网络/net-url.md)
 </details>
 
 <details>
@@ -666,7 +666,7 @@
 - 路由优先级
 
 
-> [📄 httprouter.md](./mybook/go/04_标准库/03_网络/httprouter.md)
+> [📄 httprouter.md](./mybook/01_go/04_标准库/03_网络/httprouter.md)
 </details>
 
 #### 编码与反射
@@ -684,7 +684,7 @@
 - 空切片 vs nil 的 JSON 差异
 
 
-> [📄 json.md](./mybook/go/04_标准库/04_编码与反射/json.md)
+> [📄 json.md](./mybook/01_go/04_标准库/04_编码与反射/json.md)
 </details>
 
 <details>
@@ -698,7 +698,7 @@
 - 注意事项：性能/类型安全/可维护性
 
 
-> [📄 reflect.md](./mybook/go/04_标准库/04_编码与反射/reflect.md)
+> [📄 reflect.md](./mybook/01_go/04_标准库/04_编码与反射/reflect.md)
 </details>
 
 #### 并发与同步
@@ -711,7 +711,7 @@
 - Map / Pool / Cond
 
 
-> [📄 sync详解.md](./mybook/go/04_标准库/05_并发与同步/sync详解.md)
+> [📄 sync详解.md](./mybook/01_go/04_标准库/05_并发与同步/sync详解.md)
 </details>
 
 <details>
@@ -721,7 +721,7 @@
 - atomic.Value
 
 
-> [📄 atomic详解.md](./mybook/go/04_标准库/05_并发与同步/atomic详解.md)
+> [📄 atomic详解.md](./mybook/01_go/04_标准库/05_并发与同步/atomic详解.md)
 </details>
 
 <details>
@@ -731,7 +731,7 @@
 - Do/DoChan/Forget
 
 
-> [📄 singleflight.md](./mybook/go/04_标准库/05_并发与同步/singleflight.md)
+> [📄 singleflight.md](./mybook/01_go/04_标准库/05_并发与同步/singleflight.md)
 </details>
 
 #### 系统与信号
@@ -746,7 +746,7 @@
 - 常见模式：HTTP请求超时/数据库查询超时/优雅关闭
 
 
-> [📄 context.md](./mybook/go/04_标准库/06_系统与信号/context.md)
+> [📄 context.md](./mybook/01_go/04_标准库/06_系统与信号/context.md)
 </details>
 
 <details>
@@ -756,7 +756,7 @@
 - 优雅关机基础
 
 
-> [📄 os-signal.md](./mybook/go/04_标准库/06_系统与信号/os-signal.md)
+> [📄 os-signal.md](./mybook/01_go/04_标准库/06_系统与信号/os-signal.md)
 </details>
 
 <details>
@@ -767,7 +767,7 @@
 - 静态资源打包
 
 
-> [📄 embed.md](./mybook/go/04_标准库/06_系统与信号/embed.md)
+> [📄 embed.md](./mybook/01_go/04_标准库/06_系统与信号/embed.md)
 </details>
 
 #### 日志
@@ -779,7 +779,7 @@
 - 基本日志输出
 
 
-> [📄 log.md](./mybook/go/04_标准库/07_日志/log.md)
+> [📄 log.md](./mybook/01_go/04_标准库/07_日志/log.md)
 </details>
 
 ### 1.5 第三方库
@@ -799,7 +799,7 @@
 - 写入配置：WriteConfig/SafeWriteConfig
 
 
-> [📄 viper.md](./mybook/go/05_第三方库/01_配置管理/viper.md)
+> [📄 viper.md](./mybook/01_go/05_第三方库/01_配置管理/viper.md)
 </details>
 
 #### 数据库
@@ -816,7 +816,7 @@
 - GORM Gen：类型安全ORM/代码生成
 
 
-> [📄 gorm.md](./mybook/go/05_第三方库/02_数据库/gorm.md)
+> [📄 gorm.md](./mybook/01_go/05_第三方库/02_数据库/gorm.md)
 </details>
 
 <details>
@@ -829,7 +829,7 @@
 - 结构体映射：db tag
 
 
-> [📄 sqlx.md](./mybook/go/05_第三方库/02_数据库/sqlx.md)
+> [📄 sqlx.md](./mybook/01_go/05_第三方库/02_数据库/sqlx.md)
 </details>
 
 <details>
@@ -843,7 +843,7 @@
 - 发布订阅：Subscribe/Publish
 
 
-> [📄 redis.md](./mybook/go/05_第三方库/02_数据库/redis.md)
+> [📄 redis.md](./mybook/01_go/05_第三方库/02_数据库/redis.md)
 </details>
 
 <details>
@@ -855,7 +855,7 @@
 - 索引：Indexes().CreateOne/CreateMany
 
 
-> [📄 mongodb.md](./mybook/go/05_第三方库/02_数据库/mongodb.md)
+> [📄 mongodb.md](./mybook/01_go/05_第三方库/02_数据库/mongodb.md)
 </details>
 
 <details>
@@ -866,7 +866,7 @@
 - 查询优化
 
 
-> [📄 ClickHouse.md](./mybook/go/05_第三方库/02_数据库/ClickHouse.md)
+> [📄 ClickHouse.md](./mybook/01_go/05_第三方库/02_数据库/ClickHouse.md)
 </details>
 
 <details>
@@ -877,7 +877,7 @@
 - 数据迁移
 
 
-> [📄 分库分表.md](./mybook/go/05_第三方库/02_数据库/分库分表.md)
+> [📄 分库分表.md](./mybook/01_go/05_第三方库/02_数据库/分库分表.md)
 </details>
 
 #### 消息队列
@@ -890,7 +890,7 @@
 - **RabbitMQ**：amqp091-go/工作队列/发布订阅(Fanout)/路由(Direct)/主题(Topic)
 
 
-> [📄 kafka.md](./mybook/go/05_第三方库/03_消息队列/kafka.md) · [📄 nsq.md](./mybook/go/05_第三方库/03_消息队列/nsq.md) · [📄 rabbitmq.md](./mybook/go/05_第三方库/03_消息队列/rabbitmq.md)
+> [📄 kafka.md](./mybook/01_go/05_第三方库/03_消息队列/kafka.md) · [📄 nsq.md](./mybook/01_go/05_第三方库/03_消息队列/nsq.md) · [📄 rabbitmq.md](./mybook/01_go/05_第三方库/03_消息队列/rabbitmq.md)
 </details>
 
 #### 日志
@@ -904,7 +904,7 @@
 - lumberjack 日志轮转
 
 
-> [📄 zap.md](./mybook/go/05_第三方库/04_日志/zap.md)
+> [📄 zap.md](./mybook/01_go/05_第三方库/04_日志/zap.md)
 </details>
 
 #### 命令行
@@ -920,7 +920,7 @@
 - 脚手架：cobra-cli
 
 
-> [📄 cobra.md](./mybook/go/05_第三方库/05_命令行/cobra.md)
+> [📄 cobra.md](./mybook/01_go/05_第三方库/05_命令行/cobra.md)
 </details>
 
 #### 验证与文档
@@ -935,7 +935,7 @@
 - Gin 集成：binding tag
 
 
-> [📄 validator.md](./mybook/go/05_第三方库/06_验证与文档/validator.md)
+> [📄 validator.md](./mybook/01_go/05_第三方库/06_验证与文档/validator.md)
 </details>
 
 <details>
@@ -947,7 +947,7 @@
 - Gin 集成
 
 
-> [📄 swagger.md](./mybook/go/05_第三方库/06_验证与文档/swagger.md)
+> [📄 swagger.md](./mybook/01_go/05_第三方库/06_验证与文档/swagger.md)
 </details>
 
 #### 缓存
@@ -959,7 +959,7 @@
 - 缓存策略
 
 
-> [📄 gache.md](./mybook/go/05_第三方库/07_缓存/gache.md)
+> [📄 gache.md](./mybook/01_go/05_第三方库/07_缓存/gache.md)
 </details>
 
 #### 系统工具
@@ -971,7 +971,7 @@
 - 进程信息
 
 
-> [📄 gopsutil.md](./mybook/go/05_第三方库/08_系统工具/gopsutil.md)
+> [📄 gopsutil.md](./mybook/01_go/05_第三方库/08_系统工具/gopsutil.md)
 </details>
 
 <details>
@@ -980,7 +980,7 @@
 - 常用工具集合
 
 
-> [📄 gopkg.md](./mybook/go/05_第三方库/08_系统工具/gopkg.md)
+> [📄 gopkg.md](./mybook/01_go/05_第三方库/08_系统工具/gopkg.md)
 </details>
 
 #### 开发工具
@@ -994,7 +994,7 @@
 - Docker 中使用
 
 
-> [📄 air.md](./mybook/go/05_第三方库/09_开发工具/air.md)
+> [📄 air.md](./mybook/01_go/05_第三方库/09_开发工具/air.md)
 </details>
 
 ### 1.6 Web框架
@@ -1016,7 +1016,7 @@
 - 优雅关闭与重启 / Swagger / WebSocket / SSE
 
 
-> [📄 01_Gin.md](./mybook/go/06_Web框架/01_Gin.md)
+> [📄 01_Gin.md](./mybook/01_go/06_Web框架/01_Gin.md)
 </details>
 
 <details>
@@ -1031,7 +1031,7 @@
 - 部署：Docker / K8s / 微服务拆分
 
 
-> [� 02_go-zero/](./mybook/go/06_Web框架/02_go-zero/)
+> [� 02_go-zero/](./mybook/01_go/06_Web框架/02_go-zero/)
 </details>
 
 <details>
@@ -1046,7 +1046,7 @@
 - **实例**：OmniWire 项目（WireGuard VPN + 端口转发网关）
 
 
-> [📄 04_GoFrame.md](./mybook/go/06_Web框架/04_GoFrame.md)
+> [📄 04_GoFrame.md](./mybook/01_go/06_Web框架/04_GoFrame.md)
 </details>
 
 <details>
@@ -1061,7 +1061,7 @@
 | 适用 | 中小型API | 大型微服务体系 |
 
 
-> [📄 10_框架对比.md](./mybook/go/06_Web框架/10_框架对比.md)
+> [📄 10_框架对比.md](./mybook/01_go/06_Web框架/10_框架对比.md)
 </details>
 
 #### RPC与网络
@@ -1079,7 +1079,7 @@
 - gRPC vs REST 对比
 
 
-> [📄 03_gRPC.md](./mybook/go/06_Web框架/03_gRPC.md)
+> [📄 03_gRPC.md](./mybook/01_go/06_Web框架/03_gRPC.md)
 </details>
 
 <details>
@@ -1089,7 +1089,7 @@
 - **gnet**：高性能、轻量级网络框架（Go）；基于 epoll/kqueue 实现；支持 TCP/UDP/Unix Domain Socket；Event-Driven 架构；适用：TCP/UDP 服务器、端口转发网关、代理服务
 
 
-> [📄 05_zinx.md](./mybook/go/06_Web框架/05_zinx.md)
+> [📄 05_zinx.md](./mybook/01_go/06_Web框架/05_zinx.md)
 </details>
 
 #### 服务发现
@@ -1103,7 +1103,7 @@
 - 高可用集群
 
 
-> [📄 08_etcd.md](./mybook/go/06_Web框架/08_etcd.md)
+> [📄 08_etcd.md](./mybook/01_go/06_Web框架/08_etcd.md)
 </details>
 
 <details>
@@ -1116,7 +1116,7 @@
 - 注销服务：ServiceDeregister
 
 
-> [📄 09_consul.md](./mybook/go/06_Web框架/09_consul.md)
+> [📄 09_consul.md](./mybook/01_go/06_Web框架/09_consul.md)
 </details>
 
 #### 依赖注入
@@ -1129,7 +1129,7 @@
 - 适用场景：大型项目结构化初始化
 
 
-> [📄 07_Wire依赖注入.md](./mybook/go/06_Web框架/07_Wire依赖注入.md)
+> [📄 07_Wire依赖注入.md](./mybook/01_go/06_Web框架/07_Wire依赖注入.md)
 </details>
 
 #### 微服务
@@ -1142,7 +1142,7 @@
 - 支持 HTTP/gRPC 传输
 
 
-> [📄 06_go-kit.md](./mybook/go/06_Web框架/06_go-kit.md)
+> [📄 06_go-kit.md](./mybook/01_go/06_Web框架/06_go-kit.md)
 </details>
 
 ### 1.7 性能优化
@@ -1157,7 +1157,7 @@
 - 减少内存分配，避免逃逸到堆
 
 
-> [📄 01_编码层面优化.md](./mybook/go/07_性能优化/01_编码层面优化.md)
+> [📄 01_编码层面优化.md](./mybook/01_go/07_性能优化/01_编码层面优化.md)
 </details>
 
 <details>
@@ -1168,7 +1168,7 @@
 - 多级缓存（本地 + Redis）/ singleflight 防击穿
 
 
-> [📄 02_并发优化.md](./mybook/go/07_性能优化/02_并发优化.md)
+> [📄 02_并发优化.md](./mybook/01_go/07_性能优化/02_并发优化.md)
 </details>
 
 #### 性能分析
@@ -1181,7 +1181,7 @@
 - go test -bench
 
 
-> [📄 03_性能分析工具.md](./mybook/go/07_性能优化/03_性能分析工具.md)
+> [📄 03_性能分析工具.md](./mybook/01_go/07_性能优化/03_性能分析工具.md)
 </details>
 
 <details>
@@ -1191,7 +1191,7 @@
 - 火焰图解读
 
 
-> [📄 04_trace与火焰图.md](./mybook/go/07_性能优化/04_trace与火焰图.md)
+> [📄 04_trace与火焰图.md](./mybook/01_go/07_性能优化/04_trace与火焰图.md)
 </details>
 
 <details>
@@ -1201,7 +1201,7 @@
 - 压测工具(wrk/hey/vegeta)
 
 
-> [📄 05_基准测试与压测.md](./mybook/go/07_性能优化/05_基准测试与压测.md)
+> [📄 05_基准测试与压测.md](./mybook/01_go/07_性能优化/05_基准测试与压测.md)
 </details>
 
 <details>
@@ -1210,7 +1210,7 @@
 - 综合优化案例
 
 
-> [📄 06_优化实战案例.md](./mybook/go/07_性能优化/06_优化实战案例.md)
+> [📄 06_优化实战案例.md](./mybook/01_go/07_性能优化/06_优化实战案例.md)
 </details>
 
 ### 1.8 可观测性
@@ -1224,7 +1224,7 @@
 - 日志级别策略
 
 
-> [📄 01_日志规范与结构化日志.md](./mybook/go/08_可观测性/01_日志规范与结构化日志.md)
+> [📄 01_日志规范与结构化日志.md](./mybook/01_go/08_可观测性/01_日志规范与结构化日志.md)
 </details>
 
 <details>
@@ -1235,7 +1235,7 @@
 - HTTP(gin)集成/gRPC集成
 
 
-> [📄 03_OpenTelemetry可观测性.md](./mybook/go/08_可观测性/03_OpenTelemetry可观测性.md)
+> [📄 03_OpenTelemetry可观测性.md](./mybook/01_go/08_可观测性/03_OpenTelemetry可观测性.md)
 </details>
 
 <details>
@@ -1247,7 +1247,7 @@
 - Web UI
 
 
-> [📄 02_Jaeger链路追踪.md](./mybook/go/08_可观测性/02_Jaeger链路追踪.md)
+> [📄 02_Jaeger链路追踪.md](./mybook/01_go/08_可观测性/02_Jaeger链路追踪.md)
 </details>
 
 <details>
@@ -1258,7 +1258,7 @@
 - PromQL 查询
 
 
-> [📄 04_Prometheus指标监控.md](./mybook/go/08_可观测性/04_Prometheus指标监控.md)
+> [📄 04_Prometheus指标监控.md](./mybook/01_go/08_可观测性/04_Prometheus指标监控.md)
 </details>
 
 <details>
@@ -1268,7 +1268,7 @@
 - 生产实践
 
 
-> [📄 05_可观测性实战.md](./mybook/go/08_可观测性/05_可观测性实战.md)
+> [📄 05_可观测性实战.md](./mybook/01_go/08_可观测性/05_可观测性实战.md)
 </details>
 
 ### 1.9 分布式与微服务
@@ -1284,7 +1284,7 @@
 - Gossip 协议 / 一致性哈希 / 虚拟节点
 
 
-> [📄 01_分布式基础理论.md](./mybook/go/09_分布式与微服务/01_分布式基础理论.md)
+> [📄 01_分布式基础理论.md](./mybook/01_go/09_分布式与微服务/01_分布式基础理论.md)
 </details>
 
 <details>
@@ -1295,7 +1295,7 @@
 - 健康检查
 
 
-> [📄 02_服务注册与发现.md](./mybook/go/09_分布式与微服务/02_服务注册与发现.md)
+> [📄 02_服务注册与发现.md](./mybook/01_go/09_分布式与微服务/02_服务注册与发现.md)
 </details>
 
 <details>
@@ -1306,7 +1306,7 @@
 - zookeeper 锁
 
 
-> [📄 03_分布式锁.md](./mybook/go/09_分布式与微服务/03_分布式锁.md)
+> [📄 03_分布式锁.md](./mybook/01_go/09_分布式与微服务/03_分布式锁.md)
 </details>
 
 <details>
@@ -1316,7 +1316,7 @@
 - 本地消息表
 
 
-> [📄 04_分布式事务.md](./mybook/go/09_分布式与微服务/04_分布式事务.md)
+> [📄 04_分布式事务.md](./mybook/01_go/09_分布式与微服务/04_分布式事务.md)
 </details>
 
 <details>
@@ -1327,7 +1327,7 @@
 - Leaf
 
 
-> [📄 05_分布式ID生成.md](./mybook/go/09_分布式与微服务/05_分布式ID生成.md)
+> [📄 05_分布式ID生成.md](./mybook/01_go/09_分布式与微服务/05_分布式ID生成.md)
 </details>
 
 <details>
@@ -1337,7 +1337,7 @@
 - nacos/apollo
 
 
-> [📄 06_配置中心.md](./mybook/go/09_分布式与微服务/06_配置中心.md)
+> [📄 06_配置中心.md](./mybook/01_go/09_分布式与微服务/06_配置中心.md)
 </details>
 
 <details>
@@ -1347,7 +1347,7 @@
 - 认证/限流/路由
 
 
-> [📄 07_API网关.md](./mybook/go/09_分布式与微服务/07_API网关.md)
+> [📄 07_API网关.md](./mybook/01_go/09_分布式与微服务/07_API网关.md)
 </details>
 
 <details>
@@ -1359,7 +1359,7 @@
 - SIGHUP 信号处理
 
 
-> [📄 08_优雅关机与重启.md](./mybook/go/09_分布式与微服务/08_优雅关机与重启.md)
+> [📄 08_优雅关机与重启.md](./mybook/01_go/09_分布式与微服务/08_优雅关机与重启.md)
 </details>
 
 ### 1.10 安全专题
@@ -1374,7 +1374,7 @@
 - Go TLS 配置
 
 
-> [📄 01_TLS与HTTPS.md](./mybook/go/10_安全专题/01_TLS与HTTPS.md)
+> [📄 01_TLS与HTTPS.md](./mybook/01_go/10_安全专题/01_TLS与HTTPS.md)
 </details>
 
 <details>
@@ -1385,7 +1385,7 @@
 - Session
 
 
-> [📄 02_JWT认证.md](./mybook/go/10_安全专题/02_JWT认证.md)
+> [📄 02_JWT认证.md](./mybook/01_go/10_安全专题/02_JWT认证.md)
 </details>
 
 <details>
@@ -1396,7 +1396,7 @@
 - 各语言生成 / CI/CD 集成 / 漏洞扫描（Grype / Trivy）
 
 
-> [📄 03_SBOM软件物料清单.md](./mybook/go/10_安全专题/03_SBOM软件物料清单.md)
+> [📄 03_SBOM软件物料清单.md](./mybook/01_go/10_安全专题/03_SBOM软件物料清单.md)
 </details>
 
 <details>
@@ -1407,7 +1407,7 @@
 - 实战：生成国密证书、SM4 加解密
 
 
-> [📄 04_国密算法与证书.md](./mybook/go/10_安全专题/04_国密算法与证书.md)
+> [📄 04_国密算法与证书.md](./mybook/01_go/10_安全专题/04_国密算法与证书.md)
 </details>
 
 <details>
@@ -1419,7 +1419,7 @@
 - 命令注入
 
 
-> [📄 05_常见安全漏洞与防护.md](./mybook/go/10_安全专题/05_常见安全漏洞与防护.md)
+> [📄 05_常见安全漏洞与防护.md](./mybook/01_go/10_安全专题/05_常见安全漏洞与防护.md)
 </details>
 
 ### 1.11 工具与部署
@@ -1433,7 +1433,7 @@
 - golangci-lint
 
 
-> [📄 01_开发工具链.md](./mybook/go/11_工具与部署/01_开发工具链.md)
+> [📄 01_开发工具链.md](./mybook/01_go/11_工具与部署/01_开发工具链.md)
 </details>
 
 <details>
@@ -1442,7 +1442,7 @@
 - pprof / trace / gctrace
 
 
-> [📄 02_性能调试工具.md](./mybook/go/11_工具与部署/02_性能调试工具.md)
+> [📄 02_性能调试工具.md](./mybook/01_go/11_工具与部署/02_性能调试工具.md)
 </details>
 
 <details>
@@ -1453,7 +1453,7 @@
 - 构建缓存
 
 
-> [📄 03_交叉编译与构建优化.md](./mybook/go/11_工具与部署/03_交叉编译与构建优化.md)
+> [📄 03_交叉编译与构建优化.md](./mybook/01_go/11_工具与部署/03_交叉编译与构建优化.md)
 </details>
 
 #### 部署
@@ -1466,7 +1466,7 @@
 - 多阶段构建
 
 
-> [📄 04_Docker部署.md](./mybook/go/11_工具与部署/04_Docker部署.md)
+> [📄 04_Docker部署.md](./mybook/01_go/11_工具与部署/04_Docker部署.md)
 </details>
 
 <details>
@@ -1476,7 +1476,7 @@
 - Helm Chart
 
 
-> [📄 05_Kubernetes部署.md](./mybook/go/11_工具与部署/05_Kubernetes部署.md)
+> [📄 05_Kubernetes部署.md](./mybook/01_go/11_工具与部署/05_Kubernetes部署.md)
 </details>
 
 <details>
@@ -1486,7 +1486,7 @@
 - GitLab CI
 
 
-> [📄 06_CI-CD实践.md](./mybook/go/11_工具与部署/06_CI-CD实践.md)
+> [📄 06_CI-CD实践.md](./mybook/01_go/11_工具与部署/06_CI-CD实践.md)
 </details>
 
 ### 1.12 开源项目学习
@@ -1504,7 +1504,7 @@
 - **监控面板**
 
 
-> [📁 12_开源项目学习/](./mybook/go/12_开源项目学习/)
+> [📁 12_开源项目学习/](./mybook/01_go/12_开源项目学习/)
 </details>
 
 ### 1.13 常见陷阱与最佳实践
@@ -1520,7 +1520,7 @@
 - break
 
 
-> [📄 01_语言陷阱.md](./mybook/go/13_常见陷阱与最佳实践/01_语言陷阱.md)
+> [📄 01_语言陷阱.md](./mybook/01_go/13_常见陷阱与最佳实践/01_语言陷阱.md)
 </details>
 
 <details>
@@ -1531,7 +1531,7 @@
 - 死锁
 
 
-> [📄 02_并发陷阱.md](./mybook/go/13_常见陷阱与最佳实践/02_并发陷阱.md)
+> [📄 02_并发陷阱.md](./mybook/01_go/13_常见陷阱与最佳实践/02_并发陷阱.md)
 </details>
 
 <details>
@@ -1542,7 +1542,7 @@
 - 内存泄漏
 
 
-> [📄 03_内存陷阱.md](./mybook/go/13_常见陷阱与最佳实践/03_内存陷阱.md)
+> [📄 03_内存陷阱.md](./mybook/01_go/13_常见陷阱与最佳实践/03_内存陷阱.md)
 </details>
 
 <details>
@@ -1552,7 +1552,7 @@
 - 代码审查 checklist
 
 
-> [📄 04_编码规范与最佳实践.md](./mybook/go/13_常见陷阱与最佳实践/04_编码规范与最佳实践.md)
+> [📄 04_编码规范与最佳实践.md](./mybook/01_go/13_常见陷阱与最佳实践/04_编码规范与最佳实践.md)
 </details>
 
 <details>
@@ -1561,7 +1561,7 @@
 - Go 知识点总结
 
 
-> [📄 05_速查手册.md](./mybook/go/13_常见陷阱与最佳实践/05_速查手册.md)
+> [📄 05_速查手册.md](./mybook/01_go/13_常见陷阱与最佳实践/05_速查手册.md)
 </details>
 
 ### 1.14 Go运行时
@@ -1577,7 +1577,7 @@
 - 运行时调试：GODEBUG 环境变量、pprof、trace
 
 
-> [📄 01_运行时概览.md](./mybook/go/14_Go运行时/01_运行时概览.md)
+> [📄 01_运行时概览.md](./mybook/01_go/14_Go运行时/01_运行时概览.md)
 </details>
 
 #### 调度器
@@ -1594,7 +1594,7 @@
 - LockOSThread：绑定 G 到 M
 
 
-> [📄 02_调度器深入.md](./mybook/go/14_Go运行时/02_调度器深入.md)
+> [📄 02_调度器深入.md](./mybook/01_go/14_Go运行时/02_调度器深入.md)
 </details>
 
 #### 内存分配器
@@ -1610,7 +1610,7 @@
 - 内存碎片：内部碎片、外部碎片
 
 
-> [📄 03_内存分配器.md](./mybook/go/14_Go运行时/03_内存分配器.md)
+> [📄 03_内存分配器.md](./mybook/01_go/14_Go运行时/03_内存分配器.md)
 </details>
 
 #### 垃圾收集器
@@ -1629,7 +1629,7 @@
 - Go 1.25+ GreenTea GC（实验性分代 GC）
 
 
-> [📄 04_垃圾收集器.md](./mybook/go/14_Go运行时/04_垃圾收集器.md)
+> [📄 04_垃圾收集器.md](./mybook/01_go/14_Go运行时/04_垃圾收集器.md)
 </details>
 
 #### 网络轮询器
@@ -1645,7 +1645,7 @@
 - 定时器与截止时间：SetDeadline、SetReadDeadline、SetWriteDeadline
 
 
-> [📄 05_网络轮询器.md](./mybook/go/14_Go运行时/05_网络轮询器.md)
+> [📄 05_网络轮询器.md](./mybook/01_go/14_Go运行时/05_网络轮询器.md)
 </details>
 
 #### 运行时性能分析
@@ -1661,7 +1661,7 @@
 - 性能优化流程：基准 → 分析 → 定位 → 优化 → 验证
 
 
-> [📄 06_运行时性能分析.md](./mybook/go/14_Go运行时/06_运行时性能分析.md)
+> [📄 06_运行时性能分析.md](./mybook/01_go/14_Go运行时/06_运行时性能分析.md)
 </details>
 
 ### 1.15 序列化与RPC
@@ -1681,7 +1681,7 @@
 - 最佳实践：字段编号规划、向后兼容更新
 
 
-> [📄 01_Protobuf.md](./mybook/go/05_第三方库/10_序列化与RPC/01_Protobuf.md)
+> [📄 01_Protobuf.md](./mybook/01_go/05_第三方库/10_序列化与RPC/01_Protobuf.md)
 </details>
 
 #### RPC
@@ -1698,7 +1698,7 @@
 - RPC 与 gRPC：HTTP/2、Protobuf、流式传输
 
 
-> [📄 02_RPC入门.md](./mybook/go/05_第三方库/10_序列化与RPC/02_RPC入门.md)
+> [📄 02_RPC入门.md](./mybook/01_go/05_第三方库/10_序列化与RPC/02_RPC入门.md)
 </details>
 
 ### 1.16 Go编译器
@@ -1719,7 +1719,7 @@
 - 编译器调试：编译器日志、性能分析、禁用优化
 
 
-> [📄 01_编译器概览.md](./mybook/go/15_Go编译器/01_编译器概览.md)
+> [📄 01_编译器概览.md](./mybook/01_go/15_Go编译器/01_编译器概览.md)
 </details>
 
 #### SSA中间代码
@@ -1736,7 +1736,7 @@
 - SSA与性能优化：理解优化决策、指导代码编写
 
 
-> [📄 02_SSA中间代码.md](./mybook/go/15_Go编译器/02_SSA中间代码.md)
+> [📄 02_SSA中间代码.md](./mybook/01_go/15_Go编译器/02_SSA中间代码.md)
 </details>
 
 #### 类型检查
@@ -1754,7 +1754,7 @@
 - 泛型类型检查：类型参数约束、类型实例化
 
 
-> [📄 03_类型检查.md](./mybook/go/15_Go编译器/03_类型检查.md)
+> [📄 03_类型检查.md](./mybook/01_go/15_Go编译器/03_类型检查.md)
 </details>
 
 #### 语义分析
@@ -1771,7 +1771,7 @@
 - 方法集计算：方法集、方法集规则
 
 
-> [📄 04_语义分析.md](./mybook/go/15_Go编译器/04_语义分析.md)
+> [📄 04_语义分析.md](./mybook/01_go/15_Go编译器/04_语义分析.md)
 </details>
 
 #### 编译器优化实践
@@ -1791,7 +1791,7 @@
 - 优化最佳实践：优化原则、常见优化模式、避免反模式
 
 
-> [📄 05_编译器优化实践.md](./mybook/go/15_Go编译器/05_编译器优化实践.md)
+> [📄 05_编译器优化实践.md](./mybook/01_go/15_Go编译器/05_编译器优化实践.md)
 </details>
 
 ### 1.17 WebAssembly
@@ -1812,7 +1812,7 @@
 - 性能优化：减少Go↔JS边界切换、使用TypedArray、内存管理
 
 
-> [📄 01_WebAssembly简介.md](./mybook/go/16_WebAssembly/01_WebAssembly简介.md)
+> [📄 01_WebAssembly简介.md](./mybook/01_go/16_WebAssembly/01_WebAssembly简介.md)
 </details>
 
 #### WebAssembly进阶
@@ -1830,7 +1830,7 @@
 - 部署与集成：部署到CDN、集成到Web应用、服务端WebAssembly
 
 
-> [📄 02_WebAssembly进阶.md](./mybook/go/16_WebAssembly/02_WebAssembly进阶.md)
+> [📄 02_WebAssembly进阶.md](./mybook/01_go/16_WebAssembly/02_WebAssembly进阶.md)
 </details>
 
 ---
@@ -1866,7 +1866,7 @@
 - **CLI**：命令行参数、退出状态、环境变量
 
 
-> [📁 cpp/C语言教程/语言基础/](./mybook/cpp/C语言教程/语言基础/)
+> [📁 cpp/C语言教程/语言基础/](./mybook/03_cpp/C语言教程/语言基础/)
 </details>
 
 #### 标准库
@@ -1882,7 +1882,7 @@
 - **ctype.h / wchar.h / wctype.h / stdint.h / stddef.h / stdbool.h / stdarg.h**
 
 
-> [📄 20_lua标准库.md](./mybook/lua/1_语言基础/20_lua标准库.md)
+> [📄 20_lua标准库.md](./mybook/04_lua/1_语言基础/20_lua标准库.md)
 </details>
 
 ### 2.2 C++专题
@@ -1904,7 +1904,7 @@
 - 文件与流：文件流类/读写/打开模式/二进制文件/流操纵符/字符串流/流状态
 
 
-> [📄 C++MAP.md](./mybook/cpp/C++专题/基础语法/C++MAP.md)
+> [📄 C++MAP.md](./mybook/03_cpp/C++专题/基础语法/C++MAP.md)
 </details>
 
 #### 内存与模板
@@ -1918,7 +1918,7 @@
 - 虚拟内存：分页/分段/VMA/内存映射
 
 
-> [📄 1_内存管理.md](./mybook/cpp/C++专题/内存管理/1_内存管理.md)
+> [📄 1_内存管理.md](./mybook/03_cpp/C++专题/内存管理/1_内存管理.md)
 </details>
 
 <details>
@@ -1929,7 +1929,7 @@
 - 可变参数模板 / 模板元编程
 
 
-> [📄 1_模板.md](./mybook/cpp/C++专题/模板/1_模板.md)
+> [📄 1_模板.md](./mybook/03_cpp/C++专题/模板/1_模板.md)
 </details>
 
 #### 现代特性
@@ -1948,7 +1948,7 @@
 - std::flat_map / std::flat_set（C++23）
 
 
-> [📄 1_C++11特性.md](./mybook/cpp/C++专题/现代特性/1_C++11特性.md) · [📄 2_C++14-17特性.md](./mybook/cpp/C++专题/现代特性/2_C++14-17特性.md) · [📄 3_C++20-23特性.md](./mybook/cpp/C++专题/现代特性/3_C++20-23特性.md)
+> [📄 1_C++11特性.md](./mybook/03_cpp/C++专题/现代特性/1_C++11特性.md) · [📄 2_C++14-17特性.md](./mybook/03_cpp/C++专题/现代特性/2_C++14-17特性.md) · [📄 3_C++20-23特性.md](./mybook/03_cpp/C++专题/现代特性/3_C++20-23特性.md)
 </details>
 
 <details>
@@ -1962,7 +1962,7 @@
 - **C++26**（草案）：反射/契约/线性代数库/执行器
 
 
-> [📄 1_C++11特性.md](./mybook/cpp/C++专题/现代特性/1_C++11特性.md) · [📄 2_C++14-17特性.md](./mybook/cpp/C++专题/现代特性/2_C++14-17特性.md) · [📄 3_C++20-23特性.md](./mybook/cpp/C++专题/现代特性/3_C++20-23特性.md)
+> [📄 1_C++11特性.md](./mybook/03_cpp/C++专题/现代特性/1_C++11特性.md) · [📄 2_C++14-17特性.md](./mybook/03_cpp/C++专题/现代特性/2_C++14-17特性.md) · [📄 3_C++20-23特性.md](./mybook/03_cpp/C++专题/现代特性/3_C++20-23特性.md)
 </details>
 
 #### 并发与STL
@@ -1978,7 +1978,7 @@
 - 多线程调试：data race / deadlock / live lock 检测
 
 
-> [📄 1_并发编程.md](./mybook/cpp/C++专题/并发与STL/1_并发编程.md)
+> [📄 1_并发编程.md](./mybook/03_cpp/C++专题/并发与STL/1_并发编程.md)
 </details>
 
 <details>
@@ -1990,7 +1990,7 @@
 - 函数对象：functor / lambda / std::function / std::bind
 
 
-> [📄 1_STL详解.md](./mybook/cpp/C++专题/并发与STL/1_STL详解.md)
+> [📄 1_STL详解.md](./mybook/03_cpp/C++专题/并发与STL/1_STL详解.md)
 </details>
 
 #### 工具与库
@@ -2006,7 +2006,7 @@
 - 单元测试：Google Test / Catch2
 
 
-> [📄 cmake-and-vcpkg.md](./mybook/cpp/C++专题/工具与库/cmake-and-vcpkg.md)
+> [📄 cmake-and-vcpkg.md](./mybook/03_cpp/C++专题/工具与库/cmake-and-vcpkg.md)
 </details>
 
 <details>
@@ -2025,7 +2025,7 @@
 - **Folly**：Facebook 基础库；高性能数据结构/并发/字符串
 
 
-> [📁 cpp/C++专题/工具与库/](./mybook/cpp/C++专题/工具与库/)
+> [📁 cpp/C++专题/工具与库/](./mybook/03_cpp/C++专题/工具与库/)
 </details>
 
 #### 底层与安全
@@ -2039,7 +2039,7 @@
 - 内存映射文件（mmap/CreateFileMapping）
 
 
-> [📄 1_未定义行为与内存安全.md](./mybook/cpp/C++专题/底层与安全/1_未定义行为与内存安全.md)
+> [📄 1_未定义行为与内存安全.md](./mybook/03_cpp/C++专题/底层与安全/1_未定义行为与内存安全.md)
 </details>
 
 <details>
@@ -2050,7 +2050,7 @@
 - 函数名修饰规则
 
 
-> [📄 2_汇编与调用约定.md](./mybook/cpp/C++专题/底层与安全/2_汇编与调用约定.md)
+> [📄 2_汇编与调用约定.md](./mybook/03_cpp/C++专题/底层与安全/2_汇编与调用约定.md)
 </details>
 
 ---
@@ -2078,7 +2078,7 @@
 - 类型系统：typing 模块（Protocol/TypeVar/Generic/Callable/Union/Optional/Literal/TypeAlias）
 
 
-> [📄 Python基础_第2版.md](./mybook/python/1_语言基础/Python基础_第2版.md)
+> [📄 Python基础_第2版.md](./mybook/02_python/1_语言基础/Python基础_第2版.md)
 </details>
 
 #### 风格指南
@@ -2090,7 +2090,7 @@
 - __future__ 导入
 
 
-> [📄 Python风格指南.md](./mybook/python/1_语言基础/Python风格指南.md)
+> [📄 Python风格指南.md](./mybook/02_python/1_语言基础/Python风格指南.md)
 </details>
 
 ### 3.2 Python工匠（最佳实践）
@@ -2106,7 +2106,7 @@
 - 合理使用 namedtuple/dict 返回多个值
 
 
-> [📄 1-using-variables-well.md](./mybook/python/2_Python工匠/备忘/1-using-variables-well.md)
+> [📄 1-using-variables-well.md](./mybook/02_python/2_Python工匠/备忘/1-using-variables-well.md)
 </details>
 
 #### 控制流与函数
@@ -2118,7 +2118,7 @@
 - 字符串拼接不慢、超长字符串可读性改善
 
 
-> [📄 3-tips-on-numbers-and-strings.md](./mybook/python/2_Python工匠/备忘/3-tips-on-numbers-and-strings.md)
+> [📄 3-tips-on-numbers-and-strings.md](./mybook/02_python/2_Python工匠/备忘/3-tips-on-numbers-and-strings.md)
 </details>
 
 <details>
@@ -2129,7 +2129,7 @@
 - 当心枯竭的迭代器
 
 
-> [📄 4-mastering-container-types.md](./mybook/python/2_Python工匠/备忘/4-mastering-container-types.md)
+> [📄 4-mastering-container-types.md](./mybook/02_python/2_Python工匠/备忘/4-mastering-container-types.md)
 </details>
 
 <details>
@@ -2139,7 +2139,7 @@
 - 生成器解耦循环体
 
 
-> [📄 7-two-tips-on-loop-writing.md](./mybook/python/2_Python工匠/备忘/7-two-tips-on-loop-writing.md)
+> [📄 7-two-tips-on-loop-writing.md](./mybook/02_python/2_Python工匠/备忘/7-two-tips-on-loop-writing.md)
 </details>
 
 <details>
@@ -2150,7 +2150,7 @@
 - Null Object 模式 / 生成器替代返回列表 / 限制递归
 
 
-> [📄 5-function-returning-tips.md](./mybook/python/2_Python工匠/备忘/5-function-returning-tips.md)
+> [📄 5-function-returning-tips.md](./mybook/02_python/2_Python工匠/备忘/5-function-returning-tips.md)
 </details>
 
 <details>
@@ -2159,7 +2159,7 @@
 - 只做最精确的异常捕获 / 别破坏抽象一致性 / 异常处理不喧宾夺主
 
 
-> [📄 6-three-rituals-of-exceptions-handling.md](./mybook/python/2_Python工匠/备忘/6-three-rituals-of-exceptions-handling.md)
+> [📄 6-three-rituals-of-exceptions-handling.md](./mybook/02_python/2_Python工匠/备忘/6-three-rituals-of-exceptions-handling.md)
 </details>
 
 <details>
@@ -2168,7 +2168,7 @@
 - 用类实现 / wrapt 模块 / functools.wraps() / nonlocal
 
 
-> [📄 8-tips-on-decorators.md](./mybook/python/2_Python工匠/备忘/8-tips-on-decorators.md)
+> [📄 8-tips-on-decorators.md](./mybook/02_python/2_Python工匠/备忘/8-tips-on-decorators.md)
 </details>
 
 #### 面向对象与设计
@@ -2183,7 +2183,7 @@
 - D：依赖倒置 → 抽象注入、单元测试
 
 
-> [📄 12-write-solid-python-codes-part-1.md](./mybook/python/2_Python工匠/备忘/12-write-solid-python-codes-part-1.md) · [📄 13-write-solid-python-codes-part-2.md](./mybook/python/2_Python工匠/备忘/13-write-solid-python-codes-part-2.md) · [📄 14-write-solid-python-codes-part-3.md](./mybook/python/2_Python工匠/备忘/14-write-solid-python-codes-part-3.md)
+> [📄 12-write-solid-python-codes-part-1.md](./mybook/02_python/2_Python工匠/备忘/12-write-solid-python-codes-part-1.md) · [📄 13-write-solid-python-codes-part-2.md](./mybook/02_python/2_Python工匠/备忘/13-write-solid-python-codes-part-2.md) · [📄 14-write-solid-python-codes-part-3.md](./mybook/02_python/2_Python工匠/备忘/14-write-solid-python-codes-part-3.md)
 </details>
 
 <details>
@@ -2194,7 +2194,7 @@
 - "or" 操作符陷阱 / 数据校验不要手动做
 
 
-> [📄 15-thinking-in-edge-cases.md](./mybook/python/2_Python工匠/备忘/15-thinking-in-edge-cases.md)
+> [📄 15-thinking-in-edge-cases.md](./mybook/02_python/2_Python工匠/备忘/15-thinking-in-edge-cases.md)
 </details>
 
 <details>
@@ -2205,7 +2205,7 @@
 - None 值比较陷阱 / and/or 优先级
 
 
-> [📄 2-if-else-block-secrets.md](./mybook/python/2_Python工匠/备忘/2-if-else-block-secrets.md)
+> [📄 2-if-else-block-secrets.md](./mybook/02_python/2_Python工匠/备忘/2-if-else-block-secrets.md)
 </details>
 
 #### 文件与工程
@@ -2218,7 +2218,7 @@
 - 设计接受文件对象的函数
 
 
-> [📄 11-three-tips-on-writing-file-related-codes.md](./mybook/python/2_Python工匠/备忘/11-three-tips-on-writing-file-related-codes.md)
+> [📄 11-three-tips-on-writing-file-related-codes.md](./mybook/02_python/2_Python工匠/备忘/11-three-tips-on-writing-file-related-codes.md)
 </details>
 
 <details>
@@ -2227,7 +2227,7 @@
 - 环形依赖问题的实际案例与解决方案
 
 
-> [📄 9-a-story-on-cyclic-imports.md](./mybook/python/2_Python工匠/备忘/9-a-story-on-cyclic-imports.md)
+> [📄 9-a-story-on-cyclic-imports.md](./mybook/02_python/2_Python工匠/备忘/9-a-story-on-cyclic-imports.md)
 </details>
 
 ### 3.3 Python版本演进
@@ -2247,7 +2247,7 @@
 - **3.14**: 自由线程官方支持、标注迟延求值、模板字符串、多解释器、zstd、JIT实验
 
 
-> [📁 python/3_版本演进/](./mybook/python/3_版本演进/)
+> [📁 python/3_版本演进/](./mybook/02_python/3_版本演进/)
 </details>
 
 ### 3.4 标准库
@@ -2262,7 +2262,7 @@
 - 内置函数与常量
 
 
-> [📄 内置类型.md](./mybook/python/4_标准库/内置类型.md) · [📄 内置异常.md](./mybook/python/4_标准库/内置异常.md) · [📄 内置函数.md](./mybook/python/4_标准库/内置函数.md) · [📄 内置常量.md](./mybook/python/4_标准库/内置常量.md)
+> [📄 内置类型.md](./mybook/02_python/4_标准库/内置类型.md) · [📄 内置异常.md](./mybook/02_python/4_标准库/内置异常.md) · [📄 内置函数.md](./mybook/02_python/4_标准库/内置函数.md) · [📄 内置常量.md](./mybook/02_python/4_标准库/内置常量.md)
 </details>
 
 #### 数据处理
@@ -2275,7 +2275,7 @@
 - functools：partial / reduce / cache / wraps / singledispatch
 
 
-> [📄 文本处理服务.md](./mybook/python/4_标准库/文本处理服务.md) · [📄 文件和目录访问.md](./mybook/python/4_标准库/文件和目录访问.md) · [📄 函数式编程模块.md](./mybook/python/4_标准库/函数式编程模块.md)
+> [📄 文本处理服务.md](./mybook/02_python/4_标准库/文本处理服务.md) · [📄 文件和目录访问.md](./mybook/02_python/4_标准库/文件和目录访问.md) · [📄 函数式编程模块.md](./mybook/02_python/4_标准库/函数式编程模块.md)
 </details>
 
 #### 垃圾回收
@@ -2287,7 +2287,7 @@
 - 环状双向链表 refchain / 池化技术（int/small string）
 
 
-> [📄 垃圾回收.md](./mybook/python/4_标准库/垃圾回收.md)
+> [📄 垃圾回收.md](./mybook/02_python/4_标准库/垃圾回收.md)
 </details>
 
 #### 并发与网络
@@ -2302,7 +2302,7 @@
 - Python 3.13+ 自由线程（no-GIL）实验性支持
 
 
-> [📄 并发执行.md](./mybook/python/4_标准库/并发执行.md)
+> [📄 并发执行.md](./mybook/02_python/4_标准库/并发执行.md)
 </details>
 
 <details>
@@ -2314,7 +2314,7 @@
 - WSGI（同步）/ ASGI（异步）协议与服务器
 
 
-> [📄 网络和进程间通信.md](./mybook/python/4_标准库/网络和进程间通信.md)
+> [📄 网络和进程间通信.md](./mybook/02_python/4_标准库/网络和进程间通信.md)
 </details>
 
 ### 3.5 常用库
@@ -2330,7 +2330,7 @@
 - **Huey**：轻量任务队列；Redis/SQLite 后端；支持定时任务/重试/任务管道
 
 
-> [📄 pydantic.md](./mybook/python/5_常用库/pydantic.md) · [📄 SQLAlchemy.md](./mybook/python/7_第三方库/SQLAlchemy.md) · [📄 celery.md](./mybook/python/5_常用库/celery.md) · [📄 huey.md](./mybook/python/5_常用库/huey.md)
+> [📄 pydantic.md](./mybook/02_python/5_常用库/pydantic.md) · [📄 SQLAlchemy.md](./mybook/02_python/7_第三方库/SQLAlchemy.md) · [📄 celery.md](./mybook/02_python/5_常用库/celery.md) · [📄 huey.md](./mybook/02_python/5_常用库/huey.md)
 </details>
 
 #### 网络爬虫
@@ -2343,7 +2343,7 @@
 - **Feapder**：轻量爬虫框架；支持内存/Redis 数据库；爬虫监控与报警
 
 
-> [📄 playwright.md](./mybook/python/7_第三方库/playwright.md) · [📄 scrapy.md](./mybook/python/7_第三方库/scrapy.md) · [📄 feapder.md](./mybook/python/7_第三方库/feapder.md)
+> [📄 playwright.md](./mybook/02_python/7_第三方库/playwright.md) · [📄 scrapy.md](./mybook/02_python/7_第三方库/scrapy.md) · [📄 feapder.md](./mybook/02_python/7_第三方库/feapder.md)
 </details>
 
 #### 协程性能
@@ -2356,7 +2356,7 @@
 - **Trio**：友好的异步并发库，结构化并发模型
 
 
-> [📄 gevent.md](./mybook/python/5_常用库/gevent.md) · [📄 uvloop.md](./mybook/python/5_常用库/uvloop.md)
+> [📄 gevent.md](./mybook/02_python/5_常用库/gevent.md) · [📄 uvloop.md](./mybook/02_python/5_常用库/uvloop.md)
 </details>
 
 #### 安全包管理
@@ -2372,7 +2372,7 @@
 - **DrissionPage**：网页自动化工具，浏览器控制 + 数据包收发一体化
 
 
-> [📄 代码保护.md](./mybook/python/7_第三方库/代码保护.md) · [📄 常用包.md](./mybook/python/7_第三方库/常用包.md)
+> [📄 代码保护.md](./mybook/02_python/7_第三方库/代码保护.md) · [📄 常用包.md](./mybook/02_python/7_第三方库/常用包.md)
 </details>
 
 #### 数据科学
@@ -2387,7 +2387,7 @@
 - **SciPy**：科学计算（优化/插值/积分/信号处理）
 
 
-> [📄 NumPy.md](./mybook/python/7_第三方库/NumPy.md) · [📄 Pandas.md](./mybook/python/7_第三方库/Pandas.md) · [📄 Polars.md](./mybook/python/7_第三方库/Polars.md) · [📄 数据可视化.md](./mybook/python/7_第三方库/数据可视化.md)
+> [📄 NumPy.md](./mybook/02_python/7_第三方库/NumPy.md) · [📄 Pandas.md](./mybook/02_python/7_第三方库/Pandas.md) · [📄 Polars.md](./mybook/02_python/7_第三方库/Polars.md) · [📄 数据可视化.md](./mybook/02_python/7_第三方库/数据可视化.md)
 </details>
 
 #### 包分发
@@ -2401,7 +2401,7 @@
 - **性能分析**：cProfile / line_profiler / memory_profiler / py-spy
 
 
-> [📄 常用包.md](./mybook/python/7_第三方库/常用包.md) · [📄 zipapp打包应用.md](./mybook/python/1_语言基础/zipapp打包应用.md)
+> [📄 常用包.md](./mybook/02_python/7_第三方库/常用包.md) · [📄 zipapp打包应用.md](./mybook/02_python/1_语言基础/zipapp打包应用.md)
 </details>
 
 ### 3.6 Web开发
@@ -2431,7 +2431,7 @@
 - **Django-Vue3-Admin**：Django + Vue3 前后端分离管理后台模板
 
 
-> [📁 python/6_Web开发/django/](./mybook/python/6_Web开发/django/)
+> [📁 python/6_Web开发/django/](./mybook/02_python/6_Web开发/django/)
 </details>
 
 #### Flask
@@ -2454,7 +2454,7 @@
 - 最佳实践：应用工厂模式 / 服务层模式 / 安全实践 / 日志规范 / API文档
 
 
-> [📁 python/6_Web开发/flask/](./mybook/python/6_Web开发/flask/)
+> [📁 python/6_Web开发/flask/](./mybook/02_python/6_Web开发/flask/)
 </details>
 
 #### FastAPI等
@@ -2469,7 +2469,7 @@
 - **Sanic**：高性能异步 Web 框架
 
 
-> [📁 python/6_Web开发/fastapi/](./mybook/python/6_Web开发/fastapi/) · [📄 fastapi.md](./mybook/python/6_Web开发/fastapi.md) · [📄 tornado.md](./mybook/python/6_Web开发/tornado.md) · [📄 bottle.md](./mybook/python/6_Web开发/bottle.md) · [📄 quart.md](./mybook/python/6_Web开发/quart.md) · [📄 sanic.md](./mybook/python/6_Web开发/sanic.md)
+> [📁 python/6_Web开发/fastapi/](./mybook/02_python/6_Web开发/fastapi/) · [📄 fastapi.md](./mybook/02_python/6_Web开发/fastapi.md) · [📄 tornado.md](./mybook/02_python/6_Web开发/tornado.md) · [📄 bottle.md](./mybook/02_python/6_Web开发/bottle.md) · [📄 quart.md](./mybook/02_python/6_Web开发/quart.md) · [📄 sanic.md](./mybook/02_python/6_Web开发/sanic.md)
 </details>
 
 #### 微服务
@@ -2486,7 +2486,7 @@
 - CI/CD：GitLab CI / GitHub Actions / Jenkins / ArgoCD
 
 
-> [📄 微服务.md](./mybook/python/6_Web开发/微服务.md)
+> [📄 微服务.md](./mybook/02_python/6_Web开发/微服务.md)
 </details>
 
 #### 反爬安全
@@ -2499,7 +2499,7 @@
 - 绕过技术：Selenium/Playwright/请求头伪装/代理池/Cookie 池/JS 逆向
 
 
-> [📄 反爬.md](./mybook/python/6_Web开发/反爬.md)
+> [📄 反爬.md](./mybook/02_python/6_Web开发/反爬.md)
 </details>
 
 ### 3.7 第三方库
@@ -2514,7 +2514,7 @@
 - **MongoDB（pymongo）**：文档型 NoSQL；对比 MySQL/Redis/ES；副本集选举（Raft）；事务（4.0+）；GridFS 大文件存储；聚合管道/索引优化
 
 
-> [📄 pymysql.md](./mybook/python/7_第三方库/pymysql.md) · [📄 redis-py.md](./mybook/python/7_第三方库/redis-py.md) · [📄 mongodb.md](./mybook/python/7_第三方库/mongodb.md)
+> [📄 pymysql.md](./mybook/02_python/7_第三方库/pymysql.md) · [📄 redis-py.md](./mybook/02_python/7_第三方库/redis-py.md) · [📄 mongodb.md](./mybook/02_python/7_第三方库/mongodb.md)
 </details>
 
 #### 消息队列与搜索
@@ -2527,7 +2527,7 @@
 - **Elasticsearch**：倒排索引/分词器/映射（Mapping）；插入速度优化（bulk/refresh_interval/副本延迟）；聚合查询/向量搜索/ILM 生命周期
 
 
-> [📄 rabbitmq.md](./mybook/python/7_第三方库/rabbitmq.md) · [📄 kafka.md](./mybook/python/7_第三方库/kafka.md) · [📄 Elasticsearch.md](./mybook/python/7_第三方库/Elasticsearch.md)
+> [📄 rabbitmq.md](./mybook/02_python/7_第三方库/rabbitmq.md) · [📄 kafka.md](./mybook/02_python/7_第三方库/kafka.md) · [📄 Elasticsearch.md](./mybook/02_python/7_第三方库/Elasticsearch.md)
 </details>
 
 #### LLM与AI
@@ -2545,7 +2545,7 @@
 - **Python AI 工具**：Jupyter Notebook / IPython
 
 
-> [📄 langchain.md](./mybook/python/7_第三方库/langchain.md) · [📄 litllm.md](./mybook/python/7_第三方库/litllm.md) · [📄 大模型.md](./mybook/python/7_第三方库/大模型.md) · [📄 大模型开发流程.md](./mybook/python/7_第三方库/大模型开发流程.md) · [📄 PythonAI绘画.md](./mybook/python/7_第三方库/PythonAI绘画.md) · [📄 RAG系统设计.md](./mybook/python/7_第三方库/RAG系统设计.md) · [📄 LangChain实战.md](./mybook/python/7_第三方库/LangChain实战.md)
+> [📄 langchain.md](./mybook/02_python/7_第三方库/langchain.md) · [📄 litllm.md](./mybook/02_python/7_第三方库/litllm.md) · [📄 大模型.md](./mybook/02_python/7_第三方库/大模型.md) · [📄 大模型开发流程.md](./mybook/02_python/7_第三方库/大模型开发流程.md) · [📄 PythonAI绘画.md](./mybook/02_python/7_第三方库/PythonAI绘画.md) · [📄 RAG系统设计.md](./mybook/02_python/7_第三方库/RAG系统设计.md) · [📄 LangChain实战.md](./mybook/02_python/7_第三方库/LangChain实战.md)
 </details>
 
 #### 自动化部署
@@ -2560,7 +2560,7 @@
 - **Flask-PluginKit**：基于 Flask 的插件式开发工具
 
 
-> [📄 ansible.md](./mybook/python/7_第三方库/自动化运维/ansible.md) · [📄 fabric.md](./mybook/python/7_第三方库/自动化运维/fabric.md) · [📄 terraform.md](./mybook/python/7_第三方库/自动化运维/terraform.md) · [📄 playwright.md](./mybook/python/7_第三方库/playwright.md)
+> [📄 ansible.md](./mybook/02_python/7_第三方库/自动化运维/ansible.md) · [📄 fabric.md](./mybook/02_python/7_第三方库/自动化运维/fabric.md) · [📄 terraform.md](./mybook/02_python/7_第三方库/自动化运维/terraform.md) · [📄 playwright.md](./mybook/02_python/7_第三方库/playwright.md)
 </details>
 
 ### 3.8 高并发设计
@@ -2578,7 +2578,7 @@
 - **LSM Tree**：写入优化数据结构；MemTable → SSTable → Compaction；适用于写密集场景
 
 
-> [📄 基础架构.md](./mybook/python/8_高并发设计/基础架构.md)
+> [📄 基础架构.md](./mybook/02_python/8_高并发设计/基础架构.md)
 </details>
 
 #### 高可用
@@ -2594,7 +2594,7 @@
 - 超时控制：连接超时/读超时/写超时/总超时
 
 
-> [📄 高可用.md](./mybook/python/8_高并发设计/高可用.md)
+> [📄 高可用.md](./mybook/02_python/8_高并发设计/高可用.md)
 </details>
 
 #### 高并发
@@ -2610,7 +2610,7 @@
 - 高并发写：分库分表 / 异步写与写聚合 / Kafka多Partition
 
 
-> [📄 高并发.md](./mybook/python/8_高并发设计/高并发.md)
+> [📄 高并发.md](./mybook/02_python/8_高并发设计/高并发.md)
 </details>
 
 #### 分库分表与ID
@@ -2624,7 +2624,7 @@
 - 分布式ID（Snowflake / 美团Leaf）
 
 
-> [📄 分库分表.md](./mybook/python/8_高并发设计/分库分表.md)
+> [📄 分库分表.md](./mybook/02_python/8_高并发设计/分库分表.md)
 </details>
 
 <details>
@@ -2634,7 +2634,7 @@
 - 美团Leaf（segment + snowflake）
 
 
-> [📄 唯一id.md](./mybook/python/8_高并发设计/唯一id.md)
+> [📄 唯一id.md](./mybook/02_python/8_高并发设计/唯一id.md)
 </details>
 
 #### 缓存
@@ -2650,7 +2650,7 @@
 - 缓存预热 / 缓存更新策略（LRU/LFU/FIFO）
 
 
-> [📄 缓存.md](./mybook/python/8_高并发设计/缓存.md)
+> [📄 缓存.md](./mybook/02_python/8_高并发设计/缓存.md)
 </details>
 
 #### 可观测性
@@ -2667,7 +2667,7 @@
 - **Loki**：轻量日志聚合系统，Grafana 生态，仅索引标签
 
 
-> [📄 可观测性.md](./mybook/python/8_高并发设计/可观测性.md)
+> [📄 可观测性.md](./mybook/02_python/8_高并发设计/可观测性.md)
 </details>
 
 #### 业务场景
@@ -2681,7 +2681,7 @@
 - 优化：连接复用/批量推送/分级推送/消息压缩/断线重连
 
 
-> [📄 海量推送系统.md](./mybook/python/8_高并发设计/海量推送系统.md)
+> [📄 海量推送系统.md](./mybook/02_python/8_高并发设计/海量推送系统.md)
 </details>
 
 <details>
@@ -2690,7 +2690,7 @@
 - 账号 / 密码保护 / 手机号邮箱登录 / 第三方登录 / 登录态管理 / 扫码登录
 
 
-> [📄 用户登陆服务.md](./mybook/python/8_高并发设计/用户登陆服务.md)
+> [📄 用户登陆服务.md](./mybook/02_python/8_高并发设计/用户登陆服务.md)
 </details>
 
 #### 面试题
@@ -2708,7 +2708,7 @@
 - 系统设计：短链/限流/缓存/消息队列/秒杀
 
 
-> [📄 面试题.md](./mybook/python/9_面试题/面试题.md)
+> [📄 面试题.md](./mybook/02_python/9_面试题/面试题.md)
 </details>
 
 ---
@@ -2726,7 +2726,7 @@
 - 变量作用域与解释器
 
 
-> [📄 02_lua数据类型与变量.md](./mybook/lua/1_语言基础/02_lua数据类型与变量.md)
+> [📄 02_lua数据类型与变量.md](./mybook/04_lua/1_语言基础/02_lua数据类型与变量.md)
 </details>
 
 #### 面向对象
@@ -2741,7 +2741,7 @@
 - 模块与包：require 机制 / module 函数 / package.path/cpath
 
 
-> [📄 11_面向对象.md](./mybook/lua/1_语言基础/11_面向对象.md) · [📄 12_环境.md](./mybook/lua/1_语言基础/12_环境.md)
+> [📄 11_面向对象.md](./mybook/04_lua/1_语言基础/11_面向对象.md) · [📄 12_环境.md](./mybook/04_lua/1_语言基础/12_环境.md)
 </details>
 
 #### 协程
@@ -2752,7 +2752,7 @@
 - 定义与调用 / 函数变量 / 可变参数 / 闭包
 
 
-> [📄 08_函数.md](./mybook/lua/1_语言基础/08_函数.md)
+> [📄 08_函数.md](./mybook/04_lua/1_语言基础/08_函数.md)
 </details>
 
 <details>
@@ -2768,7 +2768,7 @@
 - 与线程区别：协程非抢占、由用户调度、切换代价极低
 
 
-> [📄 14_lua_coroutine.md](./mybook/lua/1_语言基础/14_lua_coroutine.md)
+> [📄 14_lua_coroutine.md](./mybook/04_lua/1_语言基础/14_lua_coroutine.md)
 </details>
 
 #### 错误处理
@@ -2782,7 +2782,7 @@
 - 与正则的区别：无交替符(|)/无量词{m,n}/无反向引用/更轻量更快
 
 
-> [📄 04_错误处理与模式匹配.md](./mybook/lua/1_语言基础/04_错误处理与模式匹配.md)
+> [📄 04_错误处理与模式匹配.md](./mybook/04_lua/1_语言基础/04_错误处理与模式匹配.md)
 </details>
 
 #### GC与性能
@@ -2797,7 +2797,7 @@
 - 性能优化：局部变量优先/减少全局访问/预分配 table/避免频繁字符串拼接
 
 
-> [📄 17_GC与性能优化.md](./mybook/lua/1_语言基础/17_GC与性能优化.md)
+> [📄 17_GC与性能优化.md](./mybook/04_lua/1_语言基础/17_GC与性能优化.md)
 </details>
 
 #### 标准库
@@ -2815,7 +2815,7 @@
 - debug：调试（traceback/getinfo/getlocal/setlocal/getupvalue/setupvalue/getmetatable/setmetatable）
 
 
-> [📄 20_lua标准库.md](./mybook/lua/1_语言基础/20_lua标准库.md)
+> [📄 20_lua标准库.md](./mybook/04_lua/1_语言基础/20_lua标准库.md)
 </details>
 
 ### 4.2 高级主题
@@ -2833,7 +2833,7 @@
 - `ffi.new` / `ffi.cast` / `ffi.string` 等 FFI 辅助函数
 
 
-> [📄 15_luaJIT.md](./mybook/lua/2_高级主题/15_luaJIT.md) · [📄 16_lua_FFI.md](./mybook/lua/2_高级主题/16_lua_FFI.md)
+> [📄 15_luaJIT.md](./mybook/04_lua/2_高级主题/15_luaJIT.md) · [📄 16_lua_FFI.md](./mybook/04_lua/2_高级主题/16_lua_FFI.md)
 </details>
 
 #### OpenResty
@@ -2851,7 +2851,7 @@
 - Worker 进程模型：每个 Worker 独立 Lua VM，无锁竞争
 
 
-> [📄 40_openresty安装.md](./mybook/lua/2_高级主题/40_openresty安装.md)
+> [📄 40_openresty安装.md](./mybook/04_lua/2_高级主题/40_openresty安装.md)
 </details>
 
 #### Lua与C++
@@ -2868,7 +2868,7 @@
 - Userdata：light userdata（指针）/ full userdata（带 GC 和元表）
 
 
-> [📄 30_Lua与C++.md](./mybook/lua/2_高级主题/30_Lua与C++.md)
+> [📄 30_Lua与C++.md](./mybook/04_lua/2_高级主题/30_Lua与C++.md)
 </details>
 
 #### 生态
@@ -2879,7 +2879,7 @@
 - lua chunk 文件格式
 
 
-> [📄 50_luago.md](./mybook/lua/2_高级主题/50_luago.md)
+> [📄 50_luago.md](./mybook/04_lua/2_高级主题/50_luago.md)
 </details>
 
 <details>
@@ -2890,7 +2890,7 @@
 - **OpenStar**：OpenResty WAF 增强版，更灵活的规则配置/动态加载/日志分析
 
 
-> [📄 21_luafilesystem.md](./mybook/lua/2_高级主题/21_luafilesystem.md) · [📄 60_lua_ngx_waf.md](./mybook/lua/2_高级主题/60_lua_ngx_waf.md) · [📄 70_openstar.md](./mybook/lua/2_高级主题/70_openstar.md)
+> [📄 21_luafilesystem.md](./mybook/04_lua/2_高级主题/21_luafilesystem.md) · [📄 60_lua_ngx_waf.md](./mybook/04_lua/2_高级主题/60_lua_ngx_waf.md) · [📄 70_openstar.md](./mybook/04_lua/2_高级主题/70_openstar.md)
 </details>
 
 ---
@@ -2913,7 +2913,7 @@
 - CSS 预处理器：Sass / Less / PostCSS
 
 
-> [📄 1_HTML5基础.md](./mybook/web/1_前端基础/1_HTML5基础.md) · [📄 2_CSS布局.md](./mybook/web/1_前端基础/2_CSS布局.md)
+> [📄 1_HTML5基础.md](./mybook/05_web/1_前端基础/1_HTML5基础.md) · [📄 2_CSS布局.md](./mybook/05_web/1_前端基础/2_CSS布局.md)
 </details>
 
 #### JavaScript
@@ -2932,7 +2932,7 @@
 - 错误处理：try-catch / Error 类型 / unhandledrejection
 
 
-> [📄 1_JS核心.md](./mybook/web/1_前端基础/1_JS核心.md)
+> [📄 1_JS核心.md](./mybook/05_web/1_前端基础/1_JS核心.md)
 </details>
 
 <details>
@@ -2947,7 +2947,7 @@
 - tsconfig.json 配置：strict/target/module/lib/paths
 
 
-> [📄 2_TypeScript.md](./mybook/web/1_前端基础/2_TypeScript.md)
+> [📄 2_TypeScript.md](./mybook/05_web/1_前端基础/2_TypeScript.md)
 </details>
 
 ### 5.2 前端框架
@@ -2967,7 +2967,7 @@
 - 测试：Jest / React Testing Library
 
 
-> [📄 React.md](./mybook/web/2_前端框架/React.md)
+> [📄 React.md](./mybook/05_web/2_前端框架/React.md)
 </details>
 
 #### Vue
@@ -2984,7 +2984,7 @@
 - Nuxt.js：SSR/SSG/混合渲染
 
 
-> [📄 Vue.md](./mybook/web/2_前端框架/Vue.md)
+> [📄 Vue.md](./mybook/05_web/2_前端框架/Vue.md)
 </details>
 
 ### 5.3 后端与协议
@@ -3002,7 +3002,7 @@
 - 进程管理：PM2 / Docker / systemd
 
 
-> [📄 Node.js.md](./mybook/web/2_前端框架/Node.js.md)
+> [📄 Node.js.md](./mybook/05_web/2_前端框架/Node.js.md)
 </details>
 
 #### 网络与浏览器
@@ -3020,7 +3020,7 @@
 - 认证：Bearer Token / OAuth 2.0 / Session-Cookie
 
 
-> [📄 HTTP协议.md](./mybook/web/3_后端与协议/HTTP协议.md)
+> [📄 HTTP协议.md](./mybook/05_web/3_后端与协议/HTTP协议.md)
 </details>
 
 <details>
@@ -3035,7 +3035,7 @@
 - Web 安全：XSS / CSRF / CSP / CORS / 点击劫持
 
 
-> [📄 浏览器原理.md](./mybook/web/3_后端与协议/浏览器原理.md)
+> [📄 浏览器原理.md](./mybook/05_web/3_后端与协议/浏览器原理.md)
 </details>
 
 ### 5.4 工程化与工具
@@ -3054,7 +3054,7 @@
 - 常用 UI 库：DaisyUI（组件库）、Headless UI（无样式组件）、HyperUI（模板）
 
 
-> [📄 tailwind-css.md](./mybook/web/4_工程化与工具/tailwind-css.md)
+> [📄 tailwind-css.md](./mybook/05_web/4_工程化与工具/tailwind-css.md)
 </details>
 
 <details>
@@ -3070,7 +3070,7 @@
 - 框架支持：Vue / React / Svelte / Lit 等模板一键创建
 
 
-> [📄 vite.md](./mybook/web/4_工程化与工具/vite.md)
+> [📄 vite.md](./mybook/05_web/4_工程化与工具/vite.md)
 </details>
 
 #### 文档与插件
@@ -3082,7 +3082,7 @@
 - Markdown 配置与扩展 / 页面配置 / 组件 / 加密 / 布局
 
 
-> [📄 vuepress.md](./mybook/web/4_工程化与工具/vuepress.md) · [📁 web/4_工程化与工具/vuepress-demo/](./mybook/web/4_工程化与工具/vuepress-demo/)
+> [📄 vuepress.md](./mybook/05_web/4_工程化与工具/vuepress.md) · [📁 web/4_工程化与工具/vuepress-demo/](./mybook/05_web/4_工程化与工具/vuepress-demo/)
 </details>
 
 <details>
@@ -3098,7 +3098,7 @@
 - 打包发布：`vsce package` 打包 `.vsix`，发布到 VSCode Marketplace
 
 
-> [📄 memos-vscode插件开发记录.md](./mybook/web/4_工程化与工具/vscode/memos-vscode插件开发记录.md)
+> [📄 memos-vscode插件开发记录.md](./mybook/05_web/4_工程化与工具/vscode/memos-vscode插件开发记录.md)
 </details>
 
 <details>
@@ -3107,7 +3107,7 @@
 - Markdown 介绍 / 配置 / 扩展（VuePress / 主题 / 图片增强）
 
 
-> [📄 markdown.md](./mybook/web/4_工程化与工具/vuepress-demo/markdown.md)
+> [📄 markdown.md](./mybook/05_web/4_工程化与工具/vuepress-demo/markdown.md)
 </details>
 
 ---
@@ -3288,7 +3288,7 @@
 - 图（邻接矩阵/邻接表/遍历）
 
 
-> [📄 数据结构与算法.md](./mybook/algorithms/数据结构与算法.md) · [📁 algorithms/algo/](./mybook/algorithms/algo/)
+> [📄 数据结构与算法.md](./mybook/07_algorithms/数据结构与算法.md) · [📁 algorithms/algo/](./mybook/07_algorithms/algo/)
 </details>
 
 #### 算法设计与分析
@@ -3302,7 +3302,7 @@
 - 二分查找 / 搜索算法
 
 
-> [📁 algorithms/algo/](./mybook/algorithms/algo/)
+> [📁 algorithms/algo/](./mybook/07_algorithms/algo/)
 </details>
 
 <details>
@@ -3313,7 +3313,7 @@
 - 算法总览（时间/空间/稳定性对比）
 
 
-> [📁 algorithms/algo/chapter_sorting/](./mybook/algorithms/algo/chapter_sorting/)
+> [📁 algorithms/algo/chapter_sorting/](./mybook/07_algorithms/algo/chapter_sorting/)
 </details>
 
 <details>
@@ -3323,7 +3323,7 @@
 - 最差/最佳/平均时间复杂度
 
 
-> [📁 algorithms/algo/chapter_computational_complexity/](./mybook/algorithms/algo/chapter_computational_complexity/)
+> [📁 algorithms/algo/chapter_computational_complexity/](./mybook/07_algorithms/algo/chapter_computational_complexity/)
 </details>
 
 #### 理论与刷题
@@ -3336,7 +3336,7 @@
 - 内存与缓存
 
 
-> [📄 number_encoding.md](./mybook/algorithms/algo/chapter_data_structure/number_encoding.md) · [📄 character_encoding.md](./mybook/algorithms/algo/chapter_data_structure/character_encoding.md)
+> [📄 number_encoding.md](./mybook/07_algorithms/algo/chapter_data_structure/number_encoding.md) · [📄 character_encoding.md](./mybook/07_algorithms/algo/chapter_data_structure/character_encoding.md)
 </details>
 
 <details>
@@ -3349,7 +3349,7 @@
 - 面试高频 TOP10 与知识要点
 
 
-> [📄 数据结构与算法.md](./mybook/algorithms/数据结构与算法.md)
+> [📄 数据结构与算法.md](./mybook/07_algorithms/数据结构与算法.md)
 </details>
 
 ### 7.2 操作系统 & Linux
@@ -3367,7 +3367,7 @@
 - 死锁：条件（互斥/持有并等待/不可抢占/循环等待）/预防/检测/恢复
 
 
-> [📄 1_操作系统基础.md](./mybook/os-linux/1_操作系统基础.md)
+> [📄 1_操作系统基础.md](./mybook/10_os-linux/1_操作系统基础.md)
 </details>
 
 #### Linux与工具
@@ -3385,7 +3385,7 @@
 - 性能诊断：top/vmstat/iostat/sar/perf/strace/lsof
 
 
-> [📁 os-linux/](./mybook/os-linux/)
+> [📁 os-linux/](./mybook/10_os-linux/)
 </details>
 
 <details>
@@ -3399,7 +3399,7 @@
 - **iptables vs nftables**：语法简化/集合/字典/兼容性
 
 
-> [📄 4_iptables与netfilter.md](./mybook/os-linux/4_iptables与netfilter.md)
+> [📄 4_iptables与netfilter.md](./mybook/10_os-linux/4_iptables与netfilter.md)
 </details>
 
 <details>
@@ -3413,7 +3413,7 @@
 - **与 Docker/K8s 兼容性**：Docker 操作 iptables 导致冲突/解决方案
 
 
-> [📄 5_Firewalld.md](./mybook/os-linux/5_Firewalld.md)
+> [📄 5_Firewalld.md](./mybook/10_os-linux/5_Firewalld.md)
 </details>
 
 <details>
@@ -3426,7 +3426,7 @@
 - **与 iptables/Firewalld 联动**：自动封禁 IP
 
 
-> [📄 6_DenyHosts与SSH安全.md](./mybook/os-linux/6_DenyHosts与SSH安全.md)
+> [📄 6_DenyHosts与SSH安全.md](./mybook/10_os-linux/6_DenyHosts与SSH安全.md)
 </details>
 
 <details>
@@ -3442,7 +3442,7 @@
 - **性能优化清单与排查流程**
 
 
-> [📄 7_Linux性能优化.md](./mybook/os-linux/7_Linux性能优化.md)
+> [📄 7_Linux性能优化.md](./mybook/10_os-linux/7_Linux性能优化.md)
 </details>
 
 <details>
@@ -3455,7 +3455,7 @@
 - **DNS 工具**：dig/host/nslookup/resolvectl/systemd-resolved
 
 
-> [📄 8_Linux网络工具.md](./mybook/os-linux/8_Linux网络工具.md)
+> [📄 8_Linux网络工具.md](./mybook/10_os-linux/8_Linux网络工具.md)
 </details>
 
 <details>
@@ -3474,7 +3474,7 @@
 - **常用脚本模板**：日志轮转/备份/健康检查/批量部署
 
 
-> [📄 9_Shell编程.md](./mybook/os-linux/9_Shell编程.md)
+> [📄 9_Shell编程.md](./mybook/10_os-linux/9_Shell编程.md)
 </details>
 
 <details>
@@ -3490,7 +3490,7 @@
 - **WireGuard**：现代化高性能 VPN 协议；基于 UDP；Curve25519 密钥交换/Chacha20-Poly1305 加密/Poly1305 认证；内核模块（wg-go）或 Userspace（wireguard-go）实现；配置简单（Peer/Endpoint/AllowedIPs）；支持 IPv4/IPv6 双栈
 
 
-> [📄 11_网络协议.md](./mybook/os-linux/11_网络协议.md)
+> [📄 11_网络协议.md](./mybook/10_os-linux/11_网络协议.md)
 </details>
 
 <details>
@@ -3506,7 +3506,7 @@
 - 冲突解决策略与最佳实践
 
 
-> [📄 10_Git高级.md](./mybook/os-linux/10_Git高级.md)
+> [📄 10_Git高级.md](./mybook/10_os-linux/10_Git高级.md)
 </details>
 
 ### 7.3 架构设计
@@ -3522,7 +3522,7 @@
 - 软件架构风格 / 架构复用 / DSSA
 
 
-> [📄 0_软考架构基础.md](./mybook/architecture/0_软考架构基础.md) · [📄 1_架构设计.md](./mybook/architecture/1_架构设计.md)
+> [📄 0_软考架构基础.md](./mybook/08_architecture/0_软考架构基础.md) · [📄 1_架构设计.md](./mybook/08_architecture/1_架构设计.md)
 </details>
 
 #### 数据库
@@ -3538,7 +3538,7 @@
 - Redis 分布式缓存：数据类型/持久化/集群模式/缓存策略
 
 
-> [📁 architecture/数据库/](./mybook/architecture/数据库/)
+> [📁 architecture/数据库/](./mybook/08_architecture/数据库/)
 </details>
 
 #### 信息系统与安全
@@ -3552,7 +3552,7 @@
 - 大型网站架构演进九阶段：①单体架构 → ②应用数据分离 → ③使用缓存 → ④服务集群（负载均衡） → ⑤数据库读写分离 → ⑥CDN和反向代理 → ⑦分布式文件系统和数据库 → ⑧NoSQL和搜索引擎 → ⑨业务拆分（微服务化）
 
 
-> [📄 3_信息系统架构.md](./mybook/architecture/3_信息系统架构.md) · [📄 0_大型网站架构演进.md](./mybook/architecture/0_大型网站架构演进.md)
+> [📄 3_信息系统架构.md](./mybook/08_architecture/3_信息系统架构.md) · [📄 0_大型网站架构演进.md](./mybook/08_architecture/0_大型网站架构演进.md)
 </details>
 
 <details>
@@ -3561,7 +3561,7 @@
 - 机器人 / 边缘计算 / AI / 数字孪生 / 云计算与大数据
 
 
-> [📄 3_信息系统架构.md](./mybook/architecture/3_信息系统架构.md)
+> [📄 3_信息系统架构.md](./mybook/08_architecture/3_信息系统架构.md)
 </details>
 
 <details>
@@ -3575,7 +3575,7 @@
 - 安全协议：SSL/TLS / PGP / IPSec / SET / HTTPS
 
 
-> [📄 4_安全基础.md](./mybook/architecture/4_安全基础.md)
+> [📄 4_安全基础.md](./mybook/08_architecture/4_安全基础.md)
 </details>
 
 ### 7.4 DevOps & 基础设施
@@ -3595,7 +3595,7 @@
 - 运维：kubectl / 滚动更新 / 回滚 / HPA / VPA / 资源限制
 
 
-> [📄 1_K8s核心概念.md](./mybook/devops/kubernetes/1_K8s核心概念.md)
+> [📄 1_K8s核心概念.md](./mybook/09_devops/kubernetes/1_K8s核心概念.md)
 </details>
 
 <details>
@@ -3610,7 +3610,7 @@
 - **CoreDNS**：集群内 DNS 解析/Service 发现/自定义 DNS 配置/StubDomain/Upstream
 
 
-> [📄 6_K8s核心组件详解.md](./mybook/devops/kubernetes/6_K8s核心组件详解.md)
+> [📄 6_K8s核心组件详解.md](./mybook/09_devops/kubernetes/6_K8s核心组件详解.md)
 </details>
 
 <details>
@@ -3628,7 +3628,7 @@
 - **持久化最佳实践**：StatefulSet + PVC/数据备份策略/存储选型/性能优化
 
 
-> [📄 4_K8s持久化存储.md](./mybook/devops/kubernetes/4_K8s持久化存储.md)
+> [📄 4_K8s持久化存储.md](./mybook/09_devops/kubernetes/4_K8s持久化存储.md)
 </details>
 
 <details>
@@ -3650,7 +3650,7 @@
 - **长期存储**：Thanos/VictoriaMetrics/Cortex 远程写入方案
 
 
-> [📄 5_Prometheus监控K8s.md](./mybook/devops/kubernetes/5_Prometheus监控K8s.md)
+> [📄 5_Prometheus监控K8s.md](./mybook/09_devops/kubernetes/5_Prometheus监控K8s.md)
 </details>
 
 <details>
@@ -3660,7 +3660,7 @@
 - 存储卷挂载 / 可视化面板 / 容器网络
 
 
-> [📄 docker-swarm.md](./mybook/devops/docker-swarm.md)
+> [📄 docker-swarm.md](./mybook/09_devops/docker-swarm.md)
 </details>
 
 #### CI/CD与API
@@ -3675,7 +3675,7 @@
 - 最佳实践：流水线设计/环境管理/制品管理/安全扫描集成
 
 
-> [📄 1_GitHub-Actions.md](./mybook/devops/cicd/1_GitHub-Actions.md) · [📄 2_GitLab-CI.md](./mybook/devops/cicd/2_GitLab-CI.md) · [📄 3_Jenkins.md](./mybook/devops/cicd/3_Jenkins.md)
+> [📄 1_GitHub-Actions.md](./mybook/09_devops/cicd/1_GitHub-Actions.md) · [📄 2_GitLab-CI.md](./mybook/09_devops/cicd/2_GitLab-CI.md) · [📄 3_Jenkins.md](./mybook/09_devops/cicd/3_Jenkins.md)
 </details>
 
 <details>
@@ -3689,7 +3689,7 @@
 - API 文档：OpenAPI/Swagger/Protobuf
 
 
-> [📄 4_API设计.md](./mybook/devops/cicd/4_API设计.md)
+> [📄 4_API设计.md](./mybook/09_devops/cicd/4_API设计.md)
 </details>
 
 #### 自动化运维
@@ -3708,7 +3708,7 @@
 - **Puppet vs Ansible vs SaltStack 对比**
 
 
-> [📄 1_Puppet.md](./mybook/devops/自动化运维/1_Puppet.md)
+> [📄 1_Puppet.md](./mybook/09_devops/自动化运维/1_Puppet.md)
 </details>
 
 <details>
@@ -3726,7 +3726,7 @@
 - **实战**：批量部署 Web 服务/滚动更新/配置漂移检测
 
 
-> [📄 2_Ansible.md](./mybook/devops/自动化运维/2_Ansible.md)
+> [📄 2_Ansible.md](./mybook/09_devops/自动化运维/2_Ansible.md)
 </details>
 
 <details>
@@ -3745,7 +3745,7 @@
 - **SaltStack vs Ansible vs Puppet 对比**
 
 
-> [📄 3_SaltStack.md](./mybook/devops/自动化运维/3_SaltStack.md)
+> [📄 3_SaltStack.md](./mybook/09_devops/自动化运维/3_SaltStack.md)
 </details>
 
 #### 基础设施
@@ -3758,7 +3758,7 @@
 - **监控系统集成**：Prometheus + Grafana + AlertManager 全链路监控
 
 
-> [📄 4_ES集群与ELK.md](./mybook/devops/基础设施/4_ES集群与ELK.md) · [📄 5_监控系统集成.md](./mybook/devops/基础设施/5_监控系统集成.md)
+> [📄 4_ES集群与ELK.md](./mybook/09_devops/基础设施/4_ES集群与ELK.md) · [📄 5_监控系统集成.md](./mybook/09_devops/基础设施/5_监控系统集成.md)
 </details>
 
 <details>
@@ -3776,7 +3776,7 @@
 - **替代方案**：EFK（Fluentd，K8s 生态常用）/Loki + Grafana（仅索引标签，存储成本低）
 
 
-> [📄 4_ES集群与ELK.md](./mybook/devops/基础设施/4_ES集群与ELK.md)
+> [📄 4_ES集群与ELK.md](./mybook/09_devops/基础设施/4_ES集群与ELK.md)
 </details>
 
 <details>
@@ -3787,7 +3787,7 @@
 - **KSV 虚拟化**：基于 KVM 的轻量虚拟化管理平台
 
 
-> [📄 2_虚拟化.md](./mybook/devops/基础设施/2_虚拟化.md) · [📄 hyper-v.md](./mybook/devops/hyper-v.md) · [📄 vagrant.md](./mybook/devops/vagrant.md)
+> [📄 2_虚拟化.md](./mybook/09_devops/基础设施/2_虚拟化.md) · [📄 hyper-v.md](./mybook/09_devops/hyper-v.md) · [📄 vagrant.md](./mybook/09_devops/vagrant.md)
 </details>
 
 <details>
@@ -3799,7 +3799,7 @@
 - **负载均衡**：四层（LVS/NAT/DR/TUN）/七层（Nginx Ingress Controller/HAProxy）；健康检查/会话保持/权重分配
 
 
-> [📄 1_网络.md](./mybook/devops/基础设施/1_网络.md) · [📄 ovs-ovn.md](./mybook/devops/ovs-ovn.md)
+> [📄 1_网络.md](./mybook/09_devops/基础设施/1_网络.md) · [📄 ovs-ovn.md](./mybook/09_devops/ovs-ovn.md)
 </details>
 
 <details>
@@ -3811,7 +3811,7 @@
 - **LVS + Keepalived 高可用**：Keepalived 管理 IPVS 规则/健康检查/主备切换
 
 
-> [📄 6_LVS.md](./mybook/devops/基础设施/6_LVS.md)
+> [📄 6_LVS.md](./mybook/09_devops/基础设施/6_LVS.md)
 </details>
 
 <details>
@@ -3826,7 +3826,7 @@
 - **SSL 终结**：bind *:443 ssl crt/crl-file
 
 
-> [📄 7_HAProxy.md](./mybook/devops/基础设施/7_HAProxy.md)
+> [📄 7_HAProxy.md](./mybook/09_devops/基础设施/7_HAProxy.md)
 </details>
 
 <details>
@@ -3840,7 +3840,7 @@
 - **平滑升级**：kill -USR2/kill -WINCH/回滚
 
 
-> [📄 8_Nginx反向代理与负载均衡.md](./mybook/devops/基础设施/8_Nginx反向代理与负载均衡.md)
+> [📄 8_Nginx反向代理与负载均衡.md](./mybook/09_devops/基础设施/8_Nginx反向代理与负载均衡.md)
 </details>
 
 <details>
@@ -3854,7 +3854,7 @@
 - **架构选型对比**：LVS（四层极高并发）vs HAProxy（四七层混合）vs Nginx（七层 HTTP 代理）
 
 
-> [📄 9_Keepalived.md](./mybook/devops/基础设施/9_Keepalived.md)
+> [📄 9_Keepalived.md](./mybook/09_devops/基础设施/9_Keepalived.md)
 </details>
 
 <details>
@@ -3863,7 +3863,7 @@
 - K3s 集群上安装 KubeSphere
 
 
-> [📄 k3s集群上安装kubesphere.md](./mybook/devops/k3s集群上安装kubesphere.md)
+> [📄 k3s集群上安装kubesphere.md](./mybook/09_devops/k3s集群上安装kubesphere.md)
 </details>
 
 <details>
@@ -3872,7 +3872,7 @@
 - 二次开发环境搭建
 
 
-> [📄 openstack二次开发.md](./mybook/devops/openstack二次开发.md)
+> [📄 openstack二次开发.md](./mybook/09_devops/openstack二次开发.md)
 </details>
 
 ### 7.5 智能体开发
@@ -3892,7 +3892,7 @@
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
 
 
-> [📄 智能体框架.md](./mybook/agents/智能体框架.md) · [📄 AutoGen.md](./mybook/agents/AutoGen.md) · [📄 CrewAI.md](./mybook/agents/CrewAI.md) · [📄 LangGraph.md](./mybook/agents/LangGraph.md)
+> [📄 智能体框架.md](./mybook/06_agents/智能体框架.md) · [📄 AutoGen.md](./mybook/06_agents/AutoGen.md) · [📄 CrewAI.md](./mybook/06_agents/CrewAI.md) · [📄 LangGraph.md](./mybook/06_agents/LangGraph.md)
 </details>
 
 #### AI Coding 实践
@@ -3924,7 +3924,7 @@
   - 文件目标读者标注：README.md（人）、AGENTS.md（AI为主）、docs/*.md（AI为主，人可参考）
 
 
-> [📄 AI-Coding实践.md](./mybook/agents/AI-Coding实践.md)
+> [📄 AI-Coding实践.md](./mybook/06_agents/AI-Coding实践.md)
 </details>
 
 ### 7.6 其它
@@ -3946,7 +3946,7 @@
 - **评估体系**：RAGAS / LLM-as-Judge / 人工评估；准确性/相关性/幻觉率
 
 
-> [📄 大模型.md](./mybook/other/大模型.md)
+> [📄 大模型.md](./mybook/11_other/大模型.md)
 </details>
 
 #### 研发效能
@@ -3968,7 +3968,7 @@
   - AGENTS.md 维护本身就是知识沉淀：编码规范从 Wiki/口头约定 → 结构化文档
 
 
-> [📄 提高研发效能.md](./mybook/other/提高研发效能.md)
+> [📄 提高研发效能.md](./mybook/11_other/提高研发效能.md)
 </details>
 
 #### 杂项
@@ -3983,7 +3983,7 @@
 - B站技术：装机系统实践/全链路Trace追踪
 
 
-> [📄 大厂技术文章.md](./mybook/other/大厂技术文章.md)
+> [📄 大厂技术文章.md](./mybook/11_other/大厂技术文章.md)
 </details>
 
 <details>
@@ -3994,7 +3994,7 @@
 - 命令约定与调用
 
 
-> [📄 shell编程风格.md](./mybook/other/杂项/shell编程风格.md)
+> [📄 shell编程风格.md](./mybook/11_other/杂项/shell编程风格.md)
 </details>
 
 <details>
@@ -4010,5 +4010,5 @@
 - DDD（领域驱动设计）：聚合根/值对象/领域事件/限界上下文/仓储模式
 
 
-> [📄 shell编程风格.md](./mybook/other/杂项/shell编程风格.md) · [📄 构建deb包.md](./mybook/devops/构建deb包.md) · [📄 zipapp打包应用.md](./mybook/python/1_语言基础/zipapp打包应用.md)
+> [📄 shell编程风格.md](./mybook/11_other/杂项/shell编程风格.md) · [📄 构建deb包.md](./mybook/09_devops/构建deb包.md) · [📄 zipapp打包应用.md](./mybook/02_python/1_语言基础/zipapp打包应用.md)
 </details>
