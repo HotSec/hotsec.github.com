@@ -279,7 +279,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   var currentEditSlug = '';
   var highlightedSlug = null;
   var clickTimers = {};
-  var mybookBase = '';
 
   var branchColors = ['#e0af68','#6cb4ee','#9ece6a','#ff9e64','#bb9af7','#7dcfff','#f7768e','#73daca'];
 
@@ -438,18 +437,14 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       mdPathCache[slug] = null;
       return null;
     }
-    var rawPath = heading.mdLinks[0];
-    var resolved = rawPath.replace(/^\.\//, mybookBase + '/');
-    mdPathCache[slug] = resolved;
-    return resolved;
+    mdPathCache[slug] = heading.mdLinks[0];
+    return heading.mdLinks[0];
   }
 
   function resolveAllMdLinks(slug){
     var heading = headings.find(function(h){ return h.slug === slug; });
     if(!heading || !heading.isSummary || !heading.mdLinks) return [];
-    return heading.mdLinks.map(function(p){
-      return p.replace(/^\.\//, mybookBase + '/');
-    });
+    return heading.mdLinks.slice();
   }
 
   function openMdInEditor(mdLink){
@@ -1737,8 +1732,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
       try{
         var cfgResp = await fetch('config.json');
         if(cfgResp.ok){
-          var cfg = await cfgResp.json();
-          if(cfg.mybookBase) mybookBase = cfg.mybookBase;
+          await cfgResp.json();
         }
       }catch(e){ console.warn('config.json load failed, using defaults:', e); }
 

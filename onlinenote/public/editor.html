@@ -160,6 +160,7 @@
 
         this.preview = new LivePreview(document.getElementById('previewContainer'));
         await this.preview.init();
+        this.preview.setBaseSrcPath(srcPath);
         this.preview.render(initialContent);
 
         this.toolbar = new Toolbar(document.getElementById('editorToolbar'), this.editor);

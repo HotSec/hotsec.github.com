@@ -3,6 +3,11 @@ export class LivePreview {
     this.container = container;
     this.marked = null;
     this.hljs = null;
+    this.baseSrcPath = '';
+  }
+
+  setBaseSrcPath(srcPath) {
+    this.baseSrcPath = srcPath || '';
   }
 
   async init() {
@@ -17,6 +22,23 @@ export class LivePreview {
       this.hljs = window.hljs;
     }
     return this;
+  }
+
+  resolveMdLink(href) {
+    if (!this.baseSrcPath) return href;
+    if (href.startsWith('/')) return href;
+    var baseDir = this.baseSrcPath.substring(0, this.baseSrcPath.lastIndexOf('/'));
+    var resolved = baseDir + '/' + href;
+    var parts = resolved.split('/');
+    var stack = [];
+    for (var i = 0; i < parts.length; i++) {
+      if (parts[i] === '..') {
+        if (stack.length > 0) stack.pop();
+      } else if (parts[i] !== '.' && parts[i] !== '') {
+        stack.push(parts[i]);
+      }
+    }
+    return './' + stack.join('/');
   }
 
   render(markdown) {
@@ -40,8 +62,9 @@ export class LivePreview {
       if (href && href.match(/\.md$/i)) {
         a.addEventListener('click', (e) => {
           e.preventDefault();
-          const docId = href.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
-          window.open(`editor.html?doc=${encodeURIComponent(docId)}&src=${encodeURIComponent(href)}`, '_blank');
+          const resolvedHref = this.resolveMdLink(href);
+          const docId = resolvedHref.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
+          window.open(`editor.html?doc=${encodeURIComponent(docId)}&src=${encodeURIComponent(resolvedHref)}`, '_blank');
         });
       }
     });
