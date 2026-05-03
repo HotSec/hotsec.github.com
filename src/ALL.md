@@ -72,6 +72,8 @@
 - if / for / switch（默认不穿透/fallthrough）/ select
 - defer / panic / recover
 - goto / break(标签) / continue
+- **range over func**：自定义迭代器（Go 1.23+）
+- **loopvar 语义调整**：循环变量作用域修复（Go 1.22+）
 
 
 > [📄 05_控制语句.md](./mybook/go/01_语言基础/05_控制语句.md)
