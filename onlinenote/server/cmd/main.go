@@ -235,6 +235,24 @@ func (s *Server) handleLogin(c *gin.Context) {
 	})
 }
 
+func (s *Server) resolveSrcPath(src string) string {
+	resolved := src
+	if len(resolved) >= 2 && resolved[:2] == "./" {
+		resolved = resolved[2:]
+	}
+	if s.Config.MarkdownDir != "" {
+		mdPath := filepath.Join(s.Config.MarkdownDir, resolved)
+		if _, err := os.Stat(mdPath); err == nil {
+			return mdPath
+		}
+	}
+	staticPath := filepath.Join(s.Config.StaticDir, resolved)
+	if _, err := os.Stat(staticPath); err == nil {
+		return staticPath
+	}
+	return ""
+}
+
 func (s *Server) handleGetDocument(c *gin.Context) {
 	docID := c.Param("id")
 	src := c.Query("src")
@@ -246,15 +264,13 @@ func (s *Server) handleGetDocument(c *gin.Context) {
 	}
 
 	if doc.Content == "" && src != "" {
-		resolved := src
-		if len(resolved) >= 2 && resolved[:2] == "./" {
-			resolved = resolved[2:]
-		}
-		filePath := filepath.Join(s.Config.StaticDir, resolved)
-		content, err := os.ReadFile(filePath)
-		if err == nil {
-			doc.Content = string(content)
-			doc.Version = 1
+		filePath := s.resolveSrcPath(src)
+		if filePath != "" {
+			content, err := os.ReadFile(filePath)
+			if err == nil {
+				doc.Content = string(content)
+				doc.Version = 1
+			}
 		}
 	}
 
@@ -277,11 +293,11 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 	}
 
 	if src != "" {
-		resolved := src
-		if len(resolved) >= 2 && resolved[:2] == "./" {
-			resolved = resolved[2:]
+		filePath := s.resolveSrcPath(src)
+		if filePath == "" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
+			return
 		}
-		filePath := filepath.Join(s.Config.StaticDir, resolved)
 		if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
