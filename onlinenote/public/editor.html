@@ -120,7 +120,7 @@
 
         let initialContent = '';
         try {
-          let apiUrl = `/api/documents/${docId}`;
+          let apiUrl = `/api/documents/${encodeURIComponent(docId)}`;
           if (srcPath) apiUrl += `?src=${encodeURIComponent(srcPath)}`;
           const resp = await fetch(apiUrl);
           if (resp.ok) {
@@ -320,7 +320,7 @@
           const params = new URLSearchParams(window.location.search);
           const docId = params.get('doc') || 'all-md';
           const srcPath = params.get('src') || '';
-          let apiUrl = `/api/documents/${docId}`;
+          let apiUrl = `/api/documents/${encodeURIComponent(docId)}`;
           if (srcPath) apiUrl += `?src=${encodeURIComponent(srcPath)}`;
           const resp = await fetch(apiUrl, {
             method: 'PUT',
