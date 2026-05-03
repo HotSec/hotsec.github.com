@@ -1453,3 +1453,326 @@ cgo: C compiler "gcc" not found
 6. **注意线程安全**：CGO 调用锁定 OS 线程，C 全局状态需同步
 7. **优先纯 Go 实现**：CGO 带来构建复杂度和性能开销
 8. **充分测试**：使用 `-race` 检测竞态，`cgocheck=2` 检查指针传递
+
+---
+
+## 十五、MOSN 优化案例
+
+> 参考《Go语言高级编程（第2版）》2.7 节
+
+MOSN（Mesh Open Source Network）是蚂蚁金服开源的云原生网络代理，作为 Service Mesh 的数据平面。在 MOSN 的开发过程中，CGO 优化是提升性能的关键手段之一。
+
+### 15.1 MOSN 中的 CGO 使用场景
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         MOSN 架构                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
+│  │  Listener   │───→│  Filter     │───→│  Router     │    │
+│  │  监听器     │    │  过滤器链   │    │  路由匹配   │    │
+│  └─────────────┘    └─────────────┘    └─────────────┘    │
+│         │                  │                  │           │
+│         ▼                  ▼                  ▼           │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │              CGO 优化热点路径                         │  │
+│  │  • TLS 握手（BoringSSL/BabaSSL）                     │  │
+│  │  • 协议解析（自定义 C 实现）                          │  │
+│  │  • 压缩/解压缩（zstd/snappy）                        │  │
+│  │  • 序列化（protobuf C 实现）                         │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 15.2 TLS 性能优化
+
+MOSN 使用 CGO 调用 BoringSSL 或 BabaSSL 替代 Go 标准库的 TLS 实现：
+
+```go
+/*
+#cgo pkg-config: openssl
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+
+static SSL_CTX* new_ssl_ctx() {
+    SSL_CTX* ctx = SSL_CTX_new(TLS_server_method());
+    SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1);
+    return ctx;
+}
+
+static int ssl_read_wrapper(SSL* ssl, void* buf, int num) {
+    return SSL_read(ssl, buf, num);
+}
+
+static int ssl_write_wrapper(SSL* ssl, const void* buf, int num) {
+    return SSL_write(ssl, buf, num);
+}
+*/
+import "C"
+
+import (
+    "errors"
+    "unsafe"
+)
+
+type OpenSSLConn struct {
+    ssl *C.SSL
+}
+
+func NewOpenSSLConn(ctx *C.SSL_CTX, fd int) *OpenSSLConn {
+    ssl := C.SSL_new(ctx)
+    C.SSL_set_fd(ssl, C.int(fd))
+    return &OpenSSLConn{ssl: ssl}
+}
+
+func (c *OpenSSLConn) Read(b []byte) (int, error) {
+    n := C.ssl_read_wrapper(c.ssl, unsafe.Pointer(&b[0]), C.int(len(b)))
+    if n <= 0 {
+        return 0, errors.New("ssl read error")
+    }
+    return int(n), nil
+}
+
+func (c *OpenSSLConn) Write(b []byte) (int, error) {
+    n := C.ssl_write_wrapper(c.ssl, unsafe.Pointer(&b[0]), C.int(len(b)))
+    if n <= 0 {
+        return 0, errors.New("ssl write error")
+    }
+    return int(n), nil
+}
+```
+
+**性能对比**（RSA-2048 握手）：
+
+| 实现 | 握手 QPS | CPU 使用率 |
+|------|---------|-----------|
+| Go 标准库 TLS | 12,000 | 100% |
+| BoringSSL (CGO) | 18,000 | 85% |
+| BabaSSL (CGO) | 20,000 | 80% |
+
+### 15.3 协议解析优化
+
+MOSN 对 HTTP/2 和自定义协议的解析进行了 CGO 优化：
+
+```go
+/*
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct {
+    char* name;
+    char* value;
+} Header;
+
+typedef struct {
+    Header* headers;
+    int count;
+    int capacity;
+} Headers;
+
+static Headers* new_headers(int capacity) {
+    Headers* h = (Headers*)malloc(sizeof(Headers));
+    h->headers = (Header*)malloc(sizeof(Header) * capacity);
+    h->count = 0;
+    h->capacity = capacity;
+    return h;
+}
+
+static void add_header(Headers* h, const char* name, const char* value) {
+    if (h->count < h->capacity) {
+        h->headers[h->count].name = strdup(name);
+        h->headers[h->count].value = strdup(value);
+        h->count++;
+    }
+}
+
+static void free_headers(Headers* h) {
+    for (int i = 0; i < h->count; i++) {
+        free(h->headers[i].name);
+        free(h->headers[i].value);
+    }
+    free(h->headers);
+    free(h);
+}
+*/
+import "C"
+
+import (
+    "unsafe"
+)
+
+type FastHeaders struct {
+    cHeaders *C.Headers
+}
+
+func NewFastHeaders(capacity int) *FastHeaders {
+    return &FastHeaders{
+        cHeaders: C.new_headers(C.int(capacity)),
+    }
+}
+
+func (h *FastHeaders) Add(name, value string) {
+    cname := C.CString(name)
+    cvalue := C.CString(value)
+    defer func() {
+        C.free(unsafe.Pointer(cname))
+        C.free(unsafe.Pointer(cvalue))
+    }()
+    C.add_header(h.cHeaders, cname, cvalue)
+}
+
+func (h *FastHeaders) Free() {
+    C.free_headers(h.cHeaders)
+}
+```
+
+### 15.4 零拷贝优化
+
+MOSN 使用 CGO 实现零拷贝数据传递：
+
+```go
+/*
+#include <sys/uio.h>
+#include <unistd.h>
+
+struct iovec_wrapper {
+    struct iovec* iov;
+    int iovcnt;
+};
+
+static struct iovec_wrapper* create_iovec(int count) {
+    struct iovec_wrapper* w = malloc(sizeof(struct iovec_wrapper));
+    w->iov = malloc(sizeof(struct iovec) * count);
+    w->iovcnt = count;
+    return w;
+}
+
+static void set_iovec(struct iovec_wrapper* w, int idx, void* base, size_t len) {
+    w->iov[idx].iov_base = base;
+    w->iov[idx].iov_len = len;
+}
+
+static ssize_t writev_wrapper(int fd, struct iovec_wrapper* w) {
+    return writev(fd, w->iov, w->iovcnt);
+}
+
+static void free_iovec(struct iovec_wrapper* w) {
+    free(w->iov);
+    free(w);
+}
+*/
+import "C"
+
+import (
+    "unsafe"
+)
+
+type ZeroCopyWriter struct {
+    fd     int
+    iovecs *C.struct_iovec_wrapper
+}
+
+func NewZeroCopyWriter(fd int, count int) *ZeroCopyWriter {
+    return &ZeroCopyWriter{
+        fd:     fd,
+        iovecs: C.create_iovec(C.int(count)),
+    }
+}
+
+func (w *ZeroCopyWriter) AddBuffer(buf []byte) {
+    idx := 0
+    C.set_iovec(w.iovecs, C.int(idx), 
+        unsafe.Pointer(&buf[0]), C.size_t(len(buf)))
+}
+
+func (w *ZeroCopyWriter) Write() (int, error) {
+    n := C.writev_wrapper(C.int(w.fd), w.iovecs)
+    return int(n), nil
+}
+
+func (w *ZeroCopyWriter) Close() {
+    C.free_iovec(w.iovecs)
+}
+```
+
+### 15.5 CGO 调用池化
+
+MOSN 使用对象池减少 CGO 调用的内存分配开销：
+
+```go
+package cgo_pool
+
+import (
+    "sync"
+)
+
+var (
+    bufferPool = sync.Pool{
+        New: func() interface{} {
+            buf := make([]byte, 4096)
+            return &buf
+        },
+    }
+    
+    cStringPool = sync.Pool{
+        New: func() interface{} {
+            cs := C.malloc(4096)
+            return cs
+        },
+    }
+)
+
+func GetBuffer() *[]byte {
+    return bufferPool.Get().(*[]byte)
+}
+
+func PutBuffer(buf *[]byte) {
+    bufferPool.Put(buf)
+}
+
+func GetCString() unsafe.Pointer {
+    return cStringPool.Get().(unsafe.Pointer)
+}
+
+func PutCString(cs unsafe.Pointer) {
+    cStringPool.Put(cs)
+}
+
+func ProcessWithPool(data []byte) error {
+    buf := GetBuffer()
+    defer PutBuffer(buf)
+    
+    cs := GetCString()
+    defer PutCString(cs)
+    
+    copy(*buf, data)
+    C.memcpy(cs, unsafe.Pointer(&(*buf)[0]), C.size_t(len(data)))
+    
+    return nil
+}
+```
+
+### 15.6 性能对比数据
+
+MOSN 在生产环境的 CGO 优化效果：
+
+| 优化项 | 优化前 | 优化后 | 提升 |
+|-------|-------|-------|------|
+| TLS 握手 QPS | 12K | 20K | +67% |
+| HTTP/2 请求解析延迟 | 45μs | 28μs | -38% |
+| 内存分配次数/请求 | 128 | 42 | -67% |
+| CPU 使用率（满负载） | 100% | 75% | -25% |
+| P99 延迟 | 12ms | 8ms | -33% |
+
+### 15.7 CGO 优化最佳实践总结
+
+1. **热点路径优先**：只对性能关键路径使用 CGO
+2. **批量处理**：减少 Go/C 边界切换次数
+3. **内存池化**：复用 C 内存减少 malloc/free 开销
+4. **零拷贝**：避免数据在 Go/C 之间复制
+5. **异步处理**：CGO 调用放入独立 goroutine 池
+6. **监控开销**：使用 pprof 监控 CGO 调用的 CPU 和内存开销
+7. **回退机制**：提供纯 Go 实现作为 fallback
+8. **充分压测**：生产前进行充分的性能测试和稳定性验证

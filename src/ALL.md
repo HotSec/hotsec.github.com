@@ -1572,6 +1572,275 @@
 > [📄 05_速查手册.md](./mybook/go/13_常见陷阱与最佳实践/05_速查手册.md)
 </details>
 
+### 1.14 Go运行时
+
+#### 运行时概览
+
+<details>
+<summary>运行时概览</summary>
+
+- 运行时架构：调度器、内存分配器、垃圾收集器、网络轮询器
+- 运行时启动流程：schedinit → mallocinit → gcinit → main
+- sysmon 系统监控：死锁检测、强制 GC、抢占调度
+- 运行时调试：GODEBUG 环境变量、pprof、trace
+
+
+> [📄 01_运行时概览.md](./mybook/go/14_Go运行时/01_运行时概览.md)
+</details>
+
+#### 调度器
+
+<details>
+<summary>调度器深入</summary>
+
+- GMP 数据结构：g、m、p、schedt
+- G 状态：_Gidle/_Grunnable/_Grunning/_Gsyscall/_Gwaiting/_Gdead
+- 调度流程：schedule → runqget → globrunqget → netpoll → stealWork → execute
+- 工作窃取：runqsteal、窃取一半策略
+- 系统调用处理：entersyscall、exitsyscall
+- 抢占式调度：基于信号（SIGURG）、基于函数调用
+- LockOSThread：绑定 G 到 M
+
+
+> [📄 02_调度器深入.md](./mybook/go/14_Go运行时/02_调度器深入.md)
+</details>
+
+#### 内存分配器
+
+<details>
+<summary>内存分配器</summary>
+
+- TCMalloc 思想：线程本地缓存、多级分配
+- 核心结构：mspan、mcache、mcentral、mheap
+- 对象分类：微对象(<16B)、小对象(16B~32KB)、大对象(>32KB)
+- 分配流程：mallocgc → mcache → mcentral → mheap
+- 内存回收：mspan.free、mcentral.uncacheSpan、mheap.freeSpan
+- 内存碎片：内部碎片、外部碎片
+
+
+> [📄 03_内存分配器.md](./mybook/go/14_Go运行时/03_内存分配器.md)
+</details>
+
+#### 垃圾收集器
+
+<details>
+<summary>垃圾收集器</summary>
+
+- GC 演进：标记-清除 → 并发标记 → 三色并发标记 → 混合写屏障
+- 三色标记：白色（未标记）、灰色（待扫描）、黑色（存活）
+- 三色不变式：强三色、弱三色
+- 混合写屏障：Dijkstra 插入屏障 + Yuasa 删除屏障
+- GC 周期：标记准备(STW) → 并发标记 → 标记终止(STW)
+- GC 触发：堆内存触发、时间触发、手动触发
+- GOGC：堆增长率控制
+- Go 1.19+ Soft Memory Limit
+- Go 1.25+ GreenTea GC（实验性分代 GC）
+
+
+> [📄 04_垃圾收集器.md](./mybook/go/14_Go运行时/04_垃圾收集器.md)
+</details>
+
+#### 网络轮询器
+
+<details>
+<summary>网络轮询器</summary>
+
+- 设计目标：非阻塞 I/O、高并发网络
+- 核心结构：pollDesc、pollCache
+- 平台实现：epoll(Linux)、kqueue(macOS)、IOCP(Windows)
+- 工作流程：非阻塞读取 → 挂起 G → 注册 epoll → 唤醒 G
+- 与调度器集成：schedule、sysmon、findrunnable
+- 定时器与截止时间：SetDeadline、SetReadDeadline、SetWriteDeadline
+
+
+> [📄 05_网络轮询器.md](./mybook/go/14_Go运行时/05_网络轮询器.md)
+</details>
+
+#### 运行时性能分析
+
+<details>
+<summary>运行时性能分析</summary>
+
+- pprof：CPU/Heap/Goroutine/Block/Mutex 分析
+- trace：Goroutine 调度、GC 活动、系统调用追踪
+- GODEBUG：gctrace、schedtrace、allocfreetrace
+- runtime.MemStats：内存统计
+- runtime/metrics：运行时指标
+- 性能优化流程：基准 → 分析 → 定位 → 优化 → 验证
+
+
+> [📄 06_运行时性能分析.md](./mybook/go/14_Go运行时/06_运行时性能分析.md)
+</details>
+
+### 1.15 序列化与RPC
+
+#### Protobuf
+
+<details>
+<summary>Protobuf</summary>
+
+- Protobuf 简介：二进制序列化、跨语言、强类型
+- Proto 文件语法：message、enum、service、oneof、map、repeated
+- 字段类型：double/float/int32/int64/string/bytes 等
+- 代码生成：protoc、buf 工具
+- 序列化：proto.Marshal/Unmarshal
+- JSON 转换：protojson.Marshal/Unmarshal
+- 高级特性：Any、Timestamp、Duration、FieldMask
+- 最佳实践：字段编号规划、向后兼容更新
+
+
+> [📄 01_Protobuf.md](./mybook/go/05_第三方库/10_序列化与RPC/01_Protobuf.md)
+</details>
+
+#### RPC
+
+<details>
+<summary>RPC 入门</summary>
+
+- RPC 概述：远程过程调用原理
+- RPC vs REST API：动作导向 vs 资源导向
+- Go 标准库 RPC：net/rpc、net/rpc/jsonrpc
+- 方法规则：func (t *T) MethodName(args T1, reply *T2) error
+- 自定义 RPC 框架：Server、Client、连接池
+- RPC 进阶：连接管理、超时控制、服务发现、负载均衡
+- RPC 与 gRPC：HTTP/2、Protobuf、流式传输
+
+
+> [📄 02_RPC入门.md](./mybook/go/05_第三方库/10_序列化与RPC/02_RPC入门.md)
+</details>
+
+### 1.16 Go编译器
+
+#### 编译器概览
+
+<details>
+<summary>编译器概览</summary>
+
+- 编译流程：词法分析 → 语法分析 → 类型检查 → 语义分析 → SSA生成 → 优化 → 代码生成 → 链接
+- 编译器入口：cmd/compile
+- 编译阶段详解：Token、AST、类型信息、IR、SSA、汇编代码、可执行文件
+- 词法分析：Token类型、Scanner实现
+- 语法分析：AST节点类型、Parser实现
+- 查看编译器输出：AST、SSA、汇编代码
+- 编译器优化：内联优化、逃逸分析、边界检查消除
+- 编译器扩展：自定义分析工具、编译器指令
+- 编译器调试：编译器日志、性能分析、禁用优化
+
+
+> [📄 01_编译器概览.md](./mybook/go/15_Go编译器/01_编译器概览.md)
+</details>
+
+#### SSA中间代码
+
+<details>
+<summary>SSA中间代码</summary>
+
+- SSA基础概念：静态单赋值、优势、φ函数
+- Go SSA结构：Value类型、Block类型、Func结构
+- SSA生成过程：从AST到SSA、示例代码
+- SSA优化Pass：常量传播、死代码消除、公共子表达式消除
+- 查看SSA：GOSSAFUNC、-S标志、go tool compile
+- SSA优化技巧：边界检查消除、循环不变量外提、强度削减
+- SSA与性能优化：理解优化决策、指导代码编写
+
+
+> [📄 02_SSA中间代码.md](./mybook/go/15_Go编译器/02_SSA中间代码.md)
+</details>
+
+#### 类型检查
+
+<details>
+<summary>类型检查</summary>
+
+- 类型系统概览：基本类型、复合类型、引用类型、特殊类型
+- 类型信息结构：Type、Array、Slice、Map、Struct、Func、Interface
+- 类型检查过程：类型检查入口、表达式类型检查、函数调用类型检查
+- 类型推断：常量类型推断、赋值类型推断、泛型类型推断
+- 类型兼容性：类型一致性、可赋值性、接口实现检查
+- 类型转换：显式类型转换、隐式类型转换
+- 类型断言：类型断言检查、类型switch
+- 泛型类型检查：类型参数约束、类型实例化
+
+
+> [📄 03_类型检查.md](./mybook/go/15_Go编译器/03_类型检查.md)
+</details>
+
+#### 语义分析
+
+<details>
+<summary>语义分析</summary>
+
+- 语义分析任务：作用域分析、变量捕获、逃逸分析、控制流检查、其他语义检查
+- 作用域分析：作用域结构、作用域构建、标识符解析
+- 变量捕获：闭包变量捕获、捕获示例、值捕获vs引用捕获
+- 逃逸分析：逃逸分析原理、逃逸原因、逃逸分析示例、查看逃逸分析
+- 控制流检查：break/continue检查、defer检查、return路径检查
+- 初始化顺序：包初始化、初始化顺序示例
+- 方法集计算：方法集、方法集规则
+
+
+> [📄 04_语义分析.md](./mybook/go/15_Go编译器/04_语义分析.md)
+</details>
+
+#### 编译器优化实践
+
+<details>
+<summary>编译器优化实践</summary>
+
+- 内联优化：内联决策、内联预算、控制内联、内联优化示例
+- 逃逸分析优化：减少堆分配、接口逃逸、切片逃逸、查看逃逸分析
+- 边界检查消除：BCE原理、BCE示例、帮助编译器
+- 死代码消除：常量条件、未使用变量、未使用函数
+- 循环优化：循环不变量外提、强度削减、循环展开
+- 函数调用优化：尾调用优化、函数参数优化
+- 内存布局优化：结构体字段对齐、热点字段前置、False Sharing避免
+- 编译器指令：常用指令、使用场景
+- 性能分析工具：查看汇编、查看SSA、性能对比
+- 优化最佳实践：优化原则、常见优化模式、避免反模式
+
+
+> [📄 05_编译器优化实践.md](./mybook/go/15_Go编译器/05_编译器优化实践.md)
+</details>
+
+### 1.17 WebAssembly
+
+#### WebAssembly简介
+
+<details>
+<summary>WebAssembly简介</summary>
+
+- WebAssembly概述：架构、特点、文本格式(WAT)
+- Go与WebAssembly：Go WebAssembly支持、第一个程序、wasm_exec.js
+- Go WebAssembly架构：运行时架构、内存模型
+- syscall/js包：js.Value、js.Func、类型转换
+- DOM操作：基本操作、事件处理、Canvas操作
+- 网络请求：Fetch API、WebSocket
+- Web Workers：Worker示例
+- 调试技巧：使用println、使用console.log、错误处理
+- 性能优化：减少Go↔JS边界切换、使用TypedArray、内存管理
+
+
+> [📄 01_WebAssembly简介.md](./mybook/go/16_WebAssembly/01_WebAssembly简介.md)
+</details>
+
+#### WebAssembly进阶
+
+<details>
+<summary>WebAssembly进阶</summary>
+
+- 外部函数接口(FFI)：从JavaScript调用Go函数、从Go调用JavaScript函数、回调函数
+- WebAssembly虚拟机：Wasmtime运行时、Wasmer运行时、WASI
+- WebAssembly插件系统：插件架构、MOSN WebAssembly插件、插件配置
+- 导出Go函数：导出函数到WebAssembly、TinyGo导出
+- 内存共享：共享内存、跨线程通信
+- 性能优化：减少内存拷贝、批量操作、并行处理
+- 调试与测试：单元测试、性能测试、调试工具
+- 部署与集成：部署到CDN、集成到Web应用、服务端WebAssembly
+
+
+> [📄 02_WebAssembly进阶.md](./mybook/go/16_WebAssembly/02_WebAssembly进阶.md)
+</details>
+
 ---
 
 ## 二、C/C++
