@@ -12,6 +12,8 @@ export class Editor {
   }
 
   async init() {
+    const sharedDeps = '?deps=@codemirror/state@6.5.2,@codemirror/view@6.36.4,@codemirror/language@6.11.0';
+
     const [
       { EditorView, keymap },
       { markdown, markdownLanguage },
@@ -20,12 +22,12 @@ export class Editor {
       { basicSetup },
       { EditorState },
     ] = await Promise.all([
-      import('https://esm.sh/@codemirror/view@6'),
-      import('https://esm.sh/@codemirror/lang-markdown@6'),
-      import('https://esm.sh/@codemirror/language-data@6'),
-      import('https://esm.sh/@codemirror/commands@6'),
-      import('https://esm.sh/codemirror@6'),
-      import('https://esm.sh/@codemirror/state@6'),
+      import(`https://esm.sh/@codemirror/view@6.36.4`),
+      import(`https://esm.sh/@codemirror/lang-markdown@6.3.2${sharedDeps}`),
+      import(`https://esm.sh/@codemirror/language-data@6.5.1${sharedDeps}`),
+      import(`https://esm.sh/@codemirror/commands@6.8.0${sharedDeps}`),
+      import(`https://esm.sh/codemirror@6.0.1${sharedDeps}`),
+      import(`https://esm.sh/@codemirror/state@6.5.2`),
     ]);
 
     this.EditorView = EditorView;
