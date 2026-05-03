@@ -448,8 +448,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","P
   }
 
   function openMdInEditor(mdLink){
-    var docId = mdLink.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
-    window.open('editor.html?doc=' + encodeURIComponent(docId) + '&src=' + encodeURIComponent(mdLink), '_blank');
+    var decoded = mdLink;
+    try{ decoded = decodeURIComponent(mdLink); }catch(e){}
+    var docId = decoded.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
+    window.open('editor.html?doc=' + encodeURIComponent(docId) + '&src=' + encodeURIComponent(decoded), '_blank');
   }
 
   function findPathToSlug(targetSlug){

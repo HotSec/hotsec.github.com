@@ -58,10 +58,12 @@ export class LivePreview {
       }
     });
     this.container.querySelectorAll('a[href]').forEach((a) => {
-      const href = a.getAttribute('href');
-      if (href && href.match(/\.md$/i)) {
+      const rawHref = a.getAttribute('href');
+      if (rawHref && rawHref.match(/\.md$/i)) {
         a.addEventListener('click', (e) => {
           e.preventDefault();
+          var href = rawHref;
+          try { href = decodeURIComponent(rawHref); } catch(ex) {}
           const resolvedHref = this.resolveMdLink(href);
           const docId = resolvedHref.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
           window.open(`editor.html?doc=${encodeURIComponent(docId)}&src=${encodeURIComponent(resolvedHref)}`, '_blank');
