@@ -2411,7 +2411,7 @@
 - **性能分析**：cProfile / line_profiler / memory_profiler / py-spy
 
 
-> [📄 常用包.md](./mybook/02_python/07_第三方库/常用包.md) · [📄 zipapp打包应用.md](./mybook/02_python/01_语言基础/zipapp打包应用.md)
+> [📄 zipapp打包应用.md](./mybook/02_python/01_语言基础/zipapp打包应用.md)
 </details>
 
 ### 3.6 Web开发
@@ -2576,7 +2576,7 @@
 - **Flask-PluginKit**：基于 Flask 的插件式开发工具
 
 
-> [📄 ansible.md](./mybook/02_python/07_第三方库/自动化运维/ansible.md) · [📄 fabric.md](./mybook/02_python/07_第三方库/自动化运维/fabric.md) · [📄 terraform.md](./mybook/02_python/07_第三方库/自动化运维/terraform.md) · [📄 playwright.md](./mybook/02_python/07_第三方库/playwright.md) · [📄 负载均衡.md](./mybook/02_python/07_第三方库/自动化运维/负载均衡.md)
+> [📄 ansible.md](./mybook/02_python/07_第三方库/自动化运维/ansible.md) · [📄 fabric.md](./mybook/02_python/07_第三方库/自动化运维/fabric.md) · [📄 terraform.md](./mybook/02_python/07_第三方库/自动化运维/terraform.md) · [📄 负载均衡.md](./mybook/02_python/07_第三方库/自动化运维/负载均衡.md)
 </details>
 
 ### 3.8 高并发设计
@@ -2831,7 +2831,7 @@
 - debug：调试（traceback/getinfo/getlocal/setlocal/getupvalue/setupvalue/getmetatable/setmetatable）
 
 
-> [📄 11_标准库.md](./mybook/04_lua/01_语言基础/11_标准库.md) · [📄 01_Lua简介.md](./mybook/04_lua/01_语言基础/01_Lua简介.md) · [📄 03_表与元表.md](./mybook/04_lua/01_语言基础/03_表与元表.md) · [📄 10_Lua设计模式.md](./mybook/04_lua/01_语言基础/10_Lua设计模式.md)
+> [📄 01_Lua简介.md](./mybook/04_lua/01_语言基础/01_Lua简介.md) · [📄 03_表与元表.md](./mybook/04_lua/01_语言基础/03_表与元表.md) · [📄 10_Lua设计模式.md](./mybook/04_lua/01_语言基础/10_Lua设计模式.md)
 </details>
 
 ### 4.2 高级主题
@@ -3126,6 +3126,16 @@
 > [📄 markdown.md](./mybook/05_web/04_工程化与工具/vuepress-demo/markdown.md)
 </details>
 
+<details>
+<summary>VSCode 配置备忘</summary>
+
+- Markdown 配置粘贴文件目录
+- 常用配置与快捷键
+
+
+> [📄 vscode配置备忘.md](./mybook/05_web/04_工程化与工具/vscode配置备忘.md)
+</details>
+
 ---
 
 ## 六、安全
@@ -3205,6 +3215,22 @@
 > [📄 逻辑漏洞.md](./mybook/12_security/1_Web安全/逻辑漏洞.md)
 </details>
 
+<details>
+<summary>认证与授权</summary>
+
+- 认证方式对比：API Key / Basic Auth / Session-Cookie / JWT / OAuth 2.0 / SSO
+- API Key：请求头/查询参数携带密钥；简单但不安全
+- Basic Auth：Base64 编码；需配合 HTTPS
+- Session-Cookie：服务端存储会话；有状态
+- JWT：Header.Payload.Signature；无状态/跨域友好/不可存储敏感信息
+- OAuth 2.0：授权码/隐式/密码/客户端凭证四种模式
+- SSO：CAS / SAML / OIDC；单点登录/单点登出
+- 权限模型：RBAC / ABAC / ACL
+
+
+> [📄 2_认证与授权.md](./mybook/12_security/1_Web安全/2_认证与授权.md)
+</details>
+
 ### 6.2 安全工具与方法
 
 #### 渗透测试
@@ -3237,6 +3263,21 @@
 
 
 > [📄 3_Nuclei.md](./mybook/12_security/2_安全工具与方法/3_Nuclei.md)
+</details>
+
+<details>
+<summary>渗透测试工具使用</summary>
+
+- **Nmap**：网络扫描；端口扫描（-sS/-sT/-sU）/服务版本检测（-sV）/操作系统识别（-O）/脚本扫描（--script）
+- **Burp Suite**：Web 渗透测试；Proxy/Scanner/Intruder/Repeater 模块
+- **SQLMap**：自动化 SQL 注入检测与利用
+- **Metasploit**：漏洞利用框架；exploit/payload/auxiliary 模块
+- **Hydra**：在线密码爆破；支持 SSH/FTP/HTTP/MySQL 等协议
+- **Dirsearch/Gobuster**：目录扫描与暴力破解
+- **Wireshark**：网络流量分析；过滤器/协议解析/流量还原
+
+
+> [📄 2_工具使用.md](./mybook/12_security/2_安全工具与方法/2_工具使用.md)
 </details>
 
 #### 漏扫与信息收集
@@ -3365,7 +3406,6 @@
 - 面试高频 TOP10 与知识要点
 
 
-> [📄 数据结构与算法.md](./mybook/07_algorithms/数据结构与算法.md)
 </details>
 
 ### 7.2 操作系统 & Linux
@@ -3384,6 +3424,34 @@
 
 
 > [📄 1_操作系统基础.md](./mybook/10_os-linux/01_操作系统基础.md)
+</details>
+
+<details>
+<summary>内存管理</summary>
+
+- 虚拟内存：地址空间/分页机制/页表/TLB
+- 物理内存管理：伙伴系统/Slab 分配器/页面分配
+- 页面置换算法：FIFO/LRU/Clock/OPT
+- 内存映射：mmap/共享内存/匿名映射
+- Swap：交换空间/换入换出/swappiness 调优
+- 内存泄漏排查：valgrind/AddressSanitizer
+- OOM Killer：触发机制/oom_score/oom_adj
+
+
+> [📄 02_内存管理.md](./mybook/10_os-linux/02_内存管理.md)
+</details>
+
+<details>
+<summary>I/O 模型</summary>
+
+- I/O 操作流程：用户空间 ↔ 内核空间 ↔ 设备
+- 五种 I/O 模型：阻塞 I/O / 非阻塞 I/O / I/O 多路复用 / 信号驱动 I/O / 异步 I/O
+- I/O 多路复用：select / poll / epoll（LT/ET）
+- 零拷贝：mmap / sendfile / splice
+- Reactor 模式与 Proactor 模式
+
+
+> [📄 03_IO模型.md](./mybook/10_os-linux/03_IO模型.md)
 </details>
 
 #### Linux与工具
@@ -3565,8 +3633,11 @@
 <details>
 <summary>信息系统架构</summary>
 
-- 面向服务架构（SOA）：服务契约/服务编排/ESB 企业服务总线/EDB 事件驱动总线
+- 面向服务架构（SOA）：服务契约/服务编排/ESB 企业服务总线/EDA 事件驱动架构
 - 层次式架构：表现层/业务层/数据访问层/跨层通信
+- C/S 与 B/S 架构：客户端安装 vs 浏览器访问/性能 vs 跨平台
+- 中台架构：技术中台/数据中台/业务中台
+- 中间件：消息队列/缓存/搜索/配置中心/注册中心/网关/任务调度
 - 物联网架构：感知层/网络层/平台层/应用层；边缘计算/MQTT/CoAP
 - 大型网站架构演进九阶段：①单体架构 → ②应用数据分离 → ③使用缓存 → ④服务集群（负载均衡） → ⑤数据库读写分离 → ⑥CDN和反向代理 → ⑦分布式文件系统和数据库 → ⑧NoSQL和搜索引擎 → ⑨业务拆分（微服务化）
 
@@ -3580,7 +3651,6 @@
 - 机器人 / 边缘计算 / AI / 数字孪生 / 云计算与大数据
 
 
-> [📄 3_信息系统架构.md](./mybook/08_architecture/04_信息系统架构.md)
 </details>
 
 <details>
@@ -3589,6 +3659,11 @@
 - 访问控制：DAC/MAC/RBAC/ABAC 模型；三要素（主体/客体/控制策略）；实现机制（ACM/ACL/能力表/授权关系表）
 - 数字签名：RSA/ECDSA 签名与验证 / 数字证书 / CA 链；五大特性（可信/不可伪造/不可重用/不可改变/不可抵赖）
 - 信息安全保障体系：五性（机密性/完整性/可用性/可控性/可检查性）
+- 常见攻击与防御：SQL注入/XSS/CSRF/DDoS/中间人攻击/暴力破解
+- 加密算法：对称（AES/ChaCha20）/非对称（RSA/ECC）/哈希（SHA-256/bcrypt/HMAC）
+- HTTPS：TLS 1.2/1.3 握手流程/ECDHE 密钥交换/Let's Encrypt
+- OAuth 2.0：授权码/隐式/密码/客户端凭证四种模式
+- JWT：Header.Payload.Signature/无状态/黑名单撤销
 - 安全评估：等级保护（五级：用户自主保护/系统审计保护/安全标记保护/结构化保护/访问验证）/ 风险评估（要素：脆弱性/资产/威胁/风险/安全措施）/ 渗透测试 / 安全审计
 - 安全保密技术：DLP（数据泄露防护）/ 数字水印
 - 安全协议：SSL/TLS / PGP / IPSec / SET / HTTPS
@@ -3777,7 +3852,7 @@
 - **监控系统集成**：Prometheus + Grafana + AlertManager 全链路监控
 
 
-> [📄 4_ES集群与ELK.md](./mybook/09_devops/基础设施/4_ES集群与ELK.md) · [📄 5_监控系统集成.md](./mybook/09_devops/基础设施/5_监控系统集成.md)
+> [📄 5_监控系统集成.md](./mybook/09_devops/基础设施/5_监控系统集成.md)
 </details>
 
 <details>
@@ -3963,6 +4038,10 @@
 - **向量数据库**：Milvus / Qdrant / Weaviate / Chroma / Pinecone；索引类型（HNSW/IVF）
 - **Embedding 模型**：text-embedding-ada-002 / bge / m3e / GTE；维度/性能/多语言
 - **评估体系**：RAGAS / LLM-as-Judge / 人工评估；准确性/相关性/幻觉率
+- **Agent 框架**：LangGraph（图状态机）/ CrewAI（多Agent协作）/ AutoGen（多Agent对话）/ OpenAI Assistants API
+- **Function Calling**：工具定义/参数描述/模型调用/结果回传
+- **多模态**：GPT-4V（图像）/ GPT-4o（实时语音+视觉）/ Claude 3 / Gemini
+- **成本优化**：语义缓存/模型路由/量化（GGUF/AWQ/GPTQ）/批处理
 
 
 > [📄 大模型.md](./mybook/11_other/大模型.md)
@@ -3985,6 +4064,9 @@
   - 打开即理解（项目结构/编码规范/命令）+ 改完即验证（curl 接口验证/Agent Browser 页面验证）
   - Harness Engineering 四原则：Map not Manual / Mechanical Verification / Visible Feedback / Incremental Complexity
   - AGENTS.md 维护本身就是知识沉淀：编码规范从 Wiki/口头约定 → 结构化文档
+- **代码质量**：静态分析（golangci-lint/ruff/mypy）/统一格式化/Pre-commit Hook
+- **测试策略**：测试金字塔（单元 > 集成 > E2E）/关键路径覆盖/Mock 外部依赖
+- **知识管理**：架构决策记录（ADR）/Wiki 知识库/On-call 手册
 
 
 > [📄 提高研发效能.md](./mybook/11_other/提高研发效能.md)
@@ -4002,7 +4084,7 @@
 - B站技术：装机系统实践/全链路Trace追踪
 
 
-> [📄 大厂技术文章.md](./mybook/11_other/大厂技术文章.md) · [📄 shell编程风格.md](./mybook/11_other/杂项/shell编程风格.md)
+> [📄 大厂技术文章.md](./mybook/11_other/大厂技术文章.md)
 </details>
 
 <details>
@@ -4029,5 +4111,5 @@
 - DDD（领域驱动设计）：聚合根/值对象/领域事件/限界上下文/仓储模式
 
 
-> [📄 shell编程风格.md](./mybook/11_other/杂项/shell编程风格.md) · [📄 构建deb包.md](./mybook/09_devops/构建deb包.md) · [📄 zipapp打包应用.md](./mybook/02_python/01_语言基础/zipapp打包应用.md)
+> [📄 构建deb包.md](./mybook/09_devops/构建deb包.md)
 </details>
