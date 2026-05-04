@@ -861,9 +861,15 @@
 <details>
 <summary>ClickHouse</summary>
 
-- ClickHouse 连接
-- 批量写入
-- 查询优化
+- Go 客户端：clickhouse-go（原生 TCP 协议）/ ch-go（高性能底层驱动）
+- 连接与配置：DSN 连接串/连接池/压缩/超时/SSL
+- 批量写入：Batch 模式/异步写入/缓冲区刷新策略
+- 查询：Query/QueryRow/QueryContext 上下文控制
+- 数据类型映射：DateTime/Decimal/Array/LowCardinality/Nullable
+- 表引擎：MergeTree（核心）/ ReplacingMergeTree（去重）/ SummingMergeTree（预聚合）/ Distributed（分布式）
+- 分区与排序键：PARTITION BY / ORDER BY（稀疏索引）
+- 物化视图：自动聚合/增量更新
+- 集群与副本：ReplicatedMergeTree + Distributed + ZooKeeper 协调
 
 
 > [📄 ClickHouse.md](./mybook/01_go/05_第三方库/02_数据库/ClickHouse.md)
@@ -967,8 +973,13 @@
 <details>
 <summary>gopsutil 系统监控</summary>
 
-- CPU/内存/磁盘监控
-- 进程信息
+- CPU：使用率/核心数/时间统计/per-CPU 信息
+- 内存：虚拟内存/交换内存/总量/可用/使用率
+- 磁盘：分区信息/使用率/IO 统计（读写次数/字节/时间）
+- 网络：接口信息/连接统计/IO 计数器（字节/包/错误）
+- 进程：列表/详情/CPU/内存/连接/线程/环境变量
+- 主机信息：hostname/uptime/操作系统/平台/用户列表
+- 传感器：温度/风扇转速（Linux 支持）
 
 
 > [📄 gopsutil.md](./mybook/01_go/05_第三方库/08_系统工具/gopsutil.md)
@@ -977,7 +988,11 @@
 <details>
 <summary>gopkg 常用工具</summary>
 
-- 常用工具集合
+- 字节跳动开源 Go 工具包
+- retry：指数退避重试/最大次数/可重试错误判断
+- limit：并发限制器/令牌桶
+- goroutine：安全 Go 启动/recovery 捕获 panic
+- slice/shuffle/collection 等工具函数
 
 
 > [📄 gopkg.md](./mybook/01_go/05_第三方库/08_系统工具/gopkg.md) · [📄 XPath.md](./mybook/01_go/05_第三方库/08_系统工具/XPath.md)
@@ -2592,6 +2607,12 @@
 - **服务发现**：客户端发现 / 服务端发现；注册中心（Consul/Eureka/Nacos）
 - **RPC**：gRPC / Thrift / Dubbo；序列化协议/服务治理/IDL
 - **LSM Tree**：写入优化数据结构；MemTable → SSTable → Compaction；适用于写密集场景
+- **分布式理论**：CAP 定理（CP/AP 权衡）/ BASE 理论（最终一致性）/ 共识算法（Paxos/Raft/ZAB）
+- **分布式事务**：2PC / 3PC / TCC / Saga / 本地消息表 / 可靠消息最终一致性
+- **分布式ID**：UUID / 雪花算法 / 号段模式 / Redis 自增
+- **分布式锁**：Redis（SETNX+Lua）/ ZooKeeper（临时顺序节点）/ etcd（Lease）
+- **微服务**：服务拆分原则/通信方式（同步RPC+异步消息）/API网关/配置中心/服务治理
+- **高性能**：读写分离/CQRS/异步化/批量合并/连接池/数据库优化（索引/分区/分库分表）
 
 
 > [📄 基础架构.md](./mybook/02_python/08_高并发设计/基础架构.md) · [📄 微服务.md](./mybook/02_python/08_高并发设计/微服务.md) · [📄 分布式.md](./mybook/02_python/08_高并发设计/分布式.md) · [📄 高性能.md](./mybook/02_python/08_高并发设计/高性能.md)
@@ -2784,7 +2805,7 @@
 - 与线程区别：协程非抢占、由用户调度、切换代价极低
 
 
-> [📄 14_lua_coroutine.md](./mybook/04_lua/01_语言基础/08_协程.md)
+> [📄 08_协程.md](./mybook/04_lua/01_语言基础/08_协程.md)
 </details>
 
 #### 错误处理
@@ -2844,12 +2865,18 @@
 - LuaJIT：Lua 的即时编译实现，性能远超标准 Lua 解释器
 - JIT 编译：运行时将热点 Lua 代码编译为本地机器码
 - Trace 编译器：记录执行路径（Trace），优化循环和热函数
+- IR（中间表示）：Trace → IR → 机器码；Guard 守卫条件
+- NYI（Not Yet Implemented）：不支持 JIT 的操作，回退到解释执行
+- 性能优化：避免 NYI / 减少 Trace 中止 / 使用 `-jdump` 分析
 - LuaFFI：直接在 Lua 中声明和调用 C 函数，无需编写 C 绑定代码
 - `ffi.cdef` 声明 C 类型/函数签名，`ffi.C` 访问默认 C 库
-- `ffi.new` / `ffi.cast` / `ffi.string` 等 FFI 辅助函数
+- `ffi.new` / `ffi.cast` / `ffi.string` / `ffi.typeof` 等 FFI 辅助函数
+- 回调：`ffi.cast` 将 Lua 函数转为 C 函数指针
+- 内存管理：`ffi.gc` 注册 finalizer / 手动 `ffi.C.free`
+- 与 Lua C API 对比：FFI 更简洁高效，无需编写 C 胶水代码
 
 
-> [📄 15_luaJIT.md](./mybook/04_lua/02_高级主题/01_LuaJIT.md) · [📄 16_lua_FFI.md](./mybook/04_lua/02_高级主题/02_LuaFFI.md)
+> [📄 01_LuaJIT.md](./mybook/04_lua/02_高级主题/01_LuaJIT.md) · [📄 02_LuaFFI.md](./mybook/04_lua/02_高级主题/02_LuaFFI.md)
 </details>
 
 #### OpenResty
@@ -2882,9 +2909,13 @@
 - C 调用 Lua：`luaL_dostring` / `luaL_dofile` 加载脚本，`lua_pcall` 调用 Lua 函数
 - 类型检查：`luaL_checkint` / `luaL_checkstring` / `luaL_checktype`
 - Userdata：light userdata（指针）/ full userdata（带 GC 和元表）
+- 面向对象绑定：LuaBridge（轻量）/ sol2（现代 C++）/ kaguya（简洁）
+- 错误处理：`lua_pcall` 保护调用 / `lua_error` 抛出错误
+- 内存管理：引用计数 vs GC / `luaL_ref` 引用管理
+- 多返回值处理：`lua_gettop` 获取返回值数量
 
 
-> [📄 30_Lua与C++.md](./mybook/04_lua/02_高级主题/04_Lua与C++.md)
+> [📄 04_Lua与C++.md](./mybook/04_lua/02_高级主题/04_Lua与C++.md)
 </details>
 
 #### 生态
