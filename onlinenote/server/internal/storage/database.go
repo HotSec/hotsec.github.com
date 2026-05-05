@@ -45,12 +45,12 @@ func (d *Database) Close() error {
 }
 
 type DocumentVersion struct {
-	ID        int64  `json:"id"`
+	ID         int64  `json:"id"`
 	DocumentID string `json:"documentId"`
-	Version   int    `json:"version"`
-	Content   string `json:"content"`
-	UserID    string `json:"userId,omitempty"`
-	CreatedAt string `json:"createdAt"`
+	Version    int    `json:"version"`
+	Content    string `json:"content"`
+	UserID     string `json:"userId,omitempty"`
+	CreatedAt  string `json:"createdAt"`
 }
 
 type Document struct {

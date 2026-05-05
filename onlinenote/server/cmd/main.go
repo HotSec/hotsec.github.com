@@ -387,13 +387,13 @@ func (s *Server) handleGetVersions(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	dbVersions, err := s.DB.GetDocumentVersions(docID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"docId":    docID,
 		"files":    versions,
@@ -409,13 +409,13 @@ func (s *Server) handleGetVersion(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid version"})
 		return
 	}
-	
+
 	dbVersion, err := s.DB.GetDocumentVersion(docID, version)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "version not found"})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, dbVersion)
 }
 
@@ -427,20 +427,20 @@ func (s *Server) handleRollback(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid version"})
 		return
 	}
-	
+
 	var req struct {
 		UserID string `json:"userId"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		req.UserID = "anonymous"
 	}
-	
+
 	newVersion, err := s.DB.RollbackToVersion(docID, version, req.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	if err := s.DocMgr.Save(docID, newVersion.Content); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -450,13 +450,13 @@ func (s *Server) handleRollback(c *gin.Context) {
 	crdtDoc.ResetFromContent(newVersion.Content)
 
 	msg, _ := json.Marshal(ws.Message{
-		Type:     "document-rollback",
-		DocID:    docID,
-		UserID:   req.UserID,
-		Data:     json.RawMessage(`{"version":` + strconv.Itoa(newVersion.Version) + `}`),
+		Type:   "document-rollback",
+		DocID:  docID,
+		UserID: req.UserID,
+		Data:   json.RawMessage(`{"version":` + strconv.Itoa(newVersion.Version) + `}`),
 	})
 	s.Hub.Broadcast(docID, msg, nil)
-	
+
 	c.JSON(http.StatusOK, newVersion)
 }
 
@@ -535,8 +535,8 @@ func (s *Server) handleCRDTState(c *gin.Context) {
 	docID := c.Param("id")
 	doc := s.CRDTStore.Get(docID)
 	c.JSON(http.StatusOK, gin.H{
-		"docId": docID,
-		"state": doc.GetState(),
+		"docId":  docID,
+		"state":  doc.GetState(),
 		"vector": doc.GetVector(),
 	})
 }
@@ -545,8 +545,8 @@ func (s *Server) handleCRDTSync(c *gin.Context) {
 	docID := c.Param("id")
 
 	var req struct {
-		Operations []crdt.Operation   `json:"operations"`
-		Vector     map[string]int64   `json:"vector"`
+		Operations []crdt.Operation `json:"operations"`
+		Vector     map[string]int64 `json:"vector"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

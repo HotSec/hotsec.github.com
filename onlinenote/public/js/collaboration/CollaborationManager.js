@@ -101,9 +101,6 @@ export class CollaborationManager {
           this.handleRemoteCRDTOp(msg);
         }
         break;
-      case 'crdt-sync':
-        this.handleCRDTSync(msg);
-        break;
     }
   }
 
