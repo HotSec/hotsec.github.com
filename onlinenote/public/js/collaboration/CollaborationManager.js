@@ -1,3 +1,5 @@
+import { CRDTDocument, CRDTOperation } from '../crdt/CRDTDocument.js';
+
 export class CollaborationManager {
   constructor(options = {}) {
     this.ws = null;
@@ -13,10 +15,22 @@ export class CollaborationManager {
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 10;
     this.reconnectDelay = 1000;
+
+    this.crdt = new CRDTDocument(this.userId);
+    this.crdtEnabled = options.crdtEnabled || false;
+    this.onCRDTUpdate = options.onCRDTUpdate || (() => {});
+    this.pendingCRDTOps = [];
+    this.syncTimer = null;
+    this.syncInterval = 200;
   }
 
   generateId() {
     return Math.random().toString(36).substring(2, 10);
+  }
+
+  initCRDT(content) {
+    if (!this.crdtEnabled) return;
+    this.crdt.initFromContent(content);
   }
 
   connect(url) {
@@ -34,6 +48,9 @@ export class CollaborationManager {
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
       console.log('Collaboration: connected');
+      if (this.crdtEnabled) {
+        this.requestCRDTSync();
+      }
     };
 
     this.ws.onmessage = (event) => {
@@ -79,7 +96,126 @@ export class CollaborationManager {
       case 'document-saved':
         console.log('Document saved on server');
         break;
+      case 'crdt-op':
+        if (msg.userId !== this.userId) {
+          this.handleRemoteCRDTOp(msg);
+        }
+        break;
+      case 'crdt-sync':
+        this.handleCRDTSync(msg);
+        break;
     }
+  }
+
+  handleLocalChanges(changes) {
+    if (!this.crdtEnabled) {
+      this.sendChanges(changes);
+      return;
+    }
+
+    for (const change of changes) {
+      const from = change.from;
+      const to = change.to;
+      const inserted = change.inserted;
+
+      if (from !== to) {
+        const deleteOps = this.crdt.localDelete(from, to);
+        this.pendingCRDTOps.push(...deleteOps);
+      }
+
+      if (inserted && inserted.length > 0) {
+        const insertOps = this.crdt.localInsert(from, inserted);
+        this.pendingCRDTOps.push(...insertOps);
+      }
+    }
+
+    this.scheduleCRDTSync();
+  }
+
+  scheduleCRDTSync() {
+    clearTimeout(this.syncTimer);
+    this.syncTimer = setTimeout(() => {
+      this.flushCRDTOps();
+    }, this.syncInterval);
+  }
+
+  flushCRDTOps() {
+    if (this.pendingCRDTOps.length === 0) return;
+
+    const ops = this.pendingCRDTOps.map(op => op.toJSON());
+    this.pendingCRDTOps = [];
+
+    this.send({
+      type: 'crdt-op',
+      docId: this.docId,
+      userId: this.userId,
+      data: { operations: ops },
+    });
+  }
+
+  handleRemoteCRDTOp(msg) {
+    if (!this.crdtEnabled) return;
+
+    try {
+      const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
+      const ops = data.operations || [];
+
+      for (const opData of ops) {
+        const op = CRDTOperation.fromJSON(opData);
+        this.crdt.applyRemoteOperation(op);
+      }
+
+      const newContent = this.crdt.rebuild();
+      this.onCRDTUpdate(newContent);
+    } catch (e) {
+      console.error('CRDT: failed to handle remote op', e);
+    }
+  }
+
+  handleCRDTSync(msg) {
+    if (!this.crdtEnabled) return;
+
+    try {
+      const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
+      const ops = data.operations || [];
+
+      for (const opData of ops) {
+        const op = CRDTOperation.fromJSON(opData);
+        this.crdt.applyRemoteOperation(op);
+      }
+
+      const newContent = this.crdt.rebuild();
+      this.onCRDTUpdate(newContent);
+    } catch (e) {
+      console.error('CRDT: failed to handle sync', e);
+    }
+  }
+
+  requestCRDTSync() {
+    if (!this.crdtEnabled) return;
+
+    fetch(`/api/documents/${encodeURIComponent(this.docId)}/crdt/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operations: [],
+        vector: this.crdt.vector,
+      }),
+    })
+    .then(resp => resp.json())
+    .then(data => {
+      if (data.operations && data.operations.length > 0) {
+        for (const opData of data.operations) {
+          const op = CRDTOperation.fromJSON(opData);
+          this.crdt.applyRemoteOperation(op);
+        }
+        const newContent = this.crdt.rebuild();
+        this.onCRDTUpdate(newContent);
+      }
+    })
+    .catch(e => {
+      console.error('CRDT: sync request failed', e);
+    });
   }
 
   sendEdit(operation) {
@@ -124,6 +260,8 @@ export class CollaborationManager {
   }
 
   disconnect() {
+    clearTimeout(this.syncTimer);
+    this.flushCRDTOps();
     if (this.ws) {
       this.ws.close();
       this.ws = null;

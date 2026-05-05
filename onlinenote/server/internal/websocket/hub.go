@@ -9,6 +9,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type UserInfo struct {
+	UserID   string `json:"userId"`
+	UserName string `json:"userName"`
+	Color    string `json:"color"`
+}
+
 type Client struct {
 	Hub      *Hub
 	Conn     *websocket.Conn
@@ -126,17 +132,17 @@ func (h *Hub) Broadcast(docID string, data []byte, exclude *Client) {
 	}
 }
 
-func (h *Hub) GetDocUsers(docID string) []map[string]string {
+func (h *Hub) GetDocUsers(docID string) []UserInfo {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
 	clients := h.docClients[docID]
-	users := make([]map[string]string, 0, len(clients))
+	users := make([]UserInfo, 0, len(clients))
 	for client := range clients {
-		users = append(users, map[string]string{
-			"userId":   client.UserID,
-			"userName": client.UserName,
-			"color":    client.Color,
+		users = append(users, UserInfo{
+			UserID:   client.UserID,
+			UserName: client.UserName,
+			Color:    client.Color,
 		})
 	}
 	return users
@@ -164,10 +170,14 @@ func (h *Hub) broadcastLeave(client *Client) {
 
 func (h *Hub) notifyUserList(docID string) {
 	users := h.GetDocUsers(docID)
-	data, _ := json.Marshal(map[string]interface{}{
-		"type":  "user-list",
-		"docId": docID,
-		"users": users,
+	data, _ := json.Marshal(struct {
+		Type  string     `json:"type"`
+		DocID string     `json:"docId"`
+		Users []UserInfo `json:"users"`
+	}{
+		Type:  "user-list",
+		DocID: docID,
+		Users: users,
 	})
 	h.Broadcast(docID, data, nil)
 }
@@ -207,6 +217,14 @@ func (c *Client) ReadPump() {
 		case "edit", "cursor", "selection":
 			broadcastData, _ := json.Marshal(msg)
 			c.Hub.Broadcast(c.DocID, broadcastData, c)
+
+		case "crdt-op":
+			broadcastData, _ := json.Marshal(msg)
+			c.Hub.Broadcast(c.DocID, broadcastData, c)
+
+		case "crdt-sync":
+			syncData, _ := json.Marshal(msg)
+			c.Hub.Broadcast(c.DocID, syncData, c)
 
 		case "save":
 			log.Printf("document save request from %s", c.UserID)

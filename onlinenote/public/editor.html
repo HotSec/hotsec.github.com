@@ -43,6 +43,7 @@
         </div>
         <div class="editor-collab-users" id="collabUsers"></div>
         <button class="editor-btn" id="btnOutline" title="大纲">☰</button>
+        <button class="editor-btn" id="btnVersions" title="版本历史">📜</button>
         <button class="editor-btn primary" id="btnSave">保存</button>
       </div>
     </div>
@@ -105,11 +106,16 @@
         this.outlineVisible = false;
         this.saveStatus = 'saved';
         this.lastSavedContent = '';
+        this.docId = 'all-md';
+        this.versions = [];
+        this.selectedVersion = null;
+        this.crdtEnabled = true;
       }
 
       async init() {
         const params = new URLSearchParams(window.location.search);
         const docId = params.get('doc') || 'all-md';
+        this.docId = docId;
         const targetSlug = params.get('slug') || '';
         const srcPath = params.get('src') || '';
 
@@ -153,10 +159,12 @@
           content: initialContent,
           onChange: (content) => this.onContentChange(content),
           onChanges: (changes) => this.onLocalChanges(changes),
+          onCRDTOps: (changes) => this.onCRDTLocalChanges(changes),
           onSave: (content) => this.saveDocument(content),
           onCursorChange: (pos) => this.onCursorChange(pos),
         });
         await this.editor.init();
+        this.editor.enableCRDT(this.crdtEnabled);
 
         this.preview = new LivePreview(document.getElementById('previewContainer'));
         await this.preview.init();
@@ -187,10 +195,12 @@
 
         this.collab = new CollaborationManager({
           docId,
+          crdtEnabled: this.crdtEnabled,
           onUserList: (users) => this.updateCollabUsers(users),
           onUserJoin: (msg) => console.log('User joined:', msg.userName),
           onUserLeave: (msg) => console.log('User left:', msg.userId),
           onRemoteEdit: (msg) => {
+            if (this.crdtEnabled) return;
             try {
               const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
               if (data.changes && data.changes.length > 0) {
@@ -200,7 +210,17 @@
               }
             } catch (e) {}
           },
+          onCRDTUpdate: (newContent) => {
+            this.editor.applyCRDTContent(newContent);
+            this.preview.render(newContent);
+            this.outline.update();
+            this.updateStats(newContent);
+          },
         });
+
+        if (this.crdtEnabled) {
+          this.collab.initCRDT(this.lastSavedContent);
+        }
 
         this.collab.connect(wsUrl);
       }
@@ -223,8 +243,16 @@
       }
 
       onLocalChanges(changes) {
+        if (this.crdtEnabled) return;
         if (this.collab) {
           this.collab.sendChanges(changes);
+        }
+      }
+
+      onCRDTLocalChanges(changes) {
+        if (!this.crdtEnabled) return;
+        if (this.collab) {
+          this.collab.handleLocalChanges(changes);
         }
       }
 
@@ -325,7 +353,7 @@
           const resp = await fetch(apiUrl, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content }),
+            body: JSON.stringify({ content, userId: this.collab?.userId || 'anonymous' }),
           });
 
           if (resp.ok) {
@@ -353,6 +381,21 @@
           document.getElementById('btnOutline').classList.toggle('active', this.outlineVisible);
         });
 
+        document.getElementById('btnVersions').addEventListener('click', () => {
+          this.openVersionModal();
+        });
+
+        document.getElementById('closeVersionModal').addEventListener('click', () => {
+          this.closeVersionModal();
+        });
+        document.getElementById('btnCloseVersionModal').addEventListener('click', () => {
+          this.closeVersionModal();
+        });
+
+        document.getElementById('btnRollback').addEventListener('click', () => {
+          this.rollbackToVersion();
+        });
+
         document.querySelectorAll('.editor-mode-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             document.querySelectorAll('.editor-mode-btn').forEach(b => b.classList.remove('active'));
@@ -377,6 +420,123 @@
             this.toolbar.insertLink();
           }
         });
+      }
+
+      async openVersionModal() {
+        const modal = document.getElementById('versionModal');
+        modal.style.display = 'flex';
+
+        try {
+          const resp = await fetch(`/api/documents/${encodeURIComponent(this.docId)}/versions`);
+          if (resp.ok) {
+            const data = await resp.json();
+            this.versions = data.database || [];
+            this.renderVersionList();
+          }
+        } catch (e) {
+          console.error('Failed to load versions:', e);
+        }
+      }
+
+      closeVersionModal() {
+        const modal = document.getElementById('versionModal');
+        modal.style.display = 'none';
+        this.selectedVersion = null;
+        document.getElementById('versionCompare').style.display = 'none';
+        document.getElementById('versionDetail').style.display = 'flex';
+        document.getElementById('versionContent').textContent = '';
+        document.getElementById('versionTitle').textContent = '选择一个版本查看详情';
+        document.getElementById('btnRollback').style.display = 'none';
+      }
+
+      renderVersionList() {
+        const container = document.getElementById('versionList');
+        if (this.versions.length === 0) {
+          container.innerHTML = '<div style="color: #6c7086; text-align: center; padding: 20px;">暂无版本历史</div>';
+          return;
+        }
+
+        container.innerHTML = this.versions.map((v, idx) => `
+          <div class="version-item" data-idx="${idx}" style="padding: 12px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 1px solid #313244; background: #181825;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="color: #cdd6f4; font-weight: 600;">v${v.version}</span>
+              <span style="color: #6c7086; font-size: 12px;">${new Date(v.createdAt).toLocaleString()}</span>
+            </div>
+            <div style="color: #89b4fa; font-size: 12px;">${v.userId || 'anonymous'}</div>
+          </div>
+        `).join('');
+
+        container.querySelectorAll('.version-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const idx = parseInt(item.dataset.idx);
+            this.selectVersion(idx);
+          });
+        });
+      }
+
+      selectVersion(idx) {
+        this.selectedVersion = this.versions[idx];
+
+        document.querySelectorAll('.version-item').forEach((item, i) => {
+          if (i === idx) {
+            item.style.background = 'rgba(137, 180, 250, 0.1)';
+            item.style.borderColor = '#89b4fa';
+          } else {
+            item.style.background = '#181825';
+            item.style.borderColor = '#313244';
+          }
+        });
+
+        document.getElementById('versionTitle').textContent = `v${this.selectedVersion.version} - ${new Date(this.selectedVersion.createdAt).toLocaleString()}`;
+        document.getElementById('versionContent').textContent = this.selectedVersion.content;
+        document.getElementById('versionDetail').style.display = 'flex';
+        document.getElementById('versionCompare').style.display = 'none';
+        document.getElementById('btnRollback').style.display = 'inline-block';
+
+        if (idx < this.versions.length - 1) {
+          this.showVersionCompare(idx);
+        }
+      }
+
+      showVersionCompare(idx) {
+        const oldV = this.versions[idx + 1];
+        const newV = this.versions[idx];
+
+        document.getElementById('versionOld').textContent = oldV.content;
+        document.getElementById('versionNew').textContent = newV.content;
+        document.getElementById('versionCompare').style.display = 'flex';
+        document.getElementById('versionDetail').style.display = 'none';
+      }
+
+      async rollbackToVersion() {
+        if (!this.selectedVersion) return;
+
+        if (!confirm(`确定要回滚到版本 v${this.selectedVersion.version} 吗？`)) {
+          return;
+        }
+
+        try {
+          const resp = await fetch(`/api/documents/${encodeURIComponent(this.docId)}/rollback/${this.selectedVersion.version}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: this.collab?.userId || 'anonymous' }),
+          });
+
+          if (resp.ok) {
+            const newVersion = await resp.json();
+            this.editor.setContent(this.selectedVersion.content);
+            this.lastSavedContent = this.selectedVersion.content;
+            this.preview.render(this.selectedVersion.content);
+            this.setSaveStatus('saved');
+            this.closeVersionModal();
+            alert(`已成功回滚到版本 v${this.selectedVersion.version}`);
+          } else {
+            alert('回滚失败，请稍后重试');
+          }
+        } catch (e) {
+          console.error('Failed to rollback:', e);
+          alert('回滚失败，请稍后重试');
+        }
       }
 
       setMode(mode) {
@@ -438,5 +598,37 @@
       console.error('Failed to initialize editor:', err);
     });
   </script>
+
+  <div id="versionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: #1e1e2e; border-radius: 12px; width: 90%; max-width: 1000px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div style="padding: 16px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin: 0; color: #cdd6f4; font-size: 18px;">版本历史</h2>
+        <button id="closeVersionModal" style="background: none; border: none; color: #6c7086; font-size: 24px; cursor: pointer;">&times;</button>
+      </div>
+      <div style="display: flex; flex: 1; overflow: hidden;">
+        <div id="versionList" style="width: 30%; border-right: 1px solid #313244; overflow-y: auto; padding: 12px;"></div>
+        <div style="width: 70%; display: flex; flex-direction: column;">
+          <div id="versionCompare" style="display: none; flex: 1; flex-direction: row; overflow: hidden;">
+            <div style="width: 50%; padding: 16px; border-right: 1px solid #313244; overflow-y: auto;">
+              <div style="color: #f38ba8; font-weight: 600; margin-bottom: 12px;">旧版本</div>
+              <pre id="versionOld" style="white-space: pre-wrap; color: #cdd6f4; font-family: 'SF Mono', monospace; font-size: 13px; line-height: 1.6;"></pre>
+            </div>
+            <div style="width: 50%; padding: 16px; overflow-y: auto;">
+              <div style="color: #a6e3a1; font-weight: 600; margin-bottom: 12px;">新版本</div>
+              <pre id="versionNew" style="white-space: pre-wrap; color: #cdd6f4; font-family: 'SF Mono', monospace; font-size: 13px; line-height: 1.6;"></pre>
+            </div>
+          </div>
+          <div id="versionDetail" style="flex: 1; padding: 16px; overflow-y: auto;">
+            <div style="color: #cdd6f4; font-weight: 600; margin-bottom: 12px;" id="versionTitle">选择一个版本查看详情</div>
+            <pre id="versionContent" style="white-space: pre-wrap; color: #cdd6f4; font-family: 'SF Mono', monospace; font-size: 13px; line-height: 1.6;"></pre>
+          </div>
+        </div>
+      </div>
+      <div style="padding: 12px 20px; border-top: 1px solid #313244; display: flex; justify-content: flex-end; gap: 12px;">
+        <button id="btnRollback" style="display: none; padding: 8px 16px; background: #f38ba8; border: none; border-radius: 6px; color: #11111b; font-weight: 600; cursor: pointer;">回滚到此版本</button>
+        <button id="btnCloseVersionModal" style="padding: 8px 16px; background: #313244; border: none; border-radius: 6px; color: #cdd6f4; cursor: pointer;">关闭</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

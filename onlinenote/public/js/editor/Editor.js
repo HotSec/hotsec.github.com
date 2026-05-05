@@ -6,9 +6,16 @@ export class Editor {
     this.onChange = options.onChange || (() => {});
     this.onSave = options.onSave || (() => {});
     this.onChanges = options.onChanges || (() => {});
+    this.onCRDTOps = options.onCRDTOps || (() => {});
     this.saveTimer = null;
     this.debounceTimer = null;
     this.pendingChanges = [];
+    this.crdtEnabled = false;
+    this.applyingRemote = false;
+  }
+
+  enableCRDT(enabled) {
+    this.crdtEnabled = enabled;
   }
 
   async init() {
@@ -160,6 +167,9 @@ export class Editor {
         const changes = this.pendingChanges.map(c => ({...c}));
         this.pendingChanges = [];
         this.onChanges(changes);
+        if (this.crdtEnabled && !this.applyingRemote) {
+          this.onCRDTOps(changes);
+        }
       }
       clearTimeout(this.saveTimer);
       this.saveTimer = setTimeout(() => {
@@ -174,6 +184,7 @@ export class Editor {
 
   applyChanges(changes) {
     if (!this.cm || !changes || changes.length === 0) return;
+    this.applyingRemote = true;
     const pos = this.cm.state.selection.main.head;
     let offset = 0;
     const adjusted = changes.map(c => {
@@ -185,6 +196,19 @@ export class Editor {
       changes: adjusted,
       selection: { anchor: Math.min(pos, this.cm.state.doc.length + offset) },
     });
+    this.applyingRemote = false;
+  }
+
+  applyCRDTContent(newContent) {
+    if (!this.cm) return;
+    this.applyingRemote = true;
+    const pos = this.cm.state.selection.main.head;
+    const oldLen = this.cm.state.doc.length;
+    this.cm.dispatch({
+      changes: { from: 0, to: oldLen, insert: newContent },
+      selection: { anchor: Math.min(pos, newContent.length) },
+    });
+    this.applyingRemote = false;
   }
 
   setContent(content) {

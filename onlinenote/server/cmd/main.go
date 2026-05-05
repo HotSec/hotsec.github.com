@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"onlinenote/config"
+	"onlinenote/internal/crdt"
 	"onlinenote/internal/document"
 	"onlinenote/internal/storage"
 	"onlinenote/internal/user"
@@ -28,10 +30,11 @@ var upgrader = gws.Upgrader{
 }
 
 type Server struct {
-	Config *config.Config
-	DB     *storage.Database
-	DocMgr *document.Manager
-	Hub    *ws.Hub
+	Config    *config.Config
+	DB        *storage.Database
+	DocMgr    *document.Manager
+	Hub       *ws.Hub
+	CRDTStore *crdt.DocumentStore
 }
 
 func main() {
@@ -47,11 +50,14 @@ func main() {
 	hub := ws.NewHub()
 	go hub.Run()
 
+	crdtStore := crdt.NewDocumentStore()
+
 	srv := &Server{
-		Config: cfg,
-		DB:     db,
-		DocMgr: docMgr,
-		Hub:    hub,
+		Config:    cfg,
+		DB:        db,
+		DocMgr:    docMgr,
+		Hub:       hub,
+		CRDTStore: crdtStore,
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -91,6 +97,13 @@ func main() {
 			docs.GET("/:id", srv.handleGetDocument)
 			docs.PUT("/:id", srv.handleSaveDocument)
 			docs.GET("/:id/versions", srv.handleGetVersions)
+			docs.GET("/:id/versions/:version", srv.handleGetVersion)
+			docs.POST("/:id/rollback/:version", srv.handleRollback)
+			docs.GET("/:id/permissions", srv.handleGetPermissions)
+			docs.PUT("/:id/permissions", srv.handleSetPermission)
+			docs.DELETE("/:id/permissions/:userId", srv.handleDeletePermission)
+			docs.GET("/:id/crdt/state", srv.handleCRDTState)
+			docs.POST("/:id/crdt/sync", srv.handleCRDTSync)
 		}
 	}
 
@@ -286,10 +299,15 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 	src := c.Query("src")
 	var req struct {
 		Content string `json:"content" binding:"required"`
+		UserID  string `json:"userId,omitempty"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if req.UserID == "" {
+		req.UserID = "anonymous"
 	}
 
 	if src != "" {
@@ -319,12 +337,16 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 		return
 	}
 
+	if err := s.DB.SaveDocumentVersion(docID, req.Content, req.UserID); err != nil {
+		log.Printf("Warning: Failed to save document version: %v", err)
+	}
+
 	doc, _ := s.DocMgr.Load(docID)
 
 	msg, _ := json.Marshal(ws.Message{
 		Type:   "document-saved",
 		DocID:  docID,
-		UserID: "server",
+		UserID: req.UserID,
 	})
 	s.Hub.Broadcast(docID, msg, nil)
 
@@ -341,8 +363,203 @@ func (s *Server) handleGetVersions(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	
+	dbVersions, err := s.DB.GetDocumentVersions(docID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	
 	c.JSON(http.StatusOK, gin.H{
 		"docId":    docID,
-		"versions": versions,
+		"files":    versions,
+		"database": dbVersions,
 	})
+}
+
+func (s *Server) handleGetVersion(c *gin.Context) {
+	docID := c.Param("id")
+	versionStr := c.Param("version")
+	version, err := strconv.Atoi(versionStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid version"})
+		return
+	}
+	
+	dbVersion, err := s.DB.GetDocumentVersion(docID, version)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "version not found"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, dbVersion)
+}
+
+func (s *Server) handleRollback(c *gin.Context) {
+	docID := c.Param("id")
+	versionStr := c.Param("version")
+	version, err := strconv.Atoi(versionStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid version"})
+		return
+	}
+	
+	var req struct {
+		UserID string `json:"userId"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		req.UserID = "anonymous"
+	}
+	
+	newVersion, err := s.DB.RollbackToVersion(docID, version, req.UserID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	
+	if err := s.DocMgr.Save(docID, newVersion.Content); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	
+	msg, _ := json.Marshal(ws.Message{
+		Type:     "document-rollback",
+		DocID:    docID,
+		UserID:   req.UserID,
+		Data:     json.RawMessage(`{"version":` + strconv.Itoa(newVersion.Version) + `}`),
+	})
+	s.Hub.Broadcast(docID, msg, nil)
+	
+	c.JSON(http.StatusOK, newVersion)
+}
+
+func (s *Server) getUserIdFromRequest(c *gin.Context) string {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader != "" && len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+		token := authHeader[7:]
+		claims, err := user.ParseToken(token, s.Config.JWTSecret)
+		if err == nil {
+			return claims.UserID
+		}
+	}
+	return c.Query("userId")
+}
+
+func (s *Server) handleGetPermissions(c *gin.Context) {
+	docID := c.Param("id")
+	userID := s.getUserIdFromRequest(c)
+
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
+	permissions, err := s.DB.GetDocumentPermissions(docID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"permissions": permissions})
+}
+
+func (s *Server) handleSetPermission(c *gin.Context) {
+	docID := c.Param("id")
+	userID := s.getUserIdFromRequest(c)
+
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessAdmin)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied. Admin privileges required."})
+		return
+	}
+
+	var req struct {
+		UserID string `json:"userId" binding:"required"`
+		Access string `json:"access" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if req.Access != storage.AccessRead && req.Access != storage.AccessWrite && req.Access != storage.AccessAdmin {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid access level. Must be read, write, or admin."})
+		return
+	}
+
+	if err := s.DB.SetPermission(docID, req.UserID, req.Access); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+func (s *Server) handleCRDTState(c *gin.Context) {
+	docID := c.Param("id")
+	doc := s.CRDTStore.Get(docID)
+	c.JSON(http.StatusOK, gin.H{
+		"docId": docID,
+		"state": doc.GetState(),
+		"vector": doc.GetVector(),
+	})
+}
+
+func (s *Server) handleCRDTSync(c *gin.Context) {
+	docID := c.Param("id")
+
+	var req struct {
+		Operations []crdt.Operation   `json:"operations"`
+		Vector     map[string]int64   `json:"vector"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	doc := s.CRDTStore.Get(docID)
+
+	for _, op := range req.Operations {
+		doc.ApplyOperation(op)
+	}
+
+	missedOps := doc.GetOperationsSince(req.Vector)
+
+	c.JSON(http.StatusOK, gin.H{
+		"docId":      docID,
+		"operations": missedOps,
+		"vector":     doc.GetVector(),
+	})
+}
+
+func (s *Server) handleDeletePermission(c *gin.Context) {
+	docID := c.Param("id")
+	targetUserID := c.Param("userId")
+	userID := s.getUserIdFromRequest(c)
+
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessAdmin)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied. Admin privileges required."})
+		return
+	}
+
+	if err := s.DB.DeletePermission(docID, targetUserID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
 }
