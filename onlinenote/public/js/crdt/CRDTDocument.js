@@ -148,17 +148,17 @@ export class CRDTDocument {
     let currentNode = this.nodes.get(this.BOF_ID);
 
     while (currentNode && currentNode.id !== this.EOF_ID) {
-      if (!currentNode.deleted) {
+      if (!currentNode.deleted && currentNode.content) {
         visibleIndex++;
       }
-      if (visibleIndex === index) {
+      if (visibleIndex === index - 1) {
         const rightNode = this.nodes.get(currentNode.rightId) || this.nodes.get(this.EOF_ID);
         return { leftNode: currentNode, rightNode };
       }
       currentNode = this.nodes.get(currentNode.rightId);
     }
 
-    return { leftNode: currentNode || this.nodes.get(this.BOF_ID), rightNode: this.nodes.get(this.EOF_ID) };
+    return { leftNode: this.nodes.get(this.BOF_ID), rightNode: this.nodes.get(this.EOF_ID) };
   }
 
   localDelete(fromIndex, toIndex) {
@@ -190,7 +190,7 @@ export class CRDTDocument {
     let currentNode = this.nodes.get(this.BOF_ID);
 
     while (currentNode && currentNode.id !== this.EOF_ID) {
-      if (!currentNode.deleted) {
+      if (!currentNode.deleted && currentNode.content) {
         visibleIndex++;
         if (visibleIndex === index) return currentNode;
       }
@@ -385,19 +385,48 @@ export class CRDTDocument {
     this.nodes.set(this.BOF_ID, new CRDTNode(this.BOF_ID, 'system', 0, '', false, 0, null, this.EOF_ID));
     this.nodes.set(this.EOF_ID, new CRDTNode(this.EOF_ID, 'system', 0, '', false, 0, this.BOF_ID, null));
 
-    const nodeMap = new Map();
     for (const obj of state.nodes) {
       const node = CRDTNode.fromJSON(obj);
       this.nodes.set(node.id, node);
-      nodeMap.set(node.id, node);
     }
 
-    const sorted = [...nodeMap.values()].sort((a, b) => this.compareNodeIds(a.id, b.id));
+    const rightOf = new Map();
+    const leftChildren = new Map();
+
+    for (const [id, node] of this.nodes) {
+      if (id === this.BOF_ID || id === this.EOF_ID) continue;
+      if (node.leftId) {
+        if (!leftChildren.has(node.leftId)) {
+          leftChildren.set(node.leftId, []);
+        }
+        leftChildren.get(node.leftId).push(id);
+      }
+      if (node.rightId) {
+        rightOf.set(id, node.rightId);
+      }
+    }
+
+    const buildOrder = (parentId) => {
+      const children = leftChildren.get(parentId) || [];
+      if (children.length === 0) return [];
+
+      children.sort((a, b) => this.compareNodeIds(a, b));
+
+      const result = [];
+      for (const childId of children) {
+        result.push(childId);
+        result.push(...buildOrder(childId));
+      }
+      return result;
+    };
+
+    const orderedIds = buildOrder(this.BOF_ID);
 
     let prev = this.nodes.get(this.BOF_ID);
-    for (const node of sorted) {
+    for (const nodeId of orderedIds) {
+      const node = this.nodes.get(nodeId);
       node.leftId = prev.id;
-      prev.rightId = node.id;
+      prev.rightId = nodeId;
       prev = node;
     }
     prev.rightId = this.EOF_ID;

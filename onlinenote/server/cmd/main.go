@@ -47,10 +47,31 @@ func main() {
 	defer db.Close()
 
 	docMgr := document.NewManager(cfg.DataDir, cfg.StaticDir)
-	hub := ws.NewHub()
-	go hub.Run()
 
 	crdtStore := crdt.NewDocumentStore()
+
+	hub := ws.NewHub()
+	hub.OnCRDTOp = func(docID string, data []byte) {
+		var msg struct {
+			Data json.RawMessage `json:"data"`
+		}
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return
+		}
+
+		var crdtMsg struct {
+			Operations []crdt.Operation `json:"operations"`
+		}
+		if err := json.Unmarshal(msg.Data, &crdtMsg); err != nil {
+			return
+		}
+
+		doc := crdtStore.Get(docID)
+		for _, op := range crdtMsg.Operations {
+			doc.ApplyOperation(op)
+		}
+	}
+	go hub.Run()
 
 	srv := &Server{
 		Config:    cfg,
@@ -421,7 +442,10 @@ func (s *Server) handleRollback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
+	crdtDoc := s.CRDTStore.Get(docID)
+	crdtDoc.ResetFromContent(newVersion.Content)
+
 	msg, _ := json.Marshal(ws.Message{
 		Type:     "document-rollback",
 		DocID:    docID,

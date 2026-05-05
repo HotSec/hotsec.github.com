@@ -131,6 +131,15 @@ func (d *Document) GetVector() map[string]int64 {
 	return result
 }
 
+func (d *Document) ResetFromContent(content string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	d.nodes = make(map[string]*Node)
+	d.opLog = make([]Operation, 0)
+	d.clock = 0
+}
+
 type DocumentStore struct {
 	mu        sync.RWMutex
 	documents map[string]*Document

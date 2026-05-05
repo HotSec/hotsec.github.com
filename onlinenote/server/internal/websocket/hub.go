@@ -41,6 +41,7 @@ type Hub struct {
 	register   chan *Client
 	unregister chan *Client
 	mu         sync.RWMutex
+	OnCRDTOp   func(docID string, data []byte)
 }
 
 type BroadcastMessage struct {
@@ -219,12 +220,16 @@ func (c *Client) ReadPump() {
 			c.Hub.Broadcast(c.DocID, broadcastData, c)
 
 		case "crdt-op":
+			if c.Hub.OnCRDTOp != nil {
+				c.Hub.OnCRDTOp(c.DocID, message)
+			}
 			broadcastData, _ := json.Marshal(msg)
 			c.Hub.Broadcast(c.DocID, broadcastData, c)
 
 		case "crdt-sync":
-			syncData, _ := json.Marshal(msg)
-			c.Hub.Broadcast(c.DocID, syncData, c)
+			if c.Hub.OnCRDTOp != nil {
+				c.Hub.OnCRDTOp(c.DocID, message)
+			}
 
 		case "save":
 			log.Printf("document save request from %s", c.UserID)

@@ -115,14 +115,32 @@ func (d *Database) migrate() error {
 			access TEXT NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY (document_id, user_id),
-			FOREIGN KEY (document_id) REFERENCES documents(id),
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			FOREIGN KEY (document_id) REFERENCES documents(id)
 		)`,
 	}
 
 	for _, m := range migrations {
 		if _, err := d.db.Exec(m); err != nil {
 			return fmt.Errorf("exec migration: %w", err)
+		}
+	}
+
+	alterMigrations := []struct {
+		sql string
+		col string
+		tbl string
+	}{
+		{`ALTER TABLE documents ADD COLUMN public BOOLEAN DEFAULT TRUE`, "public", "documents"},
+		{`ALTER TABLE documents ADD COLUMN default_access TEXT DEFAULT 'write'`, "default_access", "documents"},
+	}
+
+	for _, am := range alterMigrations {
+		var colName string
+		err := d.db.QueryRow(`SELECT name FROM pragma_table_info(?) WHERE name = ?`, am.tbl, am.col).Scan(&colName)
+		if err != nil {
+			if _, err := d.db.Exec(am.sql); err != nil {
+				return fmt.Errorf("alter table add column %s: %w", am.col, err)
+			}
 		}
 	}
 
