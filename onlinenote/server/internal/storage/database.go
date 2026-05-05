@@ -192,23 +192,23 @@ func (d *Database) SaveDocumentVersion(docID, content, userID string) error {
 	defer tx.Rollback()
 
 	var currentVersion int
-	var exists bool
 	err = tx.QueryRow(`
-		SELECT version, 1 FROM documents WHERE id = ?
-	`, docID).Scan(&currentVersion, &exists)
+		SELECT COALESCE(version, 0) FROM documents WHERE id = ?
+	`, docID).Scan(&currentVersion)
+
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 
-	if !exists {
-		currentVersion = 0
+	if err == sql.ErrNoRows {
 		_, err = tx.Exec(`
 			INSERT INTO documents (id, title, path, version)
-			VALUES (?, '', '', 1)
+			VALUES (?, '', '', 0)
 		`, docID)
 		if err != nil {
 			return err
 		}
+		currentVersion = 0
 	}
 
 	newVersion := currentVersion + 1

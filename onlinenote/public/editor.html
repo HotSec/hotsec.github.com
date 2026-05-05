@@ -524,10 +524,14 @@
 
           if (resp.ok) {
             const newVersion = await resp.json();
-            this.editor.setContent(this.selectedVersion.content);
-            this.lastSavedContent = this.selectedVersion.content;
-            this.preview.render(this.selectedVersion.content);
+            const content = this.selectedVersion.content;
+            this.editor.setContent(content);
+            this.lastSavedContent = content;
+            this.preview.render(content);
             this.setSaveStatus('saved');
+            if (this.crdtEnabled && this.collab) {
+              this.collab.initCRDT(content);
+            }
             this.closeVersionModal();
             alert(`已成功回滚到版本 v${this.selectedVersion.version}`);
           } else {

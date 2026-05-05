@@ -144,21 +144,49 @@ export class CRDTDocument {
   }
 
   _findInsertPosition(index) {
+    if (index <= 0) {
+      let rightNode = this.nodes.get(this.BOF_ID);
+      while (rightNode && rightNode.id !== this.EOF_ID) {
+        const nextId = rightNode.rightId;
+        if (!nextId) break;
+        const next = this.nodes.get(nextId);
+        if (!next) break;
+        rightNode = next;
+        if (!rightNode.deleted && rightNode.content) break;
+      }
+      if (rightNode.id === this.EOF_ID || (rightNode.deleted || !rightNode.content)) {
+        return { leftNode: this.nodes.get(this.BOF_ID), rightNode: this.nodes.get(this.EOF_ID) };
+      }
+      return { leftNode: this.nodes.get(this.BOF_ID), rightNode };
+    }
+
     let visibleIndex = -1;
     let currentNode = this.nodes.get(this.BOF_ID);
 
     while (currentNode && currentNode.id !== this.EOF_ID) {
       if (!currentNode.deleted && currentNode.content) {
         visibleIndex++;
-      }
-      if (visibleIndex === index - 1) {
-        const rightNode = this.nodes.get(currentNode.rightId) || this.nodes.get(this.EOF_ID);
-        return { leftNode: currentNode, rightNode };
+        if (visibleIndex === index - 1) {
+          const rightNode = this.nodes.get(currentNode.rightId) || this.nodes.get(this.EOF_ID);
+          return { leftNode: currentNode, rightNode };
+        }
       }
       currentNode = this.nodes.get(currentNode.rightId);
     }
 
-    return { leftNode: this.nodes.get(this.BOF_ID), rightNode: this.nodes.get(this.EOF_ID) };
+    let leftNode = this.nodes.get(this.EOF_ID);
+    while (leftNode && leftNode.id !== this.BOF_ID) {
+      const prevId = leftNode.leftId;
+      if (!prevId) break;
+      const prev = this.nodes.get(prevId);
+      if (!prev) break;
+      leftNode = prev;
+      if (!leftNode.deleted && leftNode.content) break;
+    }
+    if (leftNode.id === this.BOF_ID || (leftNode.deleted || !leftNode.content)) {
+      return { leftNode: this.nodes.get(this.BOF_ID), rightNode: this.nodes.get(this.EOF_ID) };
+    }
+    return { leftNode, rightNode: this.nodes.get(this.EOF_ID) };
   }
 
   localDelete(fromIndex, toIndex) {
@@ -173,6 +201,9 @@ export class CRDTDocument {
   _deleteChar(index) {
     const node = this._findNodeAtIndex(index);
     if (!node || node.deleted) return null;
+
+    this.clock++;
+    this.vector[this.siteId] = this.clock;
 
     node.deleted = true;
     node.timestamp = Date.now();

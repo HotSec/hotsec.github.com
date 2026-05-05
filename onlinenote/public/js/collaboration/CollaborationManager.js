@@ -113,19 +113,22 @@ export class CollaborationManager {
       return;
     }
 
+    let offset = 0;
     for (const change of changes) {
-      const from = change.from;
-      const to = change.to;
+      const from = change.from + offset;
+      const to = change.to + offset;
       const inserted = change.inserted;
 
       if (from !== to) {
         const deleteOps = this.crdt.localDelete(from, to);
         this.pendingCRDTOps.push(...deleteOps);
+        offset -= (to - from);
       }
 
       if (inserted && inserted.length > 0) {
         const insertOps = this.crdt.localInsert(from, inserted);
         this.pendingCRDTOps.push(...insertOps);
+        offset += inserted.length;
       }
     }
 
