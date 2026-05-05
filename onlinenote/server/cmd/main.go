@@ -345,6 +345,9 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		if err := s.DB.SaveDocumentVersion(docID, req.Content, req.UserID); err != nil {
+			log.Printf("Warning: Failed to save document version for src: %v", err)
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"id":      docID,
 			"version": 1,

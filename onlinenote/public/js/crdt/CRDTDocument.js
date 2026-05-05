@@ -292,14 +292,42 @@ export class CRDTDocument {
         if (oldRight) oldRight.leftId = node.id;
       }
     } else if (rightNode) {
-      node.rightId = rightNode.id;
-      const oldLeftId = rightNode.leftId;
-      node.leftId = oldLeftId;
-      rightNode.leftId = node.id;
-      if (oldLeftId) {
-        const oldLeft = this.nodes.get(oldLeftId);
-        if (oldLeft) oldLeft.rightId = node.id;
+      let insertBefore = rightNode;
+      let current = rightNode;
+      while (current && current.id !== this.BOF_ID) {
+        const prevId = current.leftId;
+        if (!prevId) break;
+        const prev = this.nodes.get(prevId);
+        if (!prev) break;
+        insertBefore = prev;
+        if (prev.id === op.leftId) break;
+        current = prev;
       }
+
+      node.rightId = insertBefore.id;
+      node.leftId = insertBefore.leftId;
+
+      const beforePrev = this.nodes.get(insertBefore.leftId);
+      if (beforePrev) {
+        beforePrev.rightId = node.id;
+      }
+      insertBefore.leftId = node.id;
+    } else {
+      let lastNode = this.nodes.get(this.BOF_ID);
+      while (lastNode && lastNode.rightId && lastNode.rightId !== this.EOF_ID) {
+        const next = this.nodes.get(lastNode.rightId);
+        if (!next) break;
+        lastNode = next;
+      }
+
+      node.leftId = lastNode.id;
+      node.rightId = lastNode.rightId;
+
+      const afterLast = this.nodes.get(lastNode.rightId);
+      if (afterLast) {
+        afterLast.leftId = node.id;
+      }
+      lastNode.rightId = node.id;
     }
   }
 

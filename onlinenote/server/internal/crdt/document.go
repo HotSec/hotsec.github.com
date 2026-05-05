@@ -137,6 +137,7 @@ func (d *Document) ResetFromContent(content string) {
 
 	d.nodes = make(map[string]*Node)
 	d.opLog = make([]Operation, 0)
+	d.vector = make(map[string]int64)
 	d.clock = 0
 }
 
