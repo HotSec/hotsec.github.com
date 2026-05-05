@@ -12,7 +12,7 @@ export class Editor {
   }
 
   async init() {
-    const sharedDeps = '?deps=@codemirror/state@6.5.2,@codemirror/view@6.36.4,@codemirror/language@6.11.0';
+    const VERSIONS = '@codemirror/state@6.5.2,@codemirror/view@6.36.4,@codemirror/language@6.11.0';
 
     const [
       { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine },
@@ -21,11 +21,11 @@ export class Editor {
       { defaultKeymap, history, historyKeymap, indentWithTab },
       { EditorState },
     ] = await Promise.all([
-      import(`https://esm.sh/@codemirror/view@6.36.4`),
-      import(`https://esm.sh/@codemirror/lang-markdown@6.3.2${sharedDeps}`),
-      import(`https://esm.sh/@codemirror/language-data@6.5.1${sharedDeps}`),
-      import(`https://esm.sh/@codemirror/commands@6.8.0${sharedDeps}`),
-      import(`https://esm.sh/@codemirror/state@6.5.2`),
+      import(`https://esm.sh/@codemirror/view@6.36.4?deps=${VERSIONS}`),
+      import(`https://esm.sh/@codemirror/lang-markdown@6.3.2?deps=${VERSIONS}`),
+      import(`https://esm.sh/@codemirror/language-data@6.5.1?deps=${VERSIONS}`),
+      import(`https://esm.sh/@codemirror/commands@6.8.0?deps=${VERSIONS}`),
+      import(`https://esm.sh/@codemirror/state@6.5.2?deps=${VERSIONS}`),
     ]);
 
     this.EditorView = EditorView;
