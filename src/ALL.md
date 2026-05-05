@@ -4031,20 +4031,8 @@
 - MCP（Model Context Protocol）：AI 模型与外部工具/数据的标准通信协议
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
 
-> [📁 01_智能体框架/](./mybook/06_agents/01_智能体框架/)
-> [📄 01_框架总览.md](./mybook/06_agents/01_智能体框架/01_框架总览.md)
-> [📄 02_AutoGen.md](./mybook/06_agents/01_智能体框架/02_AutoGen.md)
-> [📄 03_CrewAI.md](./mybook/06_agents/01_智能体框架/03_CrewAI.md)
-> [📄 04_LangGraph.md](./mybook/06_agents/01_智能体框架/04_LangGraph.md)
-</details>
 
-#### MCP 协议
-
-<details>
-<summary>MCP 协议</summary>
-
-> [📁 02_MCP协议/](./mybook/06_agents/02_MCP协议/)
-> [📄 01_MCP开发指南.md](./mybook/06_agents/02_MCP协议/01_MCP开发指南.md)
+> [📄 智能体框架.md](./mybook/06_agents/智能体框架.md) · [📄 AutoGen.md](./mybook/06_agents/AutoGen.md) · [📄 CrewAI.md](./mybook/06_agents/CrewAI.md) · [📄 LangGraph.md](./mybook/06_agents/LangGraph.md)
 </details>
 
 #### AI Coding 实践
