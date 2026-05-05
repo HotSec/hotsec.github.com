@@ -4017,7 +4017,7 @@
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
 
 
-> [📄 智能体框架.md](./mybook/06_agents/智能体框架.md) · [📄 AutoGen.md](./mybook/06_agents/AutoGen.md) · [📄 CrewAI.md](./mybook/06_agents/CrewAI.md) · [📄 LangGraph.md](./mybook/06_agents/LangGraph.md)
+> [📄 智能体框架.md](./mybook/06_agents/智能体框架.md) · [📄 AutoGen.md](./mybook/06_agents/AutoGen.md) · [📄 CrewAI.md](./mybook/06_agents/CrewAI.md) · [📄 LangGraph.md](./mybook/06_agents/LangGraph.md) · [📄 MCP开发指南.md](./mybook/06_agents/MCP开发指南.md) · [📄 2026最新大模型对比.md](./mybook/06_agents/2026最新大模型对比.md)
 </details>
 
 #### AI Coding 实践
@@ -4042,6 +4042,14 @@
 - **自动化检查**：重要规则必须有自动化检查（`make lint-arch` 分层依赖检查）
   - 错误信息格式：WHAT（违规了什么）+ WHY（为什么不允许）+ HOW（怎么修复）
   - 规则优先级：能自动化检查的 > 写在 AGENTS.md 的 > 口头约定的
+- **主流工具**：
+  - **Claude Code**：终端 AI 编码，CLAUDE.md 配置，MCP 扩展
+  - **OpenCode**：开源终端工具，支持多 LLM 后端（OpenAI/Anthropic/Ollama）
+  - **Trae**：AI IDE，Rules 分主题管理 + Skill 可复用技能系统 + Builder 模式
+  - **Cursor**：AI IDE，Tab 补全 + Composer 多文件编辑 + .cursorrules
+  - **Aider**：开源终端工具，多模型支持，Git 深度集成
+- **项目约束文档**：AGENTS.md（通用）/ CLAUDE.md / .cursorrules / .trae/rules/ / .github/copilot-instructions.md
+- **Skill 文档规范**：将常见开发模式封装为标准化流程（api-endpoint / bug-fix / refactor / write-test 等）
 - **实施建议**：
   - 从 `/init` 或 `harness-creator` 生成初始版本
   - Bad Case 驱动迭代：每遇到一个 AI bad case，就补一条规则
