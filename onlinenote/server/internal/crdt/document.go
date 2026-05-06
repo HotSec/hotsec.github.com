@@ -131,6 +131,31 @@ func (d *Document) GetVector() map[string]int64 {
 	return result
 }
 
+func (d *Document) LoadState(state json.RawMessage) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	var data struct {
+		Nodes  []*Node          `json:"nodes"`
+		Vector map[string]int64 `json:"vector"`
+		Clock  int64            `json:"clock"`
+	}
+	if err := json.Unmarshal(state, &data); err != nil {
+		return
+	}
+
+	d.nodes = make(map[string]*Node)
+	for _, node := range data.Nodes {
+		d.nodes[node.ID] = node
+	}
+	d.vector = data.Vector
+	if d.vector == nil {
+		d.vector = make(map[string]int64)
+	}
+	d.clock = data.Clock
+	d.opLog = make([]Operation, 0)
+}
+
 func (d *Document) ResetFromContent(content string) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -161,6 +186,25 @@ func (s *DocumentStore) Get(docID string) *Document {
 	}
 
 	doc := NewDocument()
+	s.documents[docID] = doc
+	return doc
+}
+
+func (s *DocumentStore) LoadFromDB(docID string, db interface {
+	LoadCRDTState(docID string) (json.RawMessage, map[string]int64, error)
+}) *Document {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if doc, exists := s.documents[docID]; exists {
+		return doc
+	}
+
+	doc := NewDocument()
+	state, _, err := db.LoadCRDTState(docID)
+	if err == nil && len(state) > 0 {
+		doc.LoadState(state)
+	}
 	s.documents[docID] = doc
 	return doc
 }

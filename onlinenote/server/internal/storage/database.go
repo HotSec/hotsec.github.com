@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -77,6 +78,8 @@ const (
 	AccessAdmin = "admin"
 )
 
+const MaxVersionsToKeep = 50
+
 func (d *Database) migrate() error {
 	migrations := []string{
 		`CREATE TABLE IF NOT EXISTS users (
@@ -109,12 +112,20 @@ func (d *Database) migrate() error {
 			FOREIGN KEY (document_id) REFERENCES documents(id)
 		)`,
 		`CREATE INDEX IF NOT EXISTS idx_document_versions_doc ON document_versions(document_id, version)`,
+		`CREATE INDEX IF NOT EXISTS idx_document_versions_created ON document_versions(document_id, created_at DESC)`,
 		`CREATE TABLE IF NOT EXISTS document_permissions (
 			document_id TEXT NOT NULL,
 			user_id TEXT NOT NULL,
 			access TEXT NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY (document_id, user_id),
+			FOREIGN KEY (document_id) REFERENCES documents(id)
+		)`,
+		`CREATE TABLE IF NOT EXISTS crdt_state (
+			document_id TEXT PRIMARY KEY,
+			state TEXT NOT NULL,
+			vector TEXT NOT NULL,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (document_id) REFERENCES documents(id)
 		)`,
 	}
@@ -229,7 +240,25 @@ func (d *Database) SaveDocumentVersion(docID, content, userID string) error {
 		return err
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+	go d.CleanupOldVersions(docID)
+	return nil
+}
+
+func (d *Database) CleanupOldVersions(docID string) error {
+	_, err := d.db.Exec(`
+		DELETE FROM document_versions
+		WHERE document_id = ?
+		AND id NOT IN (
+			SELECT id FROM document_versions
+			WHERE document_id = ?
+			ORDER BY version DESC
+			LIMIT ?
+		)
+	`, docID, docID, MaxVersionsToKeep)
+	return err
 }
 
 func (d *Database) RollbackToVersion(docID string, version int, userID string) (*DocumentVersion, error) {
@@ -340,6 +369,32 @@ func (d *Database) GetDocumentPermissions(docID string) ([]DocumentPermission, e
 		permissions = append(permissions, p)
 	}
 	return permissions, nil
+}
+
+func (d *Database) SaveCRDTState(docID string, state json.RawMessage, vector map[string]int64) error {
+	vectorData, _ := json.Marshal(vector)
+	_, err := d.db.Exec(`
+		INSERT INTO crdt_state (document_id, state, vector, updated_at)
+		VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+		ON CONFLICT (document_id)
+		DO UPDATE SET state = excluded.state, vector = excluded.vector, updated_at = CURRENT_TIMESTAMP
+	`, docID, string(state), string(vectorData))
+	return err
+}
+
+func (d *Database) LoadCRDTState(docID string) (json.RawMessage, map[string]int64, error) {
+	var stateData string
+	var vectorData string
+	err := d.db.QueryRow(`
+		SELECT state, vector FROM crdt_state WHERE document_id = ?
+	`, docID).Scan(&stateData, &vectorData)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var vector map[string]int64
+	json.Unmarshal([]byte(vectorData), &vector)
+	return json.RawMessage(stateData), vector, nil
 }
 
 func (d *Database) DeletePermission(docID, userID string) error {

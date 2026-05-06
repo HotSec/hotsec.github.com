@@ -2,7 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -104,6 +104,7 @@ func (h *Hub) Run() {
 				select {
 				case client.Send <- msg.Data:
 				default:
+					slog.Warn("slow client detected, dropping connection", "userId", client.UserID, "docId", client.DocID)
 					h.mu.Lock()
 					close(client.Send)
 					delete(h.clients, client)
@@ -200,14 +201,14 @@ func (c *Client) ReadPump() {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("websocket read error: %v", err)
+				slog.Warn("websocket read error", "error", err)
 			}
 			break
 		}
 
 		var msg Message
 		if err := json.Unmarshal(message, &msg); err != nil {
-			log.Printf("websocket unmarshal error: %v", err)
+			slog.Warn("websocket unmarshal error", "error", err)
 			continue
 		}
 
@@ -232,7 +233,7 @@ func (c *Client) ReadPump() {
 			}
 
 		case "save":
-			log.Printf("document save request from %s", c.UserID)
+			slog.Info("document save request", "userId", c.UserID)
 		}
 
 		c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second))

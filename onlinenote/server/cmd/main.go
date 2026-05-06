@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -42,7 +42,8 @@ func main() {
 
 	db, err := storage.NewDatabase(cfg.DataDir)
 	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+		slog.Error("failed to initialize database", "error", err)
+		os.Exit(1)
 	}
 	defer db.Close()
 
@@ -86,11 +87,10 @@ func main() {
 	r.Use(gin.Logger(), gin.Recovery())
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:    []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:   []string{"Content-Length"},
 	}))
 
 	staticFS := gin.Dir(cfg.StaticDir, false)
@@ -131,16 +131,17 @@ func main() {
 	r.GET("/ws", srv.handleWebSocket)
 
 	addr := fmt.Sprintf(":%s", cfg.Port)
-	log.Printf("Server starting on %s", addr)
+	slog.Info("server starting", "addr", addr)
 	if err := r.Run(addr); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		slog.Error("failed to start server", "error", err)
+		os.Exit(1)
 	}
 }
 
 func (s *Server) handleWebSocket(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Printf("WebSocket upgrade error: %v", err)
+		slog.Warn("websocket upgrade error", "error", err)
 		return
 	}
 
@@ -291,9 +292,20 @@ func (s *Server) handleGetDocument(c *gin.Context) {
 	docID := c.Param("id")
 	src := c.Query("src")
 
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
 	doc, err := s.DocMgr.Load(docID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
@@ -318,6 +330,18 @@ func (s *Server) handleGetDocument(c *gin.Context) {
 func (s *Server) handleSaveDocument(c *gin.Context) {
 	docID := c.Param("id")
 	src := c.Query("src")
+
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessWrite)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
 	var req struct {
 		Content string `json:"content" binding:"required"`
 		UserID  string `json:"userId,omitempty"`
@@ -338,15 +362,15 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 			return
 		}
 		if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			s.internalError(c, err)
 			return
 		}
 		if err := os.WriteFile(filePath, []byte(req.Content), 0644); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			s.internalError(c, err)
 			return
 		}
 		if err := s.DB.SaveDocumentVersion(docID, req.Content, req.UserID); err != nil {
-			log.Printf("Warning: Failed to save document version for src: %v", err)
+			slog.Warn("failed to save document version for src", "error", err)
 		}
 		c.JSON(http.StatusOK, gin.H{
 			"id":      docID,
@@ -357,12 +381,12 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 	}
 
 	if err := s.DocMgr.Save(docID, req.Content); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
 	if err := s.DB.SaveDocumentVersion(docID, req.Content, req.UserID); err != nil {
-		log.Printf("Warning: Failed to save document version: %v", err)
+		slog.Warn("failed to save document version", "error", err)
 	}
 
 	doc, _ := s.DocMgr.Load(docID)
@@ -382,15 +406,27 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 
 func (s *Server) handleGetVersions(c *gin.Context) {
 	docID := c.Param("id")
+
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
 	versions, err := s.DocMgr.ListVersions(docID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
 	dbVersions, err := s.DB.GetDocumentVersions(docID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
@@ -407,6 +443,17 @@ func (s *Server) handleGetVersion(c *gin.Context) {
 	version, err := strconv.Atoi(versionStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid version"})
+		return
+	}
+
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
 		return
 	}
 
@@ -428,6 +475,17 @@ func (s *Server) handleRollback(c *gin.Context) {
 		return
 	}
 
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessWrite)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
 	var req struct {
 		UserID string `json:"userId"`
 	}
@@ -437,12 +495,12 @@ func (s *Server) handleRollback(c *gin.Context) {
 
 	newVersion, err := s.DB.RollbackToVersion(docID, version, req.UserID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
 	if err := s.DocMgr.Save(docID, newVersion.Content); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
@@ -472,13 +530,18 @@ func (s *Server) getUserIdFromRequest(c *gin.Context) string {
 	return c.Query("userId")
 }
 
+func (s *Server) internalError(c *gin.Context, err error) {
+	slog.Error("internal error", "path", c.Request.URL.Path, "error", err)
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+}
+
 func (s *Server) handleGetPermissions(c *gin.Context) {
 	docID := c.Param("id")
 	userID := s.getUserIdFromRequest(c)
 
 	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 	if !hasAccess {
@@ -488,7 +551,7 @@ func (s *Server) handleGetPermissions(c *gin.Context) {
 
 	permissions, err := s.DB.GetDocumentPermissions(docID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
@@ -501,7 +564,7 @@ func (s *Server) handleSetPermission(c *gin.Context) {
 
 	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessAdmin)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 	if !hasAccess {
@@ -524,7 +587,7 @@ func (s *Server) handleSetPermission(c *gin.Context) {
 	}
 
 	if err := s.DB.SetPermission(docID, req.UserID, req.Access); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
@@ -533,6 +596,18 @@ func (s *Server) handleSetPermission(c *gin.Context) {
 
 func (s *Server) handleCRDTState(c *gin.Context) {
 	docID := c.Param("id")
+
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
+
 	doc := s.CRDTStore.Get(docID)
 	c.JSON(http.StatusOK, gin.H{
 		"docId":  docID,
@@ -543,6 +618,17 @@ func (s *Server) handleCRDTState(c *gin.Context) {
 
 func (s *Server) handleCRDTSync(c *gin.Context) {
 	docID := c.Param("id")
+
+	userID := s.getUserIdFromRequest(c)
+	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessRead)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal error"})
+		return
+	}
+	if !hasAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+		return
+	}
 
 	var req struct {
 		Operations []crdt.Operation `json:"operations"`
@@ -575,7 +661,7 @@ func (s *Server) handleDeletePermission(c *gin.Context) {
 
 	hasAccess, err := s.DB.CheckAccess(docID, userID, storage.AccessAdmin)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 	if !hasAccess {
@@ -584,7 +670,7 @@ func (s *Server) handleDeletePermission(c *gin.Context) {
 	}
 
 	if err := s.DB.DeletePermission(docID, targetUserID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.internalError(c, err)
 		return
 	}
 
