@@ -2748,6 +2748,21 @@
 > [📄 面试题.md](./mybook/02_python/09_面试题/面试题.md)
 </details>
 
+#### 工程实践
+
+<details>
+<summary>代码格式化与检查工具</summary>
+
+- **uv**：Rust 编写的极速包管理器，替代 pip/poetry/pyenv；项目管理/虚拟环境/Python 版本管理一体化
+- **ruff**：Rust 编写的全能 Linter + 格式化器，替代 black+isort+flake8；700+ 规则，自动修复
+- **black**：不妥协的代码格式化器，PEP 8 标准，88 字符行宽，消除风格争论
+- **isort**：导入语句自动排序，按标准库/第三方/本地模块分组
+- **pylint**：深度静态分析，类型推断/数据流分析/代码评分/自定义检查器
+- **推荐组合**：极简方案用 ruff 一站式；深度方案用 ruff + pylint；传统方案用 black + isort + flake8
+
+> [📄 01_代码格式化与检查工具.md](./mybook/02_python/10_工程实践/01_代码格式化与检查工具.md)
+</details>
+
 ---
 
 ## 四、Lua
@@ -4016,8 +4031,20 @@
 - MCP（Model Context Protocol）：AI 模型与外部工具/数据的标准通信协议
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
 
+> [📁 01_智能体框架/](./mybook/06_agents/01_智能体框架/)
+> [📄 01_框架总览.md](./mybook/06_agents/01_智能体框架/01_框架总览.md)
+> [📄 02_AutoGen.md](./mybook/06_agents/01_智能体框架/02_AutoGen.md)
+> [📄 03_CrewAI.md](./mybook/06_agents/01_智能体框架/03_CrewAI.md)
+> [📄 04_LangGraph.md](./mybook/06_agents/01_智能体框架/04_LangGraph.md)
+</details>
 
-> [📄 智能体框架.md](./mybook/06_agents/智能体框架.md) · [📄 AutoGen.md](./mybook/06_agents/AutoGen.md) · [📄 CrewAI.md](./mybook/06_agents/CrewAI.md) · [📄 LangGraph.md](./mybook/06_agents/LangGraph.md) · [📄 MCP开发指南.md](./mybook/06_agents/MCP开发指南.md) · [📄 2026最新大模型对比.md](./mybook/06_agents/2026最新大模型对比.md)
+#### MCP 协议
+
+<details>
+<summary>MCP 协议</summary>
+
+> [📁 02_MCP协议/](./mybook/06_agents/02_MCP协议/)
+> [📄 01_MCP开发指南.md](./mybook/06_agents/02_MCP协议/01_MCP开发指南.md)
 </details>
 
 #### AI Coding 实践
@@ -4056,8 +4083,31 @@
   - 团队共建：全局规则放 AGENTS.md，模块细节放对应 docs/
   - 文件目标读者标注：README.md（人）、AGENTS.md（AI为主）、docs/*.md（AI为主，人可参考）
 
+> [📁 03_AI-Coding实践/](./mybook/06_agents/03_AI-Coding实践/)
+> [📄 00_索引页.md](./mybook/06_agents/03_AI-Coding实践/00_索引页.md)
+> [📄 01_AGENTS规范.md](./mybook/06_agents/03_AI-Coding实践/01_AGENTS规范.md)
+> [📄 02_工作流与Prompt.md](./mybook/06_agents/03_AI-Coding实践/02_工作流与Prompt.md)
+> [📄 03_工具详解.md](./mybook/06_agents/03_AI-Coding实践/03_工具详解.md)
+> [📄 04_Skill规范.md](./mybook/06_agents/03_AI-Coding实践/04_Skill规范.md)
+> [📄 05_最佳实践.md](./mybook/06_agents/03_AI-Coding实践/05_最佳实践.md)
+> [📄 06_开源项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/06_开源项目AGENTS合集.md)
+> [📄 07_Python项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/07_Python项目AGENTS合集.md)
+> [📄 08_Python-Web项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/08_Python-Web项目AGENTS合集.md)
+> [📄 09_流行开源项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/09_流行开源项目AGENTS合集.md)
+> [📄 10_Go语言项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/10_Go语言项目AGENTS合集.md)
+> [📄 11_Django项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/11_Django项目AGENTS合集.md)
+> [📄 12_Flask项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/12_Flask项目AGENTS合集.md)
+> [📄 13_Python项目AGENTS大全.md](./mybook/06_agents/03_AI-Coding实践/13_Python项目AGENTS大全.md)
+> [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
+</details>
 
-> [📄 AI-Coding实践.md](./mybook/06_agents/AI-Coding实践.md)
+#### 大模型对比
+
+<details>
+<summary>大模型对比</summary>
+
+> [📁 04_大模型对比/](./mybook/06_agents/04_大模型对比/)
+> [📄 01_2026最新大模型对比.md](./mybook/06_agents/04_大模型对比/01_2026最新大模型对比.md)
 </details>
 
 ### 7.6 其它
