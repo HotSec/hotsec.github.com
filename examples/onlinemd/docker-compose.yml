@@ -1,0 +1,50 @@
+services:
+  collab:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://postgres:secret@db/docs?sslmode=disable
+      - REDIS_URL=redis:6379
+      - JWT_SECRET=your-jwt-secret-change-in-production
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_WS_URL=ws://localhost:8080
+    depends_on:
+      - collab
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: docs
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - collab
+      - frontend
+
+volumes:
+  pgdata:

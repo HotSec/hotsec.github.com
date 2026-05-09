@@ -7,3 +7,5 @@ src/.vuepress/dist/
 onlinenote/data/onlinenote.db
 onlinenote/data/onlinenote.db-wal
 onlinenote/data/onlinenote.db-shm
+src/mybook/06_agents/03_AI-Coding实践/long_text_3584c14b-55a9-4e49-b2f3-ac27fe787319.txt
+.gitignore

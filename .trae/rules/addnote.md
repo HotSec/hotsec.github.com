@@ -1,3 +1,7 @@
+---
+alwaysApply: false
+description: 
+---
 添加新知识点注意点：
 1. 检查是否已存在相关笔记
 2. 如果不存在，创建新笔记
