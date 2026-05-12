@@ -3312,6 +3312,36 @@
 </details>
 
 <details>
+<summary>Nmap</summary>
+
+- 网络映射器，开源网络探测和安全审计工具（C/C++ + Lua，1997 年首发）
+- 主机发现：ARP/ICMP/TCP SYN/ACK/UDP/SCTP 多协议 Ping，支持组合探测
+- 端口扫描：12 种扫描技术（SYN/Connect/UDP/SCTP/NULL/FIN/Xmas/ACK/Window/Maimon/自定义/IP协议）
+- 版本检测：`-sV` 探测 650+ 协议，6500+ 模式匹配，强度可调（0-9）
+- OS 检测：`-O` TCP/IP 栈指纹识别，2600+ OS 指纹数据库
+- NSE 脚本引擎：Lua 脚本，600+ 内置脚本，13 个分类（auth/broadcast/default/discovery/dos/exploit/external/fuzzer/intrusive/malware/safe/version/vuln）
+- 防火墙/IDS 规避：分片攻击/诱饵扫描/源端口欺骗/IP 选项/MAC 伪造/主机随机化
+- 时序模板：T0（偏执）~ T5（疯狂），精细控制并行度/速率/超时
+
+> [📄 4_Nmap.md](./mybook/12_security/2_安全工具与方法/4_Nmap.md)
+</details>
+
+<details>
+<summary>Naabu</summary>
+
+- ProjectDiscovery 出品的快速端口扫描器（Go，MIT 许可）
+- 扫描模式：SYN（半开，需 root）/ CONNECT（默认，无特权）/ UDP
+- CDN/WAF 感知排除：自动识别 CDN IP（Cloudflare/Akamai/Incapsula/Sucuri），仅扫 80/443
+- 主机发现：ARP/ICMP/TCP SYN/ACK/IPv6 ND 多协议 Ping
+- 被动端口发现：Shodan InternetDB API，无需主动探测
+- 智能扫描：基于端口关联模型的预测性扫描，置信度可调
+- Nmap 集成：`-nmap-cli` 自动对开放端口调用 nmap 做服务发现
+- 管道化：原生 stdin/stdout，与 subfinder/httpx/nuclei 无缝协作
+
+> [📄 5_Naabu.md](./mybook/12_security/2_安全工具与方法/5_Naabu.md)
+</details>
+
+<details>
 <summary>渗透测试工具使用</summary>
 
 - **Nmap**：网络扫描；端口扫描（-sS/-sT/-sU）/服务版本检测（-sV）/操作系统识别（-O）/脚本扫描（--script）
