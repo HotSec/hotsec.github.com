@@ -4086,6 +4086,8 @@
 > [📄 11_Django项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/11_Django项目AGENTS合集.md)
 > [📄 12_Flask项目AGENTS合集.md](./mybook/06_agents/03_AI-Coding实践/12_Flask项目AGENTS合集.md)
 > [📄 13_Python项目AGENTS大全.md](./mybook/06_agents/03_AI-Coding实践/13_Python项目AGENTS大全.md)
+> [📄 22_OpenCode与oh-my-opencode.md](./mybook/06_agents/03_AI-Coding实践/22_OpenCode与oh-my-opencode.md)
+> [📄 23_oh-my-claudecode.md](./mybook/06_agents/03_AI-Coding实践/23_oh-my-claudecode.md)
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
 
