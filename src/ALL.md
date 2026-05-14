@@ -3323,7 +3323,7 @@
 - 防火墙/IDS 规避：分片攻击/诱饵扫描/源端口欺骗/IP 选项/MAC 伪造/主机随机化
 - 时序模板：T0（偏执）~ T5（疯狂），精细控制并行度/速率/超时
 
-> [📄 4_Nmap.md](./mybook/12_security/2_安全工具与方法/4_Nmap.md)
+> [📄 4_Nmap.md](./mybook/12_security/2_安全工具与方法/4_Nmap.md) · [📄 4_Sysmon系统监控.md](./mybook/12_security/2_安全工具与方法/4_Sysmon系统监控.md)
 </details>
 
 <details>
@@ -3338,7 +3338,7 @@
 - Nmap 集成：`-nmap-cli` 自动对开放端口调用 nmap 做服务发现
 - 管道化：原生 stdin/stdout，与 subfinder/httpx/nuclei 无缝协作
 
-> [📄 5_Naabu.md](./mybook/12_security/2_安全工具与方法/5_Naabu.md)
+> [📄 5_Naabu.md](./mybook/12_security/2_安全工具与方法/5_Naabu.md) · [📄 5_Sysmon_for_Linux.md](./mybook/12_security/2_安全工具与方法/5_Sysmon_for_Linux.md)
 </details>
 
 <details>
@@ -3777,7 +3777,7 @@
 - 冲突解决策略与最佳实践
 
 
-> [📄 10_Git高级.md](./mybook/10_os-linux/10_Git高级.md)
+> [📄 10_Git高级.md](./mybook/10_os-linux/10_Git高级.md) · [📄 12_Windows驱动开发.md](./mybook/10_os-linux/12_Windows驱动开发.md) · [📄 13_Linux_eBPF.md](./mybook/10_os-linux/13_Linux_eBPF.md)
 </details>
 
 ### 7.3 架构设计
@@ -3829,7 +3829,7 @@
 - 大型网站架构演进九阶段：①单体架构 → ②应用数据分离 → ③使用缓存 → ④服务集群（负载均衡） → ⑤数据库读写分离 → ⑥CDN和反向代理 → ⑦分布式文件系统和数据库 → ⑧NoSQL和搜索引擎 → ⑨业务拆分（微服务化）
 
 
-> [📄 3_信息系统架构.md](./mybook/08_architecture/04_信息系统架构.md) · [📄 0_大型网站架构演进.md](./mybook/08_architecture/06_大型网站架构演进.md)
+> [📄 3_信息系统架构.md](./mybook/08_architecture/04_信息系统架构.md) · [📄 0_大型网站架构演进.md](./mybook/08_architecture/06_大型网站架构演进.md) · [📄 07_在线文档多人实时编辑.md](./mybook/08_architecture/07_在线文档多人实时编辑.md)
 </details>
 
 <details>
@@ -4173,7 +4173,13 @@
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
 
 
-> [📄 智能体框架.md](./mybook/06_agents/智能体框架.md) · [📄 AutoGen.md](./mybook/06_agents/AutoGen.md) · [📄 CrewAI.md](./mybook/06_agents/CrewAI.md) · [📄 LangGraph.md](./mybook/06_agents/LangGraph.md)
+> [📁 01_智能体框架/](./mybook/06_agents/01_智能体框架/)
+> [📄 01_框架总览.md](./mybook/06_agents/01_智能体框架/01_框架总览.md)
+> [📄 02_AutoGen.md](./mybook/06_agents/01_智能体框架/02_AutoGen.md)
+> [📄 03_CrewAI.md](./mybook/06_agents/01_智能体框架/03_CrewAI.md)
+> [📄 04_LangGraph.md](./mybook/06_agents/01_智能体框架/04_LangGraph.md)
+> [📁 02_MCP协议/](./mybook/06_agents/02_MCP协议/)
+> [📄 01_MCP开发指南.md](./mybook/06_agents/02_MCP协议/01_MCP开发指南.md)
 </details>
 
 #### AI Coding 实践
@@ -4319,7 +4325,7 @@
 - B站技术：装机系统实践/全链路Trace追踪
 
 
-> [📄 大厂技术文章.md](./mybook/11_other/大厂技术文章.md)
+> [📄 大厂技术文章.md](./mybook/11_other/大厂技术文章.md) · [📄 knowledge_graph.md](./mybook/11_other/knowledge_graph.md)
 </details>
 
 <details>
