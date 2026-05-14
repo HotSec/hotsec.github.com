@@ -3404,6 +3404,117 @@
 > [📄 Docker安全.md](./mybook/12_security/3_云与容器安全/Docker安全.md) · [📄 K8s安全.md](./mybook/12_security/3_云与容器安全/K8s安全.md)
 </details>
 
+### 6.4 安全开发
+
+<details>
+<summary>网络流量安全分析</summary>
+
+- 全流量安全分析：流量采集、协议解析、日志分析、规则检测、威胁发现、资产识别
+- 协议解析：TCP/IP（握手安全、关键字段）、HTTP（注入/XSS/C2检测）、DNS（隧道/DGA/Fast Flux）、TLS（JA3指纹/SNI）、SMB（EternalBlue/横向移动）、FTP
+- 流量采集：端口镜像/TAP/内核抓包/eBPF；高性能抓包（PF_RING/DPDK/AF_PACKET V3/XDP）
+- 会话重组：IP分片重组→TCP流重组→协议识别→数据提取
+- 元数据提取：五元组、时间、字节、包数、应用层信息
+
+> [📄 01_网络流量安全分析.md](./mybook/12_security/4_安全开发/01_网络流量安全分析.md)
+</details>
+
+<details>
+<summary>安全产品与检测体系</summary>
+
+- IDS/IPS：签名检测/异常检测/行为分析；Suricata（多线程、EVE JSON、规则语法）、Snort
+- NDR：全流量可见性、高级威胁检测、自动化响应、回溯分析、实体分析
+- Zeek：事件驱动、50+协议解析器、结构化日志（conn/http/dns/ssl/files/weird/notice）
+- Arkime：全流量PCAP捕获、Elasticsearch索引、Web界面检索
+- SOC/SIEM：日志采集→归一化→关联分析→告警→可视化；Splunk/ELK/QRadar/Wazuh
+- Nuclei：YAML模板漏洞扫描、多协议支持、社区模板库
+
+> [📄 02_安全产品与检测体系.md](./mybook/12_security/4_安全开发/02_安全产品与检测体系.md)
+</details>
+
+<details>
+<summary>告警处理与关联分析</summary>
+
+- 告警生命周期：生成→去重→聚合→降噪→关联→溯源→处置→复盘
+- 去重策略：精确去重/模糊去重/语义去重
+- 聚合维度：按攻击源/目标/类型/时间窗口/攻击阶段
+- 降噪方法：白名单过滤/资产上下文/置信度评分/基线对比/告警疲劳控制
+- 关联分析：时序关联/因果关联/资产关联/实体关联/情报关联
+- 攻击链还原：基于ATT&CK将离散告警映射到攻击阶段
+
+> [📄 03_告警处理与关联分析.md](./mybook/12_security/4_安全开发/03_告警处理与关联分析.md)
+</details>
+
+<details>
+<summary>安全数据工程</summary>
+
+- Kafka：流量日志分发、告警事件总线、数据缓冲、采集与处理解耦
+- OpenSearch/Elasticsearch：日志存储检索、告警索引、会话索引、ILM生命周期管理
+- ClickHouse：大规模日志聚合查询、统计报表、行为基线、威胁狩猎
+- Redis：告警去重、速率计数、会话状态、情报缓存、分布式锁
+- MinIO：PCAP归档、样本存储、规则包管理
+- 数据架构：Lambda架构（批处理+速度层）、实时流处理、Go检测引擎
+
+> [📄 04_安全数据工程.md](./mybook/12_security/4_安全开发/04_安全数据工程.md)
+</details>
+
+<details>
+<summary>AI在安全中的应用</summary>
+
+- 恶意流量识别：统计/协议/行为/载荷特征；随机森林/XGBoost/DNN/1D-CNN
+- DGA检测：域名特征（熵值/辅音比例/n-gram）；规则统计+深度学习（BiLSTM/CNN）
+- 异常行为检测：统计基线/自编码器/Isolation Forest/LOF/时间序列；UEBA
+- 告警降噪ML：分类模型（真实/误报/不确定）、排序模型（威胁程度排序）
+- NLP安全应用：敏感信息识别(NER)、恶意代码分析、威胁情报提取、钓鱼检测
+- 模型工程化：gRPC推理服务、特征一致性、模型更新、数据漂移监控
+
+> [📄 05_AI在安全中的应用.md](./mybook/12_security/4_安全开发/05_AI在安全中的应用.md)
+</details>
+
+<details>
+<summary>ATT&CK与威胁情报</summary>
+
+- ATT&CK战术矩阵：侦察→资源开发→初始访问→执行→持久化→提权→防御规避→凭据访问→发现→横向移动→收集→C2→数据渗出
+- 常见技术检测：初始访问(T1566/T1190)、执行(T1059/T1047)、持久化(T1547/T1053)、横向移动(T1021/T1550)、C2(T1071/T1573)
+- IOC：IP/域名/URL/Hash/Email/证书；生命周期管理
+- TTP：战术+技术+程序，比IOC更稳定的检测维度
+- 情报源：商业情报/OSINT/社区情报/内部情报；STIX/TAXII标准
+- 溯源分析：基础设施关联/样本关联/TTP关联/语言时区分析
+
+> [📄 06_ATTCK与威胁情报.md](./mybook/12_security/4_安全开发/06_ATTCK与威胁情报.md)
+</details>
+
+<details>
+<summary>Suricata详解</summary>
+
+- 架构：多线程流水线（Workers/Autofp/Single模式），线程模块（Receive→Decode→StreamTCP→Detect→Verdict→Log）
+- 匹配算法：Aho-Corasick多模式匹配、Boyer-Moore长字符串、Hyperscan Intel加速、PCRE-JIT
+- 规则语法：Action(alert/drop/reject/pass) + Protocol(tcp/udp/http/dns/tls/smb等) + IP/端口 + Options
+- 内容匹配：content/nocase/depth/offset/distance/within/hex/fast_pattern
+- HTTP关键字：http_uri/http_method/http_client_body/http_user_agent/http_stat_code等20+
+- TLS关键字：tls_sni/ja3_hash/ja3_string/tls_cert_subject/tls_cert_issuer
+- Flow关键字：flow方向状态、flowbits跨包检测、flowint流变量
+- 配置文件：suricata.yaml（vars/af-packet/outputs/threshold）
+- EVE JSON输出：alert/http/dns/tls/ssh/files/flow/stats事件类型
+- 性能优化：Workers模式+DPDK/PF_RING、fast_pattern规则优化、memcap调优
+- 集成方案：ELK Stack、Zeek（Community ID关联）、Kafka、Go自研平台
+
+> [📄 07_Suricata详解.md](./mybook/12_security/4_安全开发/07_Suricata详解.md)
+</details>
+
+<details>
+<summary>数据库加密协议解析</summary>
+
+- MySQL：协议内嵌TLS协商，Initial Handshake Packet→SSL Connection Request→TLS握手→Handshake Response
+- PostgreSQL：独立SSLRequest包协商（Code=80877103），服务端回复'S'/'N'，还支持GSSAPI加密
+- SQL Server TDS：Pre-Login协商ENCRYPTION Token（0x00~0x03），Login7认证，TDS包头8字节
+- Oracle TNS：TNS协议内嵌加密协商，支持TLS/ANO/DH/RSA，sqlnet.ora配置加密策略
+- Redis/MongoDB：标准TLS握手，Redis 6.0+原生支持
+- 安全审计解密：证书导入、授权账户、代理模式、会话密钥提取
+- Go解析：MySQL Handshake解析、PgSSLRequest识别、TDS Pre-Login解析、通用数据库协议识别
+
+> [📄 08_数据库加密协议解析.md](./mybook/12_security/4_安全开发/08_数据库加密协议解析.md)
+</details>
+
 ---
 
 ## 七、通用基础
@@ -4132,6 +4243,7 @@
 > [📄 08_数据质量管理平台agents.md](./mybook/06_agents/03_AI-Coding实践/03_AGENTS模板/08_数据质量管理平台agents.md)
 > [📁 04_工具与框架/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/)
 > [📄 OpenCode与ClaudeCode使用教程.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/OpenCode与ClaudeCode使用教程.md)
+> [📄 02_MiniMax-Skills技能库.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_MiniMax-Skills技能库.md)
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
 
