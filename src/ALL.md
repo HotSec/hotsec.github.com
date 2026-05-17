@@ -4178,6 +4178,7 @@
 > [📄 02_AutoGen.md](./mybook/06_agents/01_智能体框架/02_AutoGen.md)
 > [📄 03_CrewAI.md](./mybook/06_agents/01_智能体框架/03_CrewAI.md)
 > [📄 04_LangGraph.md](./mybook/06_agents/01_智能体框架/04_LangGraph.md)
+> [📄 05_Hello-Agents从零构建智能体.md](./mybook/06_agents/01_智能体框架/05_Hello-Agents从零构建智能体.md)
 > [📁 02_MCP协议/](./mybook/06_agents/02_MCP协议/)
 > [📄 01_MCP开发指南.md](./mybook/06_agents/02_MCP协议/01_MCP开发指南.md)
 </details>
@@ -4250,6 +4251,11 @@
 > [📁 04_工具与框架/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/)
 > [📄 OpenCode与ClaudeCode使用教程.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/OpenCode与ClaudeCode使用教程.md)
 > [📄 02_MiniMax-Skills技能库.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_MiniMax-Skills技能库.md)
+> [📄 03_Ralph-Wiggum自主循环.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/03_Ralph-Wiggum自主循环.md)
+> [📄 04_Harness-Engineering工程范式.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/04_Harness-Engineering工程范式.md)
+> [📄 05_Codex-Goal目标管理.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/05_Codex-Goal目标管理.md)
+> [📄 06_哔哩哔哩智能开发工作流.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/06_哔哩哔哩智能开发工作流.md)
+> [📄 07_AI工程三层范式.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/07_AI工程三层范式.md)
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
 
