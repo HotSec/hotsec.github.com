@@ -95,6 +95,35 @@ Brief description of the project, its purpose, and architecture.
 4. **标注例外**：特殊处理的地方要说明
 5. **分层组织**：从概览到细节
 
+### Codex / Claude Code 落地建议
+
+AGENTS.md 和 CLAUDE.md 的内容可以高度复用。推荐以 `AGENTS.md` 作为通用入口，再按工具需要建立兼容文件：
+
+```bash
+# Claude Code 项目可选做法
+ln -s AGENTS.md CLAUDE.md
+```
+
+如果团队同时使用 Codex、Claude Code、Cursor、Copilot 等工具，AGENTS.md 中应避免写某个工具专属的交互细节，而是写所有 Agent 都需要遵守的工程约束：
+
+- 项目结构和分层边界
+- 唯一构建、测试、lint 命令
+- 允许和禁止的改动范围
+- 安全、权限、敏感信息处理规则
+- 代码审查和验证要求
+
+工具专属内容可以拆到对应文件：
+
+| 内容 | 建议位置 |
+|------|----------|
+| 所有 Agent 通用规则 | `AGENTS.md` |
+| Claude Code Hooks、子代理、斜杠命令 | `CLAUDE.md` 或 `.claude/` |
+| Codex 权限、执行偏好、审查口径 | `AGENTS.md` 的工具小节或团队文档 |
+| Cursor 局部规则 | `.cursor/rules/` |
+| Copilot 指令 | `.github/copilot-instructions.md` |
+
+关键原则：**项目规则优先，工具配置其次**。不要为了某个工具的写法牺牲规则的通用性。
+
 ### 核心理念：地图，而非手册
 
 AGENTS.md 的第一原则是**渐进式披露**——它是一张地图，不是一本手册。应该大约 200 行的导航地图，告诉 Agent「去哪里找什么」，详细内容放在链接的文档里。如果把所有内容都塞进 AGENTS.md，AI 的注意力被稀释，真正关键的规则反而容易被忽略。
@@ -275,6 +304,21 @@ project/
 - [ ] 数据库迁移规范
 - [ ] 代码审查清单
 - [ ] 部署流程
+
+### 推荐补充的 Agent 行为约束
+
+```markdown
+## Agent 工作规则
+
+- 开始实现前先阅读相关代码、测试和文档。
+- 不要回滚用户未明确要求回滚的改动。
+- 不要引入新依赖，除非任务明确需要并说明原因。
+- 不要把密钥、Token、生产地址写入代码或文档。
+- 完成后报告运行过的验证命令；未运行的验证必须说明原因。
+- 代码审查时优先报告 bug、回归、安全问题和缺失测试。
+```
+
+这些规则对 Codex、Claude Code、OpenCode、Cursor 等工具都适用。它们比“请写高质量代码”更可执行，因为 Agent 能直接据此约束自己的行为和最终交付。
 
 ### 各工具约束文档对照
 
