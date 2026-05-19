@@ -4249,6 +4249,7 @@
 > [📄 07_前端AGENTS.md模板.md](./mybook/06_agents/03_AI-Coding实践/03_AGENTS模板/07_前端AGENTS.md模板.md)
 > [📄 08_数据质量管理平台agents.md](./mybook/06_agents/03_AI-Coding实践/03_AGENTS模板/08_数据质量管理平台agents.md)
 > [📁 04_工具与框架/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/)
+> [📄 01_ClaudeCode最佳实践.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/01_ClaudeCode最佳实践.md)
 > [📄 OpenCode与ClaudeCode使用教程.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/OpenCode与ClaudeCode使用教程.md)
 > [📄 02_MiniMax-Skills技能库.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_MiniMax-Skills技能库.md)
 > [📄 03_Ralph-Wiggum自主循环.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/03_Ralph-Wiggum自主循环.md)
@@ -4256,6 +4257,14 @@
 > [📄 05_Codex-Goal目标管理.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/05_Codex-Goal目标管理.md)
 > [📄 06_哔哩哔哩智能开发工作流.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/06_哔哩哔哩智能开发工作流.md)
 > [📄 07_AI工程三层范式.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/07_AI工程三层范式.md)
+> [📄 08_OpenCode最佳实践.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/08_OpenCode最佳实践.md)
+> [📄 09_ClaudeCode源码架构.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/09_ClaudeCode源码架构.md)
+> [📄 10_ClaudeCode上下文管理.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/10_ClaudeCode上下文管理.md)
+> [📄 11_ClaudeCode多Agent机制.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/11_ClaudeCode多Agent机制.md)
+> [📄 12_OpenClaw源码分析.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/12_OpenClaw源码分析.md)
+> [📄 13_OpenCode源码分析.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/13_OpenCode源码分析.md)
+> [📄 14_ClaudeCode记忆系统.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/14_ClaudeCode记忆系统.md)
+> [📄 15_OpenClaw面试题.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/15_OpenClaw面试题.md)
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
 
