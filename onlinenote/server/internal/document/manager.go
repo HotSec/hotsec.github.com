@@ -10,11 +10,12 @@ import (
 )
 
 type Document struct {
-	ID      string
-	Title   string
-	Content string
-	Path    string
-	Version int
+	ID          string
+	Title       string
+	Content     string
+	Path        string
+	Version     int
+	CRDTEnabled bool
 }
 
 type Manager struct {
@@ -72,10 +73,11 @@ func (m *Manager) Load(docID string) (*Document, error) {
 	if err != nil {
 		if os.IsNotExist(err) {
 			return &Document{
-				ID:      docID,
-				Content: "",
-				Path:    path,
-				Version: 0,
+				ID:          docID,
+				Content:     "",
+				Path:        path,
+				Version:     0,
+				CRDTEnabled: true,
 			}, nil
 		}
 		return nil, fmt.Errorf("read file %s: %w", path, err)

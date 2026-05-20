@@ -140,6 +140,7 @@ export class CRDTDocument {
       char, node.timestamp, leftNode.id, rightNode.id
     );
     this.opLog.push(op);
+    this._tickGC();
     return op;
   }
 
@@ -213,6 +214,7 @@ export class CRDTDocument {
       '', node.timestamp, null, null
     );
     this.opLog.push(op);
+    this._tickGC();
     return op;
   }
 
@@ -243,6 +245,58 @@ export class CRDTDocument {
     if (op.clock >= this.clock) {
       this.clock = op.clock + 1;
     }
+  }
+
+  /**
+   * Apply a remote CRDT operation and return a CodeMirror-compatible
+   * ChangeSpec for incremental editor update, avoiding full-replace.
+   *
+   * Returns null if the op is a no-op (e.g. already applied, duplicate).
+   *
+   * For inserts: applies node to CRDT linked-list, then finds its
+   * visible position via getPositionForNode, returning {from, insert}.
+   *
+   * For deletes: finds the visible position BEFORE marking deleted,
+   * then applies LWW deletion, returning {from, to}.
+   */
+  applyRemoteOpAsChange(op) {
+    if (op.type === 'insert') {
+      if (this.nodes.has(op.nodeId)) return null;
+      this._applyRemoteInsert(op);
+
+      if (!this.vector[op.siteId] || op.clock > this.vector[op.siteId]) {
+        this.vector[op.siteId] = op.clock;
+      }
+      if (op.clock >= this.clock) {
+        this.clock = op.clock + 1;
+      }
+
+      const pos = this.getPositionForNode(op.nodeId);
+      if (pos < 0) return null;
+      this._tickGC();
+      return { from: pos, insert: op.content };
+    } else if (op.type === 'delete') {
+      const node = this.nodes.get(op.nodeId);
+      if (!node || node.deleted) return null;
+      if (op.timestamp < node.timestamp) return null;
+
+      const pos = this.getPositionForNode(op.nodeId);
+      if (pos < 0) return null;
+
+      node.deleted = true;
+      node.timestamp = op.timestamp;
+
+      if (!this.vector[op.siteId] || op.clock > this.vector[op.siteId]) {
+        this.vector[op.siteId] = op.clock;
+      }
+      if (op.clock >= this.clock) {
+        this.clock = op.clock + 1;
+      }
+
+      this._tickGC();
+      return { from: pos, to: pos + 1 };
+    }
+    return null;
   }
 
   _applyRemoteInsert(op) {
@@ -283,35 +337,60 @@ export class CRDTDocument {
       }
       insertAfter.rightId = node.id;
     } else if (leftNode) {
-      node.leftId = leftNode.id;
-      const oldRightId = leftNode.rightId;
-      node.rightId = oldRightId;
-      leftNode.rightId = node.id;
-      if (oldRightId) {
-        const oldRight = this.nodes.get(oldRightId);
-        if (oldRight) oldRight.leftId = node.id;
+      // Find correct insert position after leftNode using total order.
+      // Walk through all siblings sharing the same leftId and insert
+      // at the deterministic position determined by compareNodeIds.
+      let insertAfter = leftNode;
+      let current = leftNode;
+      let nextId = current.rightId;
+      while (nextId && nextId !== this.EOF_ID) {
+        const next = this.nodes.get(nextId);
+        if (!next) break;
+        if (next.leftId === op.leftId && this.compareNodeIds(op.nodeId, next.id) < 0) {
+          break;
+        }
+        insertAfter = next;
+        nextId = next.rightId;
       }
+      
+      node.leftId = insertAfter.id;
+      node.rightId = insertAfter.rightId;
+      
+      const afterNext = this.nodes.get(insertAfter.rightId);
+      if (afterNext) {
+        afterNext.leftId = node.id;
+      }
+      insertAfter.rightId = node.id;
     } else if (rightNode) {
-      let insertBefore = rightNode;
-      let current = rightNode;
-      while (current && current.id !== this.BOF_ID) {
-        const prevId = current.leftId;
-        if (!prevId) break;
-        const prev = this.nodes.get(prevId);
-        if (!prev) break;
-        insertBefore = prev;
-        if (prev.id === op.leftId) break;
-        current = prev;
+      // Walk left from rightNode using total order to find correct position.
+      // When leftNode is absent, find the node before rightNode that shares
+      // the same rightId boundary and insert deterministically.
+      let insertAfter = this.nodes.get(rightNode.leftId);
+      if (!insertAfter) {
+        insertAfter = this.nodes.get(this.BOF_ID);
+      }
+      // Walk right from insertAfter to find the correct insert position
+      // among nodes sharing the same rightId target.
+      let current = insertAfter;
+      let nextId = current.rightId;
+      while (nextId && nextId !== this.EOF_ID && nextId !== rightNode.id) {
+        const next = this.nodes.get(nextId);
+        if (!next) break;
+        if (next.rightId === rightNode.id && this.compareNodeIds(op.nodeId, next.id) < 0) {
+          break;
+        }
+        current = next;
+        nextId = next.rightId;
       }
 
-      node.rightId = insertBefore.id;
-      node.leftId = insertBefore.leftId;
+      node.leftId = current.id;
+      node.rightId = current.rightId;
 
-      const beforePrev = this.nodes.get(insertBefore.leftId);
-      if (beforePrev) {
-        beforePrev.rightId = node.id;
+      const afterCurrent = this.nodes.get(current.rightId);
+      if (afterCurrent) {
+        afterCurrent.leftId = node.id;
       }
-      insertBefore.leftId = node.id;
+      current.rightId = node.id;
     } else {
       let lastNode = this.nodes.get(this.BOF_ID);
       while (lastNode && lastNode.rightId && lastNode.rightId !== this.EOF_ID) {
@@ -434,6 +513,50 @@ export class CRDTDocument {
       vector: { ...this.vector },
       nodes: nodeList,
     };
+  }
+
+  /**
+   * Remove deleted nodes whose left and right neighbors are also
+   * deleted, since they no longer serve any structural purpose.
+   * Returns the number of nodes removed.
+   */
+  collectGarbage() {
+    if (this.nodes.size < 10) return 0;
+
+    const toDelete = [];
+    for (const [id, node] of this.nodes) {
+      if (!node.deleted) continue;
+      const leftDeleted = !node.leftId || this._isNodeDeleted(node.leftId);
+      const rightDeleted = !node.rightId || this._isNodeDeleted(node.rightId);
+      if (leftDeleted && rightDeleted) {
+        toDelete.push(id);
+      }
+    }
+
+    for (const id of toDelete) {
+      const node = this.nodes.get(id);
+      if (!node) continue;
+      const left = this.nodes.get(node.leftId);
+      if (left) left.rightId = node.rightId;
+      const right = this.nodes.get(node.rightId);
+      if (right) right.leftId = node.leftId;
+      this.nodes.delete(id);
+    }
+
+    return toDelete.length;
+  }
+
+  _tickGC() {
+    this._gcCounter = (this._gcCounter || 0) + 1;
+    if (this._gcCounter % 200 === 0) {
+      this.collectGarbage();
+    }
+  }
+
+  _isNodeDeleted(id) {
+    const node = this.nodes.get(id);
+    if (!node) return true;
+    return node.deleted;
   }
 
   loadState(state) {

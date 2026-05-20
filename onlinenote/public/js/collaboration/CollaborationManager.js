@@ -19,9 +19,11 @@ export class CollaborationManager {
     this.crdt = new CRDTDocument(this.userId);
     this.crdtEnabled = options.crdtEnabled || false;
     this.onCRDTUpdate = options.onCRDTUpdate || (() => {});
+    this.onCRDTChanges = options.onCRDTChanges || (() => {});
     this.pendingCRDTOps = [];
     this.syncTimer = null;
     this.syncInterval = 200;
+    this.lastEditVersion = 0;
   }
 
   generateId() {
@@ -85,6 +87,15 @@ export class CollaborationManager {
         break;
       case 'edit':
         if (msg.userId !== this.userId) {
+          const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
+          const editVersion = data.version || 0;
+          // Version check: only apply if this is the next expected version
+          if (editVersion > 0 && editVersion !== this.lastEditVersion + 1) {
+            console.warn('Collaboration: edit version mismatch, skipping',
+              'expected', this.lastEditVersion + 1, 'got', editVersion);
+            return;
+          }
+          this.lastEditVersion = editVersion;
           this.onRemoteEdit(msg);
         }
         break;
@@ -160,13 +171,18 @@ export class CollaborationManager {
       const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
       const ops = data.operations || [];
 
+      const changes = [];
       for (const opData of ops) {
         const op = CRDTOperation.fromJSON(opData);
-        this.crdt.applyRemoteOperation(op);
+        const change = this.crdt.applyRemoteOpAsChange(op);
+        if (change) {
+          changes.push(change);
+        }
       }
 
-      const newContent = this.crdt.rebuild();
-      this.onCRDTUpdate(newContent);
+      if (changes.length > 0) {
+        this.onCRDTChanges(changes);
+      }
     } catch (e) {
       console.error('CRDT: failed to handle remote op', e);
     }
@@ -175,23 +191,32 @@ export class CollaborationManager {
   requestCRDTSync() {
     if (!this.crdtEnabled) return;
 
+    // Flush pending ops first so they are included in the sync request
+    const ops = this.pendingCRDTOps.map(op => op.toJSON());
+    this.pendingCRDTOps = [];
+
     fetch(`/api/documents/${encodeURIComponent(this.docId)}/crdt/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        operations: [],
+        operations: ops,
         vector: this.crdt.vector,
       }),
     })
     .then(resp => resp.json())
     .then(data => {
       if (data.operations && data.operations.length > 0) {
+        const changes = [];
         for (const opData of data.operations) {
           const op = CRDTOperation.fromJSON(opData);
-          this.crdt.applyRemoteOperation(op);
+          const change = this.crdt.applyRemoteOpAsChange(op);
+          if (change) {
+            changes.push(change);
+          }
         }
-        const newContent = this.crdt.rebuild();
-        this.onCRDTUpdate(newContent);
+        if (changes.length > 0) {
+          this.onCRDTChanges(changes);
+        }
       }
     })
     .catch(e => {

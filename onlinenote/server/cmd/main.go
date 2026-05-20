@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
 
 	"onlinenote/config"
 	"onlinenote/internal/crdt"
@@ -81,7 +82,18 @@ func main() {
 		CRDTStore: crdtStore,
 	}
 
-	hub.OnCRDTOp = func(docID string, data []byte) {
+	// Per-document version counter for raw "edit" messages (non-CRDT mode)
+	editVersions := make(map[string]int64)
+	var editVersionsMu sync.Mutex
+
+	hub.OnRawEdit = func(docID string) int64 {
+		editVersionsMu.Lock()
+		defer editVersionsMu.Unlock()
+		editVersions[docID]++
+		return editVersions[docID]
+	}
+
+	hub.OnCRDTOp = func(docID string, userID string, data []byte) {
 		var msg struct {
 			Data json.RawMessage `json:"data"`
 		}
@@ -98,8 +110,31 @@ func main() {
 
 		doc := crdtStore.Get(docID)
 		for _, op := range crdtMsg.Operations {
+			// Validate SiteID matches the WebSocket client's UserID
+			if op.SiteID != userID {
+				slog.Warn("CRDT op rejected: SiteID mismatch",
+					"docId", docID,
+					"expectedSiteID", userID,
+					"gotSiteID", op.SiteID,
+				)
+				continue
+			}
+			// Validate Clock is strictly monotonic
+			currentClock := doc.GetClockForSite(op.SiteID)
+			if op.Clock <= currentClock {
+				slog.Warn("CRDT op rejected: non-monotonic clock",
+					"docId", docID,
+					"siteID", op.SiteID,
+					"currentClock", currentClock,
+					"opClock", op.Clock,
+				)
+				continue
+			}
 			doc.ApplyOperation(op)
 		}
+
+		// Periodic garbage collection of deleted CRDT nodes
+		doc.TickGarbageCollect(100)
 
 		if err := srv.DB.SaveCRDTState(docID, doc.GetState(), doc.GetVector()); err != nil {
 			slog.Warn("failed to persist CRDT state", "docId", docID, "error", err)
@@ -345,9 +380,10 @@ func (s *Server) handleGetDocument(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":      doc.ID,
-		"content": doc.Content,
-		"version": doc.Version,
+		"id":          doc.ID,
+		"content":     doc.Content,
+		"version":     doc.Version,
+		"crdtEnabled": doc.CRDTEnabled,
 	})
 }
 

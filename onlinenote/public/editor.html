@@ -109,7 +109,7 @@
         this.docId = 'all-md';
         this.versions = [];
         this.selectedVersion = null;
-        this.crdtEnabled = true;
+        this.crdtEnabled = crdtEnabledFromServer;
       }
 
       async init() {
@@ -125,6 +125,7 @@
         document.getElementById('docTitle').textContent = titleText;
 
         let initialContent = '';
+        let crdtEnabledFromServer = true;
         try {
           let apiUrl = `/api/documents/${encodeURIComponent(docId)}`;
           if (srcPath) apiUrl += `?src=${encodeURIComponent(srcPath)}`;
@@ -132,6 +133,8 @@
           if (resp.ok) {
             const data = await resp.json();
             initialContent = data.content || '';
+            // Server controls CRDT mode — client MUST NOT toggle it.
+            crdtEnabledFromServer = data.crdtEnabled !== false;
           }
         } catch (e) {
           try {
@@ -211,10 +214,15 @@
             } catch (e) {}
           },
           onCRDTUpdate: (newContent) => {
-            this.editor.applyCRDTContent(newContent);
-            this.preview.render(newContent);
+            // Legacy full-content callback — kept for compatibility.
+            // Prefer onCRDTChanges for incremental updates.
+          },
+          onCRDTChanges: (changes) => {
+            this.editor.applyCRDTChanges(changes);
+            const content = this.editor.getContent();
+            this.preview.render(content);
             this.outline.update();
-            this.updateStats(newContent);
+            this.updateStats(content);
           },
         });
 

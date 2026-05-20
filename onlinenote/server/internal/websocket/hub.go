@@ -41,7 +41,8 @@ type Hub struct {
 	register   chan *Client
 	unregister chan *Client
 	mu         sync.RWMutex
-	OnCRDTOp   func(docID string, data []byte)
+	OnCRDTOp   func(docID string, userID string, data []byte)
+	OnRawEdit  func(docID string) int64
 }
 
 type BroadcastMessage struct {
@@ -218,20 +219,35 @@ func (c *Client) ReadPump() {
 		msg.DocID = c.DocID
 
 		switch msg.Type {
-		case "edit", "cursor", "selection":
+		case "edit":
+			// Attach a server-side version counter for non-CRDT edits
+			if c.Hub.OnRawEdit != nil {
+				version := c.Hub.OnRawEdit(msg.DocID)
+				var data map[string]interface{}
+				json.Unmarshal(msg.Data, &data)
+				if data == nil {
+					data = make(map[string]interface{})
+				}
+				data["version"] = version
+				msg.Data, _ = json.Marshal(data)
+			}
+			broadcastData, _ := json.Marshal(msg)
+			c.Hub.Broadcast(c.DocID, broadcastData, c)
+
+		case "cursor", "selection":
 			broadcastData, _ := json.Marshal(msg)
 			c.Hub.Broadcast(c.DocID, broadcastData, c)
 
 		case "crdt-op":
 			if c.Hub.OnCRDTOp != nil {
-				c.Hub.OnCRDTOp(c.DocID, message)
+				c.Hub.OnCRDTOp(c.DocID, c.UserID, message)
 			}
 			broadcastData, _ := json.Marshal(msg)
 			c.Hub.Broadcast(c.DocID, broadcastData, c)
 
 		case "crdt-sync":
 			if c.Hub.OnCRDTOp != nil {
-				c.Hub.OnCRDTOp(c.DocID, message)
+				c.Hub.OnCRDTOp(c.DocID, c.UserID, message)
 			}
 
 		case "save":
@@ -257,24 +273,7 @@ func (c *Client) WritePump() {
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-
-			w, err := c.Conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			w.Write(message)
-
-		n := len(c.Send)
-		for i := 0; i < n; i++ {
-			msg, ok := <-c.Send
-			if !ok {
-				return
-			}
-			w.Write([]byte{'\n'})
-			w.Write(msg)
-		}
-
-			if err := w.Close(); err != nil {
+			if err := c.Conn.WriteMessage(websocket.TextMessage, message); err != nil {
 				return
 			}
 

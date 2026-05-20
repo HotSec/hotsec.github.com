@@ -33,6 +33,7 @@ type Document struct {
 	opLog  []Operation
 	vector map[string]int64
 	clock  int64
+	opCount int64
 }
 
 func NewDocument() *Document {
@@ -95,6 +96,12 @@ func (d *Document) GetOperationsSince(vector map[string]int64) []Operation {
 		}
 	}
 	return result
+}
+
+func (d *Document) GetClockForSite(siteID string) int64 {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	return d.vector[siteID]
 }
 
 func (d *Document) GetState() json.RawMessage {
@@ -164,6 +171,63 @@ func (d *Document) ResetFromContent(content string) {
 	d.opLog = make([]Operation, 0)
 	d.vector = make(map[string]int64)
 	d.clock = 0
+}
+
+// CollectGarbage removes deleted nodes whose left and right neighbors
+// are also deleted, since they no longer serve any structural purpose.
+// Returns the number of nodes removed.
+func (d *Document) CollectGarbage() int {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	if len(d.nodes) < 10 {
+		return 0
+	}
+
+	// First pass: identify nodes with deleted neighbors
+	toDelete := make([]string, 0)
+	for id, node := range d.nodes {
+		if !node.Deleted {
+			continue
+		}
+		leftDeleted := node.LeftID == "" || d.isNodeDeleted(node.LeftID)
+		rightDeleted := node.RightID == "" || d.isNodeDeleted(node.RightID)
+		if leftDeleted && rightDeleted {
+			toDelete = append(toDelete, id)
+		}
+	}
+
+	// Second pass: update linked list references and remove
+	for _, id := range toDelete {
+		node := d.nodes[id]
+		if left, ok := d.nodes[node.LeftID]; ok {
+			left.RightID = node.RightID
+		}
+		if right, ok := d.nodes[node.RightID]; ok {
+			right.LeftID = node.LeftID
+		}
+		delete(d.nodes, id)
+	}
+
+	return len(toDelete)
+}
+
+// isNodeDeleted checks whether a node ID corresponds to a deleted node.
+func (d *Document) isNodeDeleted(id string) bool {
+	node, exists := d.nodes[id]
+	if !exists {
+		return true // absent nodes are treated as deleted
+	}
+	return node.Deleted
+}
+
+// TickGarbageCollect increments the internal operation counter and runs
+// garbage collection when the threshold is reached.
+func (d *Document) TickGarbageCollect(threshold int64) {
+	d.opCount++
+	if d.opCount%threshold == 0 {
+		d.CollectGarbage()
+	}
 }
 
 type DocumentStore struct {

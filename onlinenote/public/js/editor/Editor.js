@@ -7,6 +7,7 @@ export class Editor {
     this.onSave = options.onSave || (() => {});
     this.onChanges = options.onChanges || (() => {});
     this.onCRDTOps = options.onCRDTOps || (() => {});
+    this.onCRDTChanges = options.onCRDTChanges || (() => {});
     this.saveTimer = null;
     this.debounceTimer = null;
     this.pendingChanges = [];
@@ -127,7 +128,7 @@ export class Editor {
           saveKeymap,
           customTheme,
           EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
+            if (update.docChanged && !this.applyingRemote) {
               update.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
                 this.pendingChanges.push({
                   from: fromA,
@@ -201,14 +202,20 @@ export class Editor {
     this.applyingRemote = false;
   }
 
-  applyCRDTContent(newContent) {
-    if (!this.cm) return;
+  /**
+   * Apply incremental CRDT changes as CodeMirror ChangeSpecs.
+   * Unlike applyCRDTContent (full replace), this preserves undo history,
+   * cursor position, and selections through CodeMirror's change mapping.
+   */
+  applyCRDTChanges(changes) {
+    if (!this.cm || !changes || changes.length === 0) return;
     this.applyingRemote = true;
+    const tr = this.cm.state.update({ changes });
     const pos = this.cm.state.selection.main.head;
-    const oldLen = this.cm.state.doc.length;
+    const newPos = tr.changes.mapPos(pos);
     this.cm.dispatch({
-      changes: { from: 0, to: oldLen, insert: newContent },
-      selection: { anchor: Math.min(pos, newContent.length) },
+      changes,
+      selection: { anchor: newPos },
     });
     this.applyingRemote = false;
   }
@@ -223,12 +230,27 @@ export class Editor {
     });
   }
 
+  /**
+   * Dispatch a change to CodeMirror and, if CRDT is enabled, immediately
+   * route it through the CRDT pipeline, bypassing the 300 ms debounce.
+   * Used by toolbar / hotkey helpers so structural edits sync right away.
+   */
+  _applyToolbarChange(from, to, insert) {
+    if (!this.cm) return;
+    this.applyingRemote = true;
+    this.cm.dispatch({
+      changes: { from, to, insert },
+    });
+    this.applyingRemote = false;
+    if (this.crdtEnabled && typeof to === 'number' && to >= from) {
+      this.onCRDTOps([{ from, to, inserted: insert }]);
+    }
+  }
+
   insertAtCursor(text) {
     if (!this.cm) return;
     const { from } = this.cm.state.selection.main;
-    this.cm.dispatch({
-      changes: { from, insert: text },
-    });
+    this._applyToolbarChange(from, from, text);
     this.cm.focus();
   }
 
@@ -236,9 +258,8 @@ export class Editor {
     if (!this.cm) return;
     const { from, to } = this.cm.state.selection.main;
     const selected = this.cm.state.sliceDoc(from, to);
-    this.cm.dispatch({
-      changes: { from, to, insert: before + selected + (after || before) },
-    });
+    const separator = after || before;
+    this._applyToolbarChange(from, to, before + selected + separator);
     this.cm.focus();
   }
 
@@ -249,9 +270,7 @@ export class Editor {
     const existing = line.text.match(/^(#{1,6}\s*|- |\d+\. |\> |- \[[ x]\] )/);
     const from = line.from;
     const to = existing ? from + existing[0].length : from;
-    this.cm.dispatch({
-      changes: { from, to: existing ? to : from, insert: prefix },
-    });
+    this._applyToolbarChange(from, existing ? to : from, prefix);
     this.cm.focus();
   }
 
