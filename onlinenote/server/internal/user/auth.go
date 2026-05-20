@@ -2,6 +2,7 @@ package user
 
 import (
 	"crypto/rand"
+	"encoding/binary"
 	"encoding/hex"
 	"time"
 
@@ -72,7 +73,9 @@ func ParseToken(tokenString, secret string) (*Claims, error) {
 	}
 	return nil, jwt.ErrTokenInvalidClaims
 }
-
-func AssignColor(index int) string {
-	return colorPool[index%len(colorPool)]
+func RandomColor() string {
+	b := make([]byte, 8)
+	rand.Read(b)
+	idx := int(binary.BigEndian.Uint64(b) % uint64(len(colorPool)))
+	return colorPool[idx]
 }

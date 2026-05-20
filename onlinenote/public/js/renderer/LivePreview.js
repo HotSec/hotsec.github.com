@@ -65,7 +65,7 @@ export class LivePreview {
           var href = rawHref;
           try { href = decodeURIComponent(rawHref); } catch(ex) {}
           const resolvedHref = this.resolveMdLink(href);
-          const docId = resolvedHref.replace(/^\.\//, '').replace(/\.md$/, '').replace(/\//g, '--');
+          const docId = resolvedHref.replace(/^\.\//, '').replace(/\.md$/, '').replace(/--/g, '-_').replace(/\//g, '--');
           window.open(`editor.html?doc=${encodeURIComponent(docId)}&src=${encodeURIComponent(resolvedHref)}`, '_blank');
         });
       }

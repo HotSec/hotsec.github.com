@@ -192,9 +192,11 @@ export class Editor {
       offset += (c.inserted ? c.inserted.length : 0) - (c.to - c.from);
       return adj;
     });
+    const tr = this.cm.state.update({ changes: adjusted });
+    const newPos = tr.changes.mapPos(pos);
     this.cm.dispatch({
       changes: adjusted,
-      selection: { anchor: Math.min(pos, this.cm.state.doc.length + offset) },
+      selection: { anchor: newPos },
     });
     this.applyingRemote = false;
   }

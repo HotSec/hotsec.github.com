@@ -248,16 +248,50 @@ func (d *Database) SaveDocumentVersion(docID, content, userID string) error {
 }
 
 func (d *Database) CleanupOldVersions(docID string) error {
-	_, err := d.db.Exec(`
-		DELETE FROM document_versions
+	rows, err := d.db.Query(`
+		SELECT id FROM document_versions
 		WHERE document_id = ?
-		AND id NOT IN (
-			SELECT id FROM document_versions
-			WHERE document_id = ?
-			ORDER BY version DESC
-			LIMIT ?
-		)
-	`, docID, docID, MaxVersionsToKeep)
+		ORDER BY version DESC
+		LIMIT ?
+	`, docID, MaxVersionsToKeep)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var keepIDs []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return err
+		}
+		keepIDs = append(keepIDs, id)
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	if len(keepIDs) == 0 {
+		return nil
+	}
+
+	placeholders := make([]byte, 0, len(keepIDs)*2)
+	args := make([]interface{}, 0, len(keepIDs)+1)
+	args = append(args, docID)
+	for i, id := range keepIDs {
+		if i > 0 {
+			placeholders = append(placeholders, ',')
+		}
+		placeholders = append(placeholders, '?')
+		args = append(args, id)
+	}
+
+	query := fmt.Sprintf(`
+		DELETE FROM document_versions
+		WHERE document_id = ? AND id NOT IN (%s)
+	`, string(placeholders))
+
+	_, err = d.db.Exec(query, args...)
 	return err
 }
 

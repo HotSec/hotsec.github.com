@@ -172,25 +172,6 @@ export class CollaborationManager {
     }
   }
 
-  handleCRDTSync(msg) {
-    if (!this.crdtEnabled) return;
-
-    try {
-      const data = typeof msg.data === 'string' ? JSON.parse(msg.data) : msg.data;
-      const ops = data.operations || [];
-
-      for (const opData of ops) {
-        const op = CRDTOperation.fromJSON(opData);
-        this.crdt.applyRemoteOperation(op);
-      }
-
-      const newContent = this.crdt.rebuild();
-      this.onCRDTUpdate(newContent);
-    } catch (e) {
-      console.error('CRDT: failed to handle sync', e);
-    }
-  }
-
   requestCRDTSync() {
     if (!this.crdtEnabled) return;
 

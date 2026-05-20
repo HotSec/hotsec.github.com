@@ -97,23 +97,25 @@ func (h *Hub) Run() {
 			clients := h.docClients[msg.DocID]
 			h.mu.RUnlock()
 
-			for client := range clients {
-				if client == msg.Exclude {
-					continue
-				}
-				select {
-				case client.Send <- msg.Data:
-				default:
-					slog.Warn("slow client detected, dropping connection", "userId", client.UserID, "docId", client.DocID)
-					h.mu.Lock()
+		for client := range clients {
+			if client == msg.Exclude {
+				continue
+			}
+			select {
+			case client.Send <- msg.Data:
+			default:
+				slog.Warn("slow client detected, dropping connection", "userId", client.UserID, "docId", client.DocID)
+				h.mu.Lock()
+				if _, ok := h.clients[client]; ok {
 					close(client.Send)
 					delete(h.clients, client)
 					if docClients, ok := h.docClients[msg.DocID]; ok {
 						delete(docClients, client)
 					}
-					h.mu.Unlock()
 				}
+				h.mu.Unlock()
 			}
+		}
 		}
 	}
 }
@@ -262,11 +264,15 @@ func (c *Client) WritePump() {
 			}
 			w.Write(message)
 
-			n := len(c.Send)
-			for i := 0; i < n; i++ {
-				w.Write([]byte{'\n'})
-				w.Write(<-c.Send)
+		n := len(c.Send)
+		for i := 0; i < n; i++ {
+			msg, ok := <-c.Send
+			if !ok {
+				return
 			}
+			w.Write([]byte{'\n'})
+			w.Write(msg)
+		}
 
 			if err := w.Close(); err != nil {
 				return

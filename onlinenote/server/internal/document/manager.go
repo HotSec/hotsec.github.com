@@ -2,6 +2,7 @@ package document
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
@@ -49,7 +50,9 @@ func (m *Manager) seedFromStatic(staticDir string) {
 	}
 
 	if doc.Content == "" {
-		m.Save("all-md", string(content))
+		if err := m.Save("all-md", string(content)); err != nil {
+			slog.Warn("failed to seed all-md document", "error", err)
+		}
 	}
 }
 

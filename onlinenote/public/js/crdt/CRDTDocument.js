@@ -465,21 +465,28 @@ export class CRDTDocument {
       }
     }
 
-    const buildOrder = (parentId) => {
-      const children = leftChildren.get(parentId) || [];
-      if (children.length === 0) return [];
-
-      children.sort((a, b) => this.compareNodeIds(a, b));
-
+    const orderedIds = (() => {
       const result = [];
-      for (const childId of children) {
-        result.push(childId);
-        result.push(...buildOrder(childId));
+      const stack = [];
+      const rootChildren = leftChildren.get(this.BOF_ID) || [];
+      if (rootChildren.length === 0) return result;
+      rootChildren.sort((a, b) => this.compareNodeIds(a, b));
+      for (let i = rootChildren.length - 1; i >= 0; i--) {
+        stack.push(rootChildren[i]);
+      }
+      while (stack.length > 0) {
+        const nodeId = stack.pop();
+        result.push(nodeId);
+        const children = leftChildren.get(nodeId) || [];
+        if (children.length > 0) {
+          children.sort((a, b) => this.compareNodeIds(a, b));
+          for (let i = children.length - 1; i >= 0; i--) {
+            stack.push(children[i]);
+          }
+        }
       }
       return result;
-    };
-
-    const orderedIds = buildOrder(this.BOF_ID);
+    })();
 
     let prev = this.nodes.get(this.BOF_ID);
     for (const nodeId of orderedIds) {

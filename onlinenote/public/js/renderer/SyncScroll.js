@@ -59,7 +59,10 @@ export class SyncScroll {
       this.editorScrolling = true;
 
       if (this.headingMap.length > 0) {
-        const lineAtTop = Math.floor(editorEl.scrollTop / (editorEl.scrollHeight / this.editor.cm.state.doc.lines)) + 1;
+        const scrollHeight = editorEl.scrollHeight;
+        const docLines = this.editor.cm.state.doc.lines;
+        if (docLines === 0 || scrollHeight === 0) return;
+        const lineAtTop = Math.floor(editorEl.scrollTop / (scrollHeight / docLines)) + 1;
         const target = this.findEditorScrollTarget(lineAtTop);
         if (target && target.previewEl) {
           const containerRect = previewEl.getBoundingClientRect();

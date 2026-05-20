@@ -25,7 +25,22 @@ var upgrader = gws.Upgrader{
 	ReadBufferSize:  1024 * 1024,
 	WriteBufferSize: 1024 * 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			return true
+		}
+		// Reject plain-http origins over TLS (wss) connections to prevent
+		// mixed-content / downgrade attacks.
+		isTLS := r.TLS != nil
+		originIsHTTP := len(origin) > 7 && origin[:7] == "http://"
+		if isTLS && originIsHTTP {
+			return false
+		}
+		host := r.Host
+		if origin == "http://"+host || origin == "https://"+host {
+			return true
+		}
+		return false
 	},
 }
 
@@ -40,6 +55,10 @@ type Server struct {
 func main() {
 	cfg := config.Load()
 
+	if cfg.JWTSecret == "onlinenote-secret-key-change-in-production" {
+		slog.Warn("JWT_SECRET is set to the default value - this is insecure for production use")
+	}
+
 	db, err := storage.NewDatabase(cfg.DataDir)
 	if err != nil {
 		slog.Error("failed to initialize database", "error", err)
@@ -52,6 +71,16 @@ func main() {
 	crdtStore := crdt.NewDocumentStore()
 
 	hub := ws.NewHub()
+	go hub.Run()
+
+	srv := &Server{
+		Config:    cfg,
+		DB:        db,
+		DocMgr:    docMgr,
+		Hub:       hub,
+		CRDTStore: crdtStore,
+	}
+
 	hub.OnCRDTOp = func(docID string, data []byte) {
 		var msg struct {
 			Data json.RawMessage `json:"data"`
@@ -71,15 +100,10 @@ func main() {
 		for _, op := range crdtMsg.Operations {
 			doc.ApplyOperation(op)
 		}
-	}
-	go hub.Run()
 
-	srv := &Server{
-		Config:    cfg,
-		DB:        db,
-		DocMgr:    docMgr,
-		Hub:       hub,
-		CRDTStore: crdtStore,
+		if err := srv.DB.SaveCRDTState(docID, doc.GetState(), doc.GetVector()); err != nil {
+			slog.Warn("failed to persist CRDT state", "docId", docID, "error", err)
+		}
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -160,7 +184,7 @@ func (s *Server) handleWebSocket(c *gin.Context) {
 		docID = "all-md"
 	}
 	if color == "" {
-		color = user.AssignColor(len(s.Hub.GetDocUsers(docID)))
+		color = user.RandomColor()
 	}
 
 	client := &ws.Client{
@@ -201,7 +225,7 @@ func (s *Server) handleRegister(c *gin.Context) {
 		Username:     req.Username,
 		PasswordHash: hash,
 		Email:        req.Email,
-		Color:        user.AssignColor(0),
+		Color:        user.RandomColor(),
 	}
 
 	_, err = s.DB.DB().Exec(
@@ -352,9 +376,8 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 	}
 
 	if req.UserID == "" {
-		req.UserID = "anonymous"
+		req.UserID = "anon-" + user.GenerateID()
 	}
-
 	if src != "" {
 		filePath := s.resolveSrcPath(src)
 		if filePath == "" {
@@ -490,7 +513,7 @@ func (s *Server) handleRollback(c *gin.Context) {
 		UserID string `json:"userId"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		req.UserID = "anonymous"
+		req.UserID = "anon-" + user.GenerateID()
 	}
 
 	newVersion, err := s.DB.RollbackToVersion(docID, version, req.UserID)
@@ -527,7 +550,7 @@ func (s *Server) getUserIdFromRequest(c *gin.Context) string {
 			return claims.UserID
 		}
 	}
-	return c.Query("userId")
+	return ""
 }
 
 func (s *Server) internalError(c *gin.Context, err error) {
