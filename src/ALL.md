@@ -1526,6 +1526,7 @@
 
 **详细文档**：
 > [📄 02_k8s.md](./mybook/01_go/12_开源项目学习/02_k8s.md) · [📄 03_gin-vue-admin.md](./mybook/01_go/12_开源项目学习/03_gin-vue-admin.md) · [📄 04_gin-api.md](./mybook/01_go/12_开源项目学习/04_gin-api.md) · [📄 05_packetbeat.md](./mybook/01_go/12_开源项目学习/05_packetbeat.md) · [📄 06_监控面板.md](./mybook/01_go/12_开源项目学习/06_监控面板.md) · [📄 07_ksv.md](./mybook/01_go/12_开源项目学习/07_ksv.md) · [📄 08_memos.md](./mybook/01_go/12_开源项目学习/08_memos.md) · [📄 01_k3s/01_简介与安装.md](./mybook/01_go/12_开源项目学习/01_k3s/01_简介与安装.md) · [📄 01_k3s/02_源码笔记-入口.md](./mybook/01_go/12_开源项目学习/01_k3s/02_源码笔记-入口.md) · [📄 01_k3s/03_源码笔记-依赖.md](./mybook/01_go/12_开源项目学习/01_k3s/03_源码笔记-依赖.md) · [📄 01_k3s/04_源码笔记-server.md](./mybook/01_go/12_开源项目学习/01_k3s/04_源码笔记-server.md)
+> [📁 02_nuclei/](./mybook/01_go/12_开源项目学习/02_nuclei/) · 项目概览/YAML模板引擎详解/核心执行引擎/匹配器与提取器/完整分析总结
 </details>
 
 ### 1.13 常见陷阱与最佳实践
@@ -4319,6 +4320,7 @@
 > [📄 16_CLAUDEmd实战指南.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/16_CLAUDEmd实战指南.md)
 > [📄 17_MiniMax-Mavis-Agent-Teams.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/17_MiniMax-Mavis-Agent-Teams.md)
 > [📄 18_多Agent协作系统.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/18_多Agent协作系统.md)
+> [📁 02_openclaw源码分析/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_openclaw/) · 项目概览/核心架构与Gateway/Agents与Sessions/Config与CLI/整体分析/核心运行时详解
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
 
