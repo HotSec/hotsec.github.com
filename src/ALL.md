@@ -3402,6 +3402,7 @@
 
 
 > [📄 Docker安全.md](./mybook/12_security/3_云与容器安全/Docker安全.md) · [📄 K8s安全.md](./mybook/12_security/3_云与容器安全/K8s安全.md)
+> [📄 09_Falco详解.md](./mybook/12_security/3_云与容器安全/09_Falco详解.md)
 </details>
 
 ### 6.4 安全开发
@@ -3499,6 +3500,7 @@
 - 集成方案：ELK Stack、Zeek（Community ID关联）、Kafka、Go自研平台
 
 > [📄 07_Suricata详解.md](./mybook/12_security/4_安全开发/07_Suricata详解.md)
+> [📄 07_Suricata知识点总结.md](./mybook/12_security/4_安全开发/07_Suricata知识点总结.md)
 </details>
 
 <details>
@@ -3513,6 +3515,44 @@
 - Go解析：MySQL Handshake解析、PgSSLRequest识别、TDS Pre-Login解析、通用数据库协议识别
 
 > [📄 08_数据库加密协议解析.md](./mybook/12_security/4_安全开发/08_数据库加密协议解析.md)
+</details>
+
+### 6.5 域安全与凭证提取
+
+<details>
+<summary>域凭证提取技术</summary>
+
+- **本地凭证提取**：
+  - SAM/SECURITY 注册表解密：SYSKEY 算法/Scrambler Key/PEK 解密/NTLM Hash 提取
+  - LSASS 内存转储：9种方法(任务管理器/Procdump/comsvcs.dll/SilentProcessExit/MiniDumpWriteDump/SQLDumper/Createdump/ProcessExplorer/PowerShell)+PPL绕过
+  - LSA Secrets：机器账户/缓存域凭据/NL$KM/DPAPI_SYSTEM/服务账户密码
+- **绕过杀软技术**：
+  - 白加黑 DLL：DLL劫持/侧加载/远程注入/签名程序利用/regsvr32绕过
+  - Shellcode分离：C/C#/PowerShell/宏/JS五种加载器 + AES/RC4/XOR多层加密
+  - 免杀：12种技术（混淆/API动态调用/系统调用/反射加载/进程镂空/环境检测等）
+  - 白签名 LOLBins：MSBuild/InstallUtil/Mshta/Certutil/Bitsadmin/Wmic 等
+- **域控制器凭证提取**：
+  - NTDS.DIT 数据库结构：ESE 引擎/datatable/PEK密码加密/四种提取方法对比
+  - DCSync：DRSUAPI协议/DRSGetNCChanges调用流程/最小权限利用/ACL滥用
+- **Gadgets（攻击利用技术）**：
+  - .NET Gadgets：PSRemoting/WMI/DCOM/ScheduledTask
+  - Office Gadgets：VBA宏 + PowerShell加载/反射加载
+  - LOLBins：8种系统工具 Lolbas 利用/MSHTA/Regsvr32/Rundll32
+  - DotNetToJScript：.NET程序集转为JS/VBS绕过
+- **Kerberos深度攻击**：
+  - 票据类型：TGT/TGS/白银/黄金/钻石/蓝宝石
+  - 域委派攻击：无约束/约束/RBCD/s4u2self/s4u2proxy
+  - Kerberoasting/AS-REP Roasting/子域信任/SID History注入
+- **内存 & 磁盘镜像取证提取**：
+  - 内存获取：WinPMEM/DumpIt/FTK/Magnet
+  - Volatility3/2：hashdump/lsadump/cachedump/procdump
+  - MemProcFS：将内存挂载为文件系统直接读取
+  - 磁盘镜像四步提取法：注册表→NTDS→DPAPI→浏览器/RDP凭证
+- **攻击链**：初始访问→信息收集→横向移动→提权→域控攻陷→持久化
+- **检测与防御**：12种攻击检测Event ID/防御四层模型/审计策略配置/防御命令
+- **AD攻击面矩阵**：9大攻击面(Kerberos/ADCS/ACL/GPO/信任/委派/喷洒/中继/ADFS)
+
+> [📄 01_域凭证提取技术.md](./mybook/12_security/5_域安全与凭证提取/01_域凭证提取技术.md)
 </details>
 
 ---
@@ -3857,6 +3897,17 @@
 
 
 > [📄 4_安全基础.md](./mybook/08_architecture/05_安全基础.md)
+</details>
+
+<details>
+<summary>研发技术与产品</summary>
+
+- 研发技术总监：职责描述、技术战略规划、团队管理、技术决策
+- 研发技术能力：技能矩阵、能力评估、成长路径
+- 数据安全产品：产品体系、核心功能、技术架构、市场分析
+
+> [📄 08_研发技术总监职位描述.md](./mybook/08_architecture/08_研发技术总监职位描述.md) · [📄 08_研发技术能力总结.md](./mybook/08_architecture/08_研发技术能力总结.md)
+> [📄 09_数据安全产品总结.md](./mybook/08_architecture/09_数据安全产品总结.md)
 </details>
 
 ### 7.4 DevOps & 基础设施
@@ -4265,6 +4316,9 @@
 > [📄 13_OpenCode源码分析.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/13_OpenCode源码分析.md)
 > [📄 14_ClaudeCode记忆系统.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/14_ClaudeCode记忆系统.md)
 > [📄 15_OpenClaw面试题.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/15_OpenClaw面试题.md)
+> [📄 16_CLAUDEmd实战指南.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/16_CLAUDEmd实战指南.md)
+> [📄 17_MiniMax-Mavis-Agent-Teams.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/17_MiniMax-Mavis-Agent-Teams.md)
+> [📄 18_多Agent协作系统.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/18_多Agent协作系统.md)
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
 
