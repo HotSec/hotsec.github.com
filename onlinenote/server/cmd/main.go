@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 
 	"onlinenote/config"
@@ -268,7 +269,11 @@ func (s *Server) handleRegister(c *gin.Context) {
 		u.ID, u.Username, u.PasswordHash, u.Email, u.Color,
 	)
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+		if strings.Contains(err.Error(), "UNIQUE constraint") {
+			c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+		} else {
+			s.internalError(c, err)
+		}
 		return
 	}
 
@@ -448,7 +453,11 @@ func (s *Server) handleSaveDocument(c *gin.Context) {
 		slog.Warn("failed to save document version", "error", err)
 	}
 
-	doc, _ := s.DocMgr.Load(docID)
+	doc, err := s.DocMgr.Load(docID)
+	if err != nil {
+		s.internalError(c, err)
+		return
+	}
 
 	msg, _ := json.Marshal(ws.Message{
 		Type:   "document-saved",

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -179,6 +180,9 @@ func (d *Database) GetDocumentVersions(docID string) ([]DocumentVersion, error) 
 		}
 		versions = append(versions, v)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return versions, nil
 }
 
@@ -243,7 +247,11 @@ func (d *Database) SaveDocumentVersion(docID, content, userID string) error {
 	if err := tx.Commit(); err != nil {
 		return err
 	}
-	go d.CleanupOldVersions(docID)
+	go func() {
+		if err := d.CleanupOldVersions(docID); err != nil {
+			slog.Warn("cleanup old versions failed", "docId", docID, "error", err)
+		}
+	}()
 	return nil
 }
 
@@ -402,6 +410,9 @@ func (d *Database) GetDocumentPermissions(docID string) ([]DocumentPermission, e
 		}
 		permissions = append(permissions, p)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return permissions, nil
 }
 
@@ -427,7 +438,9 @@ func (d *Database) LoadCRDTState(docID string) (json.RawMessage, map[string]int6
 	}
 
 	var vector map[string]int64
-	json.Unmarshal([]byte(vectorData), &vector)
+	if err := json.Unmarshal([]byte(vectorData), &vector); err != nil {
+		return nil, nil, fmt.Errorf("unmarshal crdt vector: %w", err)
+	}
 	return json.RawMessage(stateData), vector, nil
 }
 
