@@ -242,3 +242,335 @@ GLSL 实时视觉特效，36 种 ShaderToy 兼容技术路线，输出独立 Web
 | 视频配乐/BGM | minimax-music-gen |
 | AI宠物唱歌 | buddy-sings |
 | 定制播放列表 | minimax-music-playlist |
+
+***
+
+## 深度机制解析
+
+### 一、Skills 的本质与价值
+
+Skills 是 MiniMax Agent 的核心扩展机制，本质上是**可复用的任务模块**。
+
+**核心价值：**
+- **能力封装**：将复杂任务封装为独立可调用的单元
+- **跨场景复用**：同一 Skill 可在不同任务中调用
+- **团队协作**：Leader 可将 Skills 分配给不同 Worker
+- **持续进化**：每次执行沉淀经验，自动优化
+
+**与传统工具调用的区别：**
+
+| 维度 | 传统工具调用 | MiniMax Skills |
+|------|-------------|----------------|
+| 粒度 | 单步操作 | 完整任务流 |
+| 状态管理 | 无状态 | 自带状态追踪 |
+| 学习能力 | 无 | 自动沉淀经验 |
+| 协作能力 | 独立调用 | 可组合编排 |
+
+---
+
+### 二、Skills 工作机制
+
+#### 1. 生命周期
+
+```
+注册 → 发现 → 选择 → 执行 → 反馈 → 沉淀
+```
+
+**注册阶段**：
+- Skills 存储在 `~/.claude/skills/` 目录
+- 支持本地安装和远程仓库
+- 每个 Skill 包含 `skill.json` 配置文件
+
+**发现阶段**：
+- Agent 自动扫描可用 Skills
+- 根据任务需求匹配最合适的 Skill
+- 考虑因素：任务类型、历史成功率、资源消耗
+
+**执行阶段**：
+- Skill 获得独立的上下文空间
+- 可调用其他 Skills（嵌套调用）
+- 支持异步执行和进度汇报
+
+#### 2. Skill Manifest 结构
+
+```json
+{
+  "name": "frontend-dev",
+  "version": "1.0.0",
+  "description": "完整前端页面开发",
+  "tags": ["frontend", "react", "tailwind"],
+  "requirements": {
+    "memory": 512,
+    "timeout": 300,
+    "tools": ["file_write", "terminal"]
+  },
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "design_spec": {"type": "string"},
+      "tech_stack": {"type": "string", "enum": ["react", "vue", "svelte"]},
+      "features": {"type": "array", "items": {"type": "string"}}
+    },
+    "required": ["design_spec"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "project_path": {"type": "string"},
+      "preview_url": {"type": "string"},
+      "summary": {"type": "string"}
+    }
+  }
+}
+```
+
+---
+
+### 三、核心 Skill 类型
+
+#### 1. 执行型 Skills
+
+直接完成具体任务，返回明确结果。
+
+**示例：**
+- `frontend-dev`：生成前端项目
+- `minimax-pdf`：生成 PDF 文档
+- `vision-analysis`：图片分析
+
+**特点：**
+- 输入输出明确
+- 执行时间可预测
+- 结果可验证
+
+#### 2. 工具型 Skills
+
+提供特定工具能力，作为其他 Skills 的支撑。
+
+**示例：**
+- `terminal`：命令行执行
+- `file_write`：文件写入
+- `web_search`：网络搜索
+
+**特点：**
+- 原子化操作
+- 无业务逻辑
+- 高复用性
+
+#### 3. 协调型 Skills
+
+负责任务拆解和子任务协调。
+
+**示例：**
+- `task-decomposer`：任务拆解
+- `workflow-orchestrator`：工作流编排
+- `verifier`：验证验收
+
+**特点：**
+- 不直接产生输出
+- 管理其他 Skills
+- 决策驱动
+
+---
+
+### 四、Skill 开发指南
+
+#### 1. 创建自定义 Skill
+
+**步骤 1：创建目录结构**
+```
+~/.claude/skills/my-custom-skill/
+├── skill.json          # 元数据配置
+├── main.py             # 主逻辑
+├── requirements.txt    # 依赖
+└── README.md           # 文档
+```
+
+**步骤 2：实现核心逻辑**
+```python
+from minimax_skills import Skill, Context
+
+class MyCustomSkill(Skill):
+    def __init__(self):
+        super().__init__()
+        self.name = "my-custom-skill"
+    
+    async def execute(self, context: Context):
+        # 获取输入参数
+        input_data = context.get_input()
+        
+        # 执行核心逻辑
+        result = await self.process(input_data)
+        
+        # 返回结果
+        return {
+            "success": True,
+            "data": result,
+            "summary": "执行完成"
+        }
+    
+    async def process(self, data):
+        # 实际处理逻辑
+        pass
+```
+
+**步骤 3：测试与发布**
+```bash
+# 本地测试
+mmx skill test my-custom-skill
+
+# 打包发布
+mmx skill package my-custom-skill
+mmx skill publish my-custom-skill-1.0.0.zip
+```
+
+#### 2. 最佳实践
+
+**命名规范：**
+- 小写字母 + 连字符
+- 描述性命名（如 `pdf-generator` 而非 `tool1`）
+
+**错误处理：**
+- 使用结构化错误码
+- 提供详细错误信息
+- 支持重试机制
+
+**性能优化：**
+- 缓存中间结果
+- 异步执行耗时操作
+- 批量处理减少调用次数
+
+---
+
+### 五、Skills 在 Agent Teams 中的应用
+
+#### 1. 分工协作模式
+
+```
+Leader
+    │
+    ├── Worker 1 ──→ frontend-dev Skill
+    │
+    ├── Worker 2 ──→ fullstack-dev Skill
+    │
+    └── Verifier ──→ code-review Skill
+```
+
+#### 2. Skill 组合策略
+
+**流水线模式：**
+```
+输入 → Skill A → Skill B → Skill C → 输出
+```
+
+**并行模式：**
+```
+输入
+    │
+    ├─→ Skill A ──┐
+    ├─→ Skill B ──┼→ 合并 → 输出
+    └─→ Skill C ──┘
+```
+
+**条件分支模式：**
+```
+输入 → 判断 → Skill A（条件1）
+          └→ Skill B（条件2）
+```
+
+#### 3. 技能市场（Skill Marketplace）
+
+Mavis 内置技能商店，支持：
+- 浏览和搜索 Skills
+- 一键安装
+- 评分和评论
+- 版本管理
+
+---
+
+### 六、Skills 进阶特性
+
+#### 1. 记忆集成
+
+Skills 可以访问和更新 Agent 记忆：
+```python
+# 读取长期记忆
+history = context.memory.get("project_guidelines")
+
+# 写入记忆
+context.memory.set("last_deploy_time", datetime.now())
+
+# 查询相关记忆
+related = context.memory.search("frontend best practices")
+```
+
+#### 2. 自适应优化
+
+每次执行后自动学习：
+- 记录执行时间和成功率
+- 分析失败原因
+- 自动调整参数
+- 推荐更优路径
+
+#### 3. 权限控制
+
+Skills 有独立的权限边界：
+- 文件系统访问范围
+- API 调用限额
+- 网络访问控制
+- 敏感操作审批
+
+---
+
+### 七、典型应用场景
+
+#### 场景 1：全栈项目开发
+
+```
+用户请求：创建一个电商后台管理系统
+
+执行流程：
+1. Leader 分析需求，识别需要的 Skills
+2. 分配 Worker 1 使用 fullstack-dev Skill 搭建后端
+3. 分配 Worker 2 使用 frontend-dev Skill 开发前端
+4. 分配 Verifier 使用 code-review Skill 验收
+5. 自动集成测试
+6. 交付最终项目
+```
+
+#### 场景 2：数据分析报告
+
+```
+用户请求：分析销售数据并生成报告
+
+执行流程：
+1. 使用 data-analysis Skill 处理数据
+2. 使用 chart-generator Skill 生成图表
+3. 使用 minimax-pdf Skill 生成报告
+4. 使用 vision-analysis Skill 审查报告质量
+```
+
+#### 场景 3：内容创作
+
+```
+用户请求：为新产品写一篇营销文案
+
+执行流程：
+1. 使用 web-search Skill 收集竞品信息
+2. 使用 content-writer Skill 生成初稿
+3. 使用 grammar-check Skill 校对
+4. 使用 seo-analyzer Skill 优化
+```
+
+---
+
+### 八、总结
+
+MiniMax Skills 是一套强大的能力扩展系统，核心优势：
+
+1. **模块化设计**：任务封装为独立单元，便于复用和维护
+2. **智能调度**：自动选择最优 Skill 组合
+3. **持续进化**：基于执行数据不断优化
+4. **团队协作**：支持多 Agent 分工协作
+5. **生态开放**：支持自定义开发和共享
+
+通过合理使用 Skills，可以显著提升 Agent 的任务处理能力和效率。
