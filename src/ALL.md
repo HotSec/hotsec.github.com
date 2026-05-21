@@ -2343,7 +2343,7 @@
 > [📄 网络和进程间通信.md](./mybook/02_python/04_标准库/网络和进程间通信.md)
 </details>
 
-### 3.5 常用库
+### 3.5 第三方库（常用库与第三方库合并）
 
 #### 核心库
 
@@ -2356,7 +2356,7 @@
 - **Huey**：轻量任务队列；Redis/SQLite 后端；支持定时任务/重试/任务管道
 
 
-> [📄 pydantic.md](./mybook/02_python/05_常用库/pydantic.md) · [📄 SQLAlchemy.md](./mybook/02_python/07_第三方库/SQLAlchemy.md) · [📄 celery.md](./mybook/02_python/05_常用库/celery.md) · [📄 huey.md](./mybook/02_python/05_常用库/huey.md) · [📄 hrq.md](./mybook/02_python/05_常用库/hrq.md)
+> [📄 pydantic.md](./mybook/02_python/07_第三方库/pydantic.md) · [📄 SQLAlchemy.md](./mybook/02_python/07_第三方库/SQLAlchemy.md) · [📄 celery.md](./mybook/02_python/07_第三方库/celery.md) · [📄 huey.md](./mybook/02_python/07_第三方库/huey.md) · [📄 hrq.md](./mybook/02_python/07_第三方库/hrq.md)
 </details>
 
 #### 网络爬虫
@@ -2382,7 +2382,7 @@
 - **Trio**：友好的异步并发库，结构化并发模型
 
 
-> [📄 gevent.md](./mybook/02_python/05_常用库/gevent.md) · [📄 uvloop.md](./mybook/02_python/05_常用库/uvloop.md)
+> [📄 gevent.md](./mybook/02_python/07_第三方库/gevent.md) · [📄 uvloop.md](./mybook/02_python/07_第三方库/uvloop.md)
 </details>
 
 #### 安全包管理
@@ -2428,6 +2428,65 @@
 
 
 > [📄 zipapp打包应用.md](./mybook/02_python/01_语言基础/zipapp打包应用.md)
+</details>
+
+#### 数据库驱动
+
+<details>
+<summary>数据库驱动</summary>
+
+- **PyMySQL**：纯 Python MySQL 客户端；SQL 执行流程（connect → cursor → execute → fetch）/MySQL 行存储格式/连接池/事务控制
+- **Redis（redis-py）**：5 大基础数据类型 + 3 大扩展类型（HyperLogLog/Bitmap/Geo）；主从/哨兵/Cluster；分布式锁（SET NX EX）/Redlock/Pipeline/发布订阅/Lua 脚本
+- **MongoDB（pymongo）**：文档型 NoSQL；对比 MySQL/Redis/ES；副本集选举（Raft）；事务（4.0+）；GridFS 大文件存储；聚合管道/索引优化
+
+
+> [📄 pymysql.md](./mybook/02_python/07_第三方库/pymysql.md) · [📄 redis-py.md](./mybook/02_python/07_第三方库/redis-py.md) · [📄 mongodb.md](./mybook/02_python/07_第三方库/mongodb.md) · [📄 python-memcached.md](./mybook/02_python/07_第三方库/python-memcached.md)
+</details>
+
+#### 消息队列与搜索
+
+<details>
+<summary>消息队列 & 搜索</summary>
+
+- **RabbitMQ**：AMQP 协议；Exchange 类型（direct/fanout/topic/headers）；生产者-消费者/发布订阅/路由/模糊匹配；消息确认/持久化/死信队列/延迟队列
+- **Kafka**：高吞吐分布式消息系统；Topic/Partition/Consumer Group/Offset；日志追加存储/零拷贝/页面缓存；Exactly-Once 语义/事务/分区再平衡；Kafka Streams/Connect 生态
+- **Elasticsearch**：倒排索引/分词器/映射（Mapping）；插入速度优化（bulk/refresh_interval/副本延迟）；聚合查询/向量搜索/ILM 生命周期
+
+
+> [📄 rabbitmq.md](./mybook/02_python/07_第三方库/rabbitmq.md) · [📄 kafka.md](./mybook/02_python/07_第三方库/kafka.md) · [📄 Elasticsearch.md](./mybook/02_python/07_第三方库/Elasticsearch.md)
+</details>
+
+#### LLM与AI
+
+<details>
+<summary>LLM & AI</summary>
+
+- **LangChain**：6 大核心组件（Model I/O / Data Connection / Chains / Memory / Agents / Callbacks）
+- **LiteLLM**：统一多模型 API，支持 OpenAI/Azure/Anthropic 等 100+ 模型；路由/负载均衡/故障转移
+- **大模型开发流程**：确定目标 → 设计功能 → 搭建架构 → 建向量数据库 → Prompt Engineering → 验证迭代 → 前后端搭建 → 体验优化
+- **RAG vs 微调**：RAG 更新成本低/可解释性强/降低幻觉；微调可定制风格/行为但计算成本高
+- **提示词工程**：设计原则（清晰/具体/分步）/迭代优化/Bad Case 分析/Chain-of-Thought
+- **推理部署**：Ollama（本地部署）/vLLM（高吞吐推理服务）/Tensor-Parallel/AWQ/GPTQ 量化
+- **AI 绘画**：Stable Diffusion / ComfyUI / ControlNet
+- **Python AI 工具**：Jupyter Notebook / IPython
+
+
+> [📄 langchain.md](./mybook/02_python/07_第三方库/langchain.md) · [📄 litllm.md](./mybook/02_python/07_第三方库/litllm.md) · [📄 大模型.md](./mybook/02_python/07_第三方库/大模型.md) · [📄 大模型开发流程.md](./mybook/02_python/07_第三方库/大模型开发流程.md) · [📄 PythonAI绘画.md](./mybook/02_python/07_第三方库/PythonAI绘画.md) · [📄 RAG系统设计.md](./mybook/02_python/07_第三方库/RAG系统设计.md) · [📄 LangChain实战.md](./mybook/02_python/07_第三方库/LangChain实战.md)
+</details>
+
+#### 自动化部署
+
+<details>
+<summary>自动化 & 部署</summary>
+
+- **Ansible**：自动化运维；Playbook/Inventory/Module/Role；幂等性/声明式配置
+- **Fabric**：轻量远程执行框架；SSH 连接/批量命令/文件上传下载/任务编排
+- **Terraform**：IaC 基础设施即代码；HCL 语法/Provider/State 管理/模块化
+- **Playwright**：浏览器自动化；同步/异步 API/反检测/截图/定位器/网络拦截
+- **Flask-PluginKit**：基于 Flask 的插件式开发工具
+
+
+> [📄 ansible.md](./mybook/02_python/07_第三方库/自动化运维/ansible.md) · [📄 fabric.md](./mybook/02_python/07_第三方库/自动化运维/fabric.md) · [📄 terraform.md](./mybook/02_python/07_第三方库/terraform.md) · [📄 负载均衡.md](./mybook/02_python/07_第三方库/自动化运维/负载均衡.md)
 </details>
 
 ### 3.6 Web开发
@@ -2534,68 +2593,7 @@
 > [📄 反爬.md](./mybook/02_python/06_Web开发/反爬.md)
 </details>
 
-### 3.7 第三方库
-
-#### 数据库驱动
-
-<details>
-<summary>数据库驱动</summary>
-
-- **PyMySQL**：纯 Python MySQL 客户端；SQL 执行流程（connect → cursor → execute → fetch）/MySQL 行存储格式/连接池/事务控制
-- **Redis（redis-py）**：5 大基础数据类型 + 3 大扩展类型（HyperLogLog/Bitmap/Geo）；主从/哨兵/Cluster；分布式锁（SET NX EX）/Redlock/Pipeline/发布订阅/Lua 脚本
-- **MongoDB（pymongo）**：文档型 NoSQL；对比 MySQL/Redis/ES；副本集选举（Raft）；事务（4.0+）；GridFS 大文件存储；聚合管道/索引优化
-
-
-> [📄 pymysql.md](./mybook/02_python/07_第三方库/pymysql.md) · [📄 redis-py.md](./mybook/02_python/07_第三方库/redis-py.md) · [📄 mongodb.md](./mybook/02_python/07_第三方库/mongodb.md) · [📄 python-memcached.md](./mybook/02_python/07_第三方库/python-memcached.md)
-</details>
-
-#### 消息队列与搜索
-
-<details>
-<summary>消息队列 & 搜索</summary>
-
-- **RabbitMQ**：AMQP 协议；Exchange 类型（direct/fanout/topic/headers）；生产者-消费者/发布订阅/路由/模糊匹配；消息确认/持久化/死信队列/延迟队列
-- **Kafka**：高吞吐分布式消息系统；Topic/Partition/Consumer Group/Offset；日志追加存储/零拷贝/页面缓存；Exactly-Once 语义/事务/分区再平衡；Kafka Streams/Connect 生态
-- **Elasticsearch**：倒排索引/分词器/映射（Mapping）；插入速度优化（bulk/refresh_interval/副本延迟）；聚合查询/向量搜索/ILM 生命周期
-
-
-> [📄 rabbitmq.md](./mybook/02_python/07_第三方库/rabbitmq.md) · [📄 kafka.md](./mybook/02_python/07_第三方库/kafka.md) · [📄 Elasticsearch.md](./mybook/02_python/07_第三方库/Elasticsearch.md)
-</details>
-
-#### LLM与AI
-
-<details>
-<summary>LLM & AI</summary>
-
-- **LangChain**：6 大核心组件（Model I/O / Data Connection / Chains / Memory / Agents / Callbacks）
-- **LiteLLM**：统一多模型 API，支持 OpenAI/Azure/Anthropic 等 100+ 模型；路由/负载均衡/故障转移
-- **大模型开发流程**：确定目标 → 设计功能 → 搭建架构 → 建向量数据库 → Prompt Engineering → 验证迭代 → 前后端搭建 → 体验优化
-- **RAG vs 微调**：RAG 更新成本低/可解释性强/降低幻觉；微调可定制风格/行为但计算成本高
-- **提示词工程**：设计原则（清晰/具体/分步）/迭代优化/Bad Case 分析/Chain-of-Thought
-- **推理部署**：Ollama（本地部署）/vLLM（高吞吐推理服务）/Tensor-Parallel/AWQ/GPTQ 量化
-- **AI 绘画**：Stable Diffusion / ComfyUI / ControlNet
-- **Python AI 工具**：Jupyter Notebook / IPython
-
-
-> [📄 langchain.md](./mybook/02_python/07_第三方库/langchain.md) · [📄 litllm.md](./mybook/02_python/07_第三方库/litllm.md) · [📄 大模型.md](./mybook/02_python/07_第三方库/大模型.md) · [📄 大模型开发流程.md](./mybook/02_python/07_第三方库/大模型开发流程.md) · [📄 PythonAI绘画.md](./mybook/02_python/07_第三方库/PythonAI绘画.md) · [📄 RAG系统设计.md](./mybook/02_python/07_第三方库/RAG系统设计.md) · [📄 LangChain实战.md](./mybook/02_python/07_第三方库/LangChain实战.md)
-</details>
-
-#### 自动化部署
-
-<details>
-<summary>自动化 & 部署</summary>
-
-- **Ansible**：自动化运维；Playbook/Inventory/Module/Role；幂等性/声明式配置
-- **Fabric**：轻量远程执行框架；SSH 连接/批量命令/文件上传下载/任务编排
-- **Terraform**：IaC 基础设施即代码；HCL 语法/Provider/State 管理/模块化
-- **Playwright**：浏览器自动化；同步/异步 API/反检测/截图/定位器/网络拦截
-- **Flask-PluginKit**：基于 Flask 的插件式开发工具
-
-
-> [📄 ansible.md](./mybook/02_python/07_第三方库/自动化运维/ansible.md) · [📄 fabric.md](./mybook/02_python/07_第三方库/自动化运维/fabric.md) · [📄 terraform.md](./mybook/02_python/07_第三方库/自动化运维/terraform.md) · [📄 负载均衡.md](./mybook/02_python/07_第三方库/自动化运维/负载均衡.md)
-</details>
-
-### 3.8 高并发设计
+### 3.7 高并发设计
 
 #### 架构
 
