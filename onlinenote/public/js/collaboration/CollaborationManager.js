@@ -152,6 +152,7 @@ export class CollaborationManager {
 
   flushCRDTOps() {
     if (this.pendingCRDTOps.length === 0) return;
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
 
     const ops = this.pendingCRDTOps.map(op => op.toJSON());
     this.pendingCRDTOps = [];
