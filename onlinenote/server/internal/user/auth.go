@@ -79,3 +79,7 @@ func RandomColor() string {
 	idx := int(binary.BigEndian.Uint64(b) % uint64(len(colorPool)))
 	return colorPool[idx]
 }
+
+func AssignColor(index int) string {
+	return colorPool[index%len(colorPool)]
+}
