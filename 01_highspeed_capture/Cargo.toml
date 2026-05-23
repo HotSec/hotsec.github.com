@@ -1,0 +1,63 @@
+[package]
+name = "highspeed-capture"
+version = "0.1.0"
+edition = "2021"
+authors = ["Highspeed Capture Team <team@example.com>"]
+description = "High-performance 40Gbps packet capture tool with AF_XDP"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+# 异步运行时
+tokio = { version = "1.0", features = ["full"] }
+
+# 命令行参数
+clap = { version = "4.4", features = ["derive", "string"] }
+
+# 系统调用
+libc = "0.2"
+nix = { version = "0.27", features = ["socket", "sched", "net"] }
+
+# 错误处理
+anyhow = "1.0"
+thiserror = "1.0"
+
+# 日志
+log = "0.4"
+env_logger = "0.10"
+
+# 数据处理
+bytes = "1.5"
+crossbeam = { version = "0.8", features = ["crossbeam-channel"] }
+etherparse = "0.14"
+
+# 内存映射
+memmap2 = "0.9"
+
+# 时间处理
+chrono = { version = "0.4", features = ["serde"] }
+
+# 配置
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+
+tempfile = "3.8"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 1
+
+[features]
+default = ["afxdp"]
+afxdp = []
+dpdk = []
+pcap = []

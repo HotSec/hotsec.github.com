@@ -1,0 +1,21 @@
+interface = "eth0"
+mode = "Full"
+output_dir = "./captures"
+buffer_size = 4096
+
+[pcap]
+size_limit_mb = 1024
+compression = false
+
+[afxdp]
+umem_size = 536870912
+fill_ring_size = 4096
+comp_ring_size = 4096
+rx_ring_size = 4096
+frame_size = 2048
+use_huge_pages = true
+
+[performance]
+cpu_core_affinity = [0, 1, 2, 3]
+num_parser_threads = 2
+num_writer_threads = 2
