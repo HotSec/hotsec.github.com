@@ -4318,6 +4318,7 @@
 > [📄 16_CLAUDEmd实战指南.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/16_CLAUDEmd实战指南.md)
 > [📄 17_MiniMax-Mavis-Agent-Teams.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/17_MiniMax-Mavis-Agent-Teams.md)
 > [📄 18_多Agent协作系统.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/18_多Agent协作系统.md)
+> [📄 19_ClaudeCode-powerup教程.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/19_ClaudeCode-powerup教程.md)
 > [📁 02_openclaw源码分析/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_openclaw/) · 项目概览/核心架构与Gateway/Agents与Sessions/Config与CLI/整体分析/核心运行时详解
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
