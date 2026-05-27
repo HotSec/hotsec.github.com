@@ -3373,6 +3373,50 @@
 </details>
 
 <details>
+<summary>红队信息收集</summary>
+
+- CDN判断与绕过（多地Ping/子域名/DNS历史/SSL证书/MX记录/F5 LTM解码）
+- 子域名收集（搜索引擎/资产测绘/爆破工具/Hosts碰撞）
+- IP信息收集（反查域名/C段扫描/旁站查询/端口扫描）
+- 公司名称收集（企业查询/供应商攻击/ICP备案/GitHub泄露）
+- 网站深入收集（指纹识别/目录扫描/JS信息收集/WAF探测）
+
+> [📄 10_红队信息收集.md](./mybook/12_security/2_安全工具与方法/10_红队信息收集.md)
+</details>
+
+<details>
+<summary>AI 驱动的红队免杀知识库</summary>
+
+- 8 个核心模块：PHP免杀/Java免杀/AdaptixC2 BOF/Ghost Bits/360 QVM/Impacket/fscan/BYOVD
+- 核心理念："人定策略，AI 出内容"，讲清楚原理、适用场景、限制条件
+- AI辅助生成：QwenPaw/DeepSeek/Claude Code + 人工验证
+
+> [📄 24_AI-Redteam-Notes.md](./mybook/12_security/2_安全工具与方法/24_AI-Redteam-Notes.md)
+</details>
+
+<details>
+<summary>Pentest AI Agents</summary>
+
+- 35 个 Claude Code 渗透测试子代理，覆盖侦察/Web/AD/云/移动/无线/社工/载荷/逆向/漏洞链/检测/取证
+- 双层执行模型：Tier 1 顾问模式 + Tier 2 执行模式（范围守卫 + 逐命令审批）
+- 80+ 底层工具跟踪，Findings DB 持久化，doctor.sh 工具检查
+- v3.2 新增：c2-operator, container-breakout, opsec-anonymizer, llm-redteam
+
+> [📄 25_Pentest-AI-Agents.md](./mybook/12_security/2_安全工具与方法/25_Pentest-AI-Agents.md)
+</details>
+
+<details>
+<summary>Anthropic 网络安全技能库</summary>
+
+- 754 个结构化网络安全技能，覆盖 26 个安全领域
+- 五框架统一映射（MITRE ATT&CK v18/NIST CSF 2.0/ATLAS v5.4/D3FEND v1.3/NIST AI RMF 1.0）
+- agentskills.io 标准，兼容 Claude Code/Copilot/Cursor 等 26+ 平台
+- Token 优化设计（frontmatter 约 30 tokens），渐进式披露
+
+> [📄 22_Anthropic网络安全技能库.md](./mybook/12_security/2_安全工具与方法/22_Anthropic网络安全技能库.md)
+</details>
+
+<details>
 <summary>容器内信息收集</summary>
 
 - 基础系统信息：/etc/os-release / hostname / 进程列表 / 网络配置
@@ -3552,6 +3596,92 @@
 - **AD攻击面矩阵**：9大攻击面(Kerberos/ADCS/ACL/GPO/信任/委派/喷洒/中继/ADFS)
 
 > [📄 01_域凭证提取技术.md](./mybook/12_security/5_域安全与凭证提取/01_域凭证提取技术.md)
+</details>
+
+### 6.6 安全合规与基础设施
+
+<details>
+<summary>等保2.0</summary>
+
+- 等保2.0概述（GB/T 22239-2019），五个等级定义，三重防护体系
+- 等保2.0 vs 1.0核心差异对照，云计算安全扩展要求
+- 测评流程：定级→备案→建设整改→等级测评→监督检查
+- 常见问题与实战要点
+
+> [📄 01_等保2.0.md](./mybook/12_security/6_安全合规与基础设施/01_等保2.0.md)
+</details>
+
+<details>
+<summary>ISO 27001</summary>
+
+- ISO 27001概述，PDCA循环，标准族结构
+- 14个控制域（A.5-A.18）概要，ISMS建设流程
+- 风险评估方法论：风险值=可能性×影响
+- 与等保2.0对比，认证流程与周期，实战要点
+
+> [📄 02_ISO27001.md](./mybook/12_security/6_安全合规与基础设施/02_ISO27001.md)
+</details>
+
+<details>
+<summary>个人信息保护合规</summary>
+
+- 中国三法并行体系（网安法/个保法/数安法）
+- 个保法核心：7项合法性基础、8项个人权利、DPIA、DPO
+- 敏感个人信息处理规则、未成年人保护
+- 数据出境三条路径、App合规四维要求
+- 企业四维合规体系、与GDPR对比
+
+> [📄 03_个人信息保护合规.md](./mybook/12_security/6_安全合规与基础设施/03_个人信息保护合规.md)
+</details>
+
+<details>
+<summary>PKI公钥基础设施</summary>
+
+- PKI核心组件（CA/RA/CRL/OCSP）、X.509 v3证书结构
+- 证书链与信任模型、证书生命周期7阶段
+- CRL vs OCSP vs OCSP Stapling
+- 国密算法体系（SM2/SM3/SM4/SM9双证书）
+- PKI实战：HTTPS/TLS/mTLS/代码签名/SAML
+
+> [📄 04_PKI公钥基础设施.md](./mybook/12_security/6_安全合规与基础设施/04_PKI公钥基础设施.md)
+</details>
+
+<details>
+<summary>身份认证与IAM</summary>
+
+- 认证因子与MFA、认证协议（SAML/OAuth2.0/OIDC/Kerberos）
+- SSO单点登录、IAM生命周期6阶段
+- 授权模型对比（RBAC/ABAC/PBAC/ReBAC/ACL）
+- JIT访问、PAM特权访问管理、联邦身份
+- 云IAM实践（AWS/Azure/GCP对比）、常见攻击与防御
+
+> [📄 05_身份认证与IAM.md](./mybook/12_security/6_安全合规与基础设施/05_身份认证与IAM.md)
+</details>
+
+<details>
+<summary>零信任架构</summary>
+
+- NIST SP 800-207标准、6大核心原则
+- 三大逻辑组件（PE/PA/PEP）、数据平面+控制平面
+- SDP软件定义边界、微隔离技术
+- SASE/ZTNA、6步实施路径、4级成熟度模型
+- 主流方案对比（Zscaler/Palo Alto/Cisco/Akamai/Cloudflare）
+
+> [📄 06_零信任架构.md](./mybook/12_security/6_安全合规与基础设施/06_零信任架构.md)
+</details>
+
+<details>
+<summary>云安全</summary>
+
+- 共享责任模型、IaaS/PaaS/SaaS安全职责划分
+- 云安全威胁（MITRE ATT&CK Cloud/OWASP Cloud Top 10）
+- 云基础设施安全（VPC/安全组/KMS/HSM）
+- 云原生安全（容器/K8s/Service Mesh/CI-CD）
+- CSPM/CWPP、多云与混合云策略
+- 云安全合规（等保2.0云扩展/CIS/CSA STAR/SOC 2）
+- 主流云厂商安全服务对比、最佳实践
+
+> [📄 07_云安全.md](./mybook/12_security/6_安全合规与基础设施/07_云安全.md)
 </details>
 
 ---
@@ -3835,6 +3965,31 @@
 > [📄 0_软考架构基础.md](./mybook/08_architecture/01_软考架构基础.md) · [📄 1_架构设计.md](./mybook/08_architecture/02_架构设计.md) · [📄 03_分布式理论.md](./mybook/08_architecture/03_分布式理论.md)
 </details>
 
+<details>
+<summary>软考系统架构师</summary>
+
+- 计算机组成与体系结构（CPU/流水线/Cache/校验码/Flynn分类）
+- 操作系统（进程管理/PV操作/死锁/存储管理/磁盘调度）
+- 计算机网络（OSI与TCP/IP/子网划分/TCP拥塞控制/路由协议）
+- 软件工程（过程模型/需求工程/UML/设计模式/测试/CMMI）
+- 系统架构设计（架构风格/4+1视图/质量属性/ATAM评估/中间件/Web架构）
+- 数据库系统（范式/关系代数/SQL/并发控制/分布式数据库/数据仓库）
+- 安全与法律法规（密码学/访问控制/网络安全/知识产权/标准化/招投标法）
+- 项目管理与数学经济（挣值分析/CPM/运筹学/系统可靠性/决策论）
+
+> [📁 软考系统架构师/](./mybook/08_architecture/02_软考系统架构师/)
+
+**详细文档**：
+> [📄 01_计算机组成与体系结构.md](./mybook/08_architecture/02_软考系统架构师/01_计算机组成与体系结构.md)
+> [📄 02_操作系统.md](./mybook/08_architecture/02_软考系统架构师/02_操作系统.md)
+> [📄 03_计算机网络.md](./mybook/08_architecture/02_软考系统架构师/03_计算机网络.md)
+> [📄 04_软件工程.md](./mybook/08_architecture/02_软考系统架构师/04_软件工程.md)
+> [📄 05_系统架构设计.md](./mybook/08_architecture/02_软考系统架构师/05_系统架构设计.md)
+> [📄 06_数据库系统.md](./mybook/08_architecture/02_软考系统架构师/06_数据库系统.md)
+> [📄 07_安全与法律法规.md](./mybook/08_architecture/02_软考系统架构师/07_安全与法律法规.md)
+> [📄 08_项目管理与数学经济.md](./mybook/08_architecture/02_软考系统架构师/08_项目管理与数学经济.md)
+</details>
+
 #### 数据库
 
 <details>
@@ -3851,7 +4006,7 @@
 > [📁 architecture/数据库/](./mybook/08_architecture/01_数据库/)
 
 **详细文档**：
-> [📄 1_关系数据库.md](./mybook/08_architecture/01_数据库/1_关系数据库.md) · [📄 2_NoSQL.md](./mybook/08_architecture/01_数据库/2_NoSQL.md) · [📄 3_分布式数据库.md](./mybook/08_architecture/01_数据库/3_分布式数据库.md)
+> [📄 1_关系数据库.md](./mybook/08_architecture/01_数据库/1_关系数据库.md) · [📄 2_NoSQL.md](./mybook/08_architecture/01_数据库/2_NoSQL.md) · [📄 3_分布式数据库.md](./mybook/08_architecture/01_数据库/3_分布式数据库.md) · [📄 4_Redis深度实践.md](./mybook/08_architecture/01_数据库/4_Redis深度实践.md)
 </details>
 
 #### 信息系统与安全
@@ -3869,6 +4024,14 @@
 
 
 > [📄 3_信息系统架构.md](./mybook/08_architecture/04_信息系统架构.md) · [📄 0_大型网站架构演进.md](./mybook/08_architecture/06_大型网站架构演进.md) · [📄 07_在线文档多人实时编辑.md](./mybook/08_architecture/07_在线文档多人实时编辑.md)
+</details>
+
+<details>
+<summary>API 服务架构</summary>
+
+- Hot-Search-API：基于 Gin 框架的 31+ 平台热搜聚合 API 服务，支持高并发聚合、零外部依赖、健康检查
+
+> [📄 11_Hot-Search-API热搜聚合服务.md](./mybook/08_architecture/07_API服务架构/11_Hot-Search-API热搜聚合服务.md)
 </details>
 
 <details>
@@ -3907,6 +4070,7 @@
 
 > [📄 08_研发技术总监职位描述.md](./mybook/08_architecture/08_研发技术总监职位描述.md) · [📄 08_研发技术能力总结.md](./mybook/08_architecture/08_研发技术能力总结.md)
 > [📄 09_数据安全产品总结.md](./mybook/08_architecture/09_数据安全产品总结.md)
+> [📄 10_微服务架构深度实践.md](./mybook/08_architecture/10_微服务架构深度实践.md)
 </details>
 
 ### 7.4 DevOps & 基础设施
@@ -4320,6 +4484,13 @@
 > [📄 18_多Agent协作系统.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/18_多Agent协作系统.md)
 > [📄 19_ClaudeCode-powerup教程.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/19_ClaudeCode-powerup教程.md)
 > [📄 20_Superpowers最佳实践.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/20_Superpowers最佳实践.md)
+> [📄 21_SpecKit与SDD规格驱动开发.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/21_SpecKit与SDD规格驱动开发.md)
+> [📄 22_ECC-AllThingsClaudeCode.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/22_ECC-AllThingsClaudeCode.md)
+> [📄 23_AndrejKarpathy-Skills-CLAUDEmd.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/23_AndrejKarpathy-Skills-CLAUDEmd.md)
+> [📄 24_OpenSpec规范驱动开发.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/24_OpenSpec规范驱动开发.md)
+> [📄 25_PromptHub.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/25_PromptHub.md)
+> [📄 26_CodeGraph语义代码索引.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/26_CodeGraph语义代码索引.md)
+> [📄 27_CodeGraphy代码图谱引擎.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/27_CodeGraphy代码图谱引擎.md)
 > [📁 02_openclaw源码分析/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_openclaw/) · 项目概览/核心架构与Gateway/Agents与Sessions/Config与CLI/整体分析/核心运行时详解
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
