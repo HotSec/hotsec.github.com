@@ -1,4 +1,4 @@
-use std::io::{self, Read};
+use std::io;
 use std::os::fd::{FromRawFd, RawFd};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -33,7 +33,6 @@ struct xdp_umem_reg {
     chunk_size: u32,
     headroom: u32,
     flags: u32,
-    tx_metadata_len: u32, // Added from header!
 }
 
 #[repr(C)]
@@ -184,7 +183,6 @@ impl XskSocket {
         let comp_ring_desc_count = fill_ring_size.next_power_of_two();
         let rx_ring_desc_count = rx_ring_size.next_power_of_two();
 
-        // Configure rings BEFORE UMEM and offsets!
         unsafe {
             let ret = libc::setsockopt(
                 xsk_fd, SOL_XDP, XDP_RX_RING,
@@ -224,7 +222,6 @@ impl XskSocket {
             }
         }
 
-        // Now register umem
         unsafe {
             let reg = xdp_umem_reg {
                 addr: umem_ptr,
@@ -232,7 +229,6 @@ impl XskSocket {
                 chunk_size: umem_frame_size,
                 headroom: 0,
                 flags: 0,
-                tx_metadata_len: 0,
             };
             let ret = libc::setsockopt(
                 xsk_fd, SOL_XDP, XDP_UMEM_REG,
@@ -262,15 +258,23 @@ impl XskSocket {
             }
         }
 
-        // Mmap all rings (correct size calculation from C example)
-    let fill_ring_size_bytes = (offsets.fr.desc + (fill_ring_desc_count as u64) * std::mem::size_of::<xdp_desc>() as u64) as usize;
-    let fill_mmap = Self::mmap_ring_fd(xsk_fd, XDP_UMEM_PGOFF_FILL_RING, fill_ring_size_bytes)?;
+        let fill_ring_size_bytes = (offsets.fr.desc + (fill_ring_desc_count as u64) * std::mem::size_of::<xdp_desc>() as u64) as usize;
+        let fill_mmap = match Self::mmap_ring_fd(xsk_fd, XDP_UMEM_PGOFF_FILL_RING, fill_ring_size_bytes) {
+            Ok(m) => m,
+            Err(e) => { unsafe { libc::close(xsk_fd); } return Err(e); }
+        };
 
-    let comp_ring_size_bytes = (offsets.cr.desc + (comp_ring_desc_count as u64) * std::mem::size_of::<xdp_desc>() as u64) as usize;
-    let comp_mmap = Self::mmap_ring_fd(xsk_fd, XDP_UMEM_PGOFF_COMPLETION_RING, comp_ring_size_bytes)?;
+        let comp_ring_size_bytes = (offsets.cr.desc + (comp_ring_desc_count as u64) * std::mem::size_of::<xdp_desc>() as u64) as usize;
+        let comp_mmap = match Self::mmap_ring_fd(xsk_fd, XDP_UMEM_PGOFF_COMPLETION_RING, comp_ring_size_bytes) {
+            Ok(m) => m,
+            Err(e) => { unsafe { libc::close(xsk_fd); } return Err(e); }
+        };
 
-    let rx_ring_size_bytes = (offsets.rx.desc + (rx_ring_desc_count as u64) * std::mem::size_of::<xdp_desc>() as u64) as usize;
-    let rx_mmap = Self::mmap_ring_fd(xsk_fd, XDP_PGOFF_RX_RING, rx_ring_size_bytes)?;
+        let rx_ring_size_bytes = (offsets.rx.desc + (rx_ring_desc_count as u64) * std::mem::size_of::<xdp_desc>() as u64) as usize;
+        let rx_mmap = match Self::mmap_ring_fd(xsk_fd, XDP_PGOFF_RX_RING, rx_ring_size_bytes) {
+            Ok(m) => m,
+            Err(e) => { unsafe { libc::close(xsk_fd); } return Err(e); }
+        };
 
         let mut fill_ring = unsafe {
             Ring::new(fill_mmap, offsets.fr.producer, offsets.fr.consumer, offsets.fr.desc, offsets.fr.flags, fill_ring_desc_count)
@@ -431,7 +435,7 @@ impl PacketCapture {
         nix::net::if_::if_nametoindex(name).map(|i| i as i32).map_err(Into::into)
     }
 
-    pub async fn run(&self) -> anyhow::Result<()> {
+    pub fn run(&self) -> anyhow::Result<()> {
         info!("Starting AF_XDP capture loop");
 
         #[cfg(target_os = "linux")]
@@ -470,14 +474,15 @@ impl PacketCapture {
         }
 
         if sockets.is_empty() {
-            warn!("No AF_XDP sockets created, using tcpdump fallback");
-            return self.run_tcpdump_fallback().await;
+            warn!("No AF_XDP sockets created, using AF_PACKET fallback");
+            return self.run_raw_socket_fallback();
         }
 
         info!("AF_XDP capture active with {} queues", sockets.len());
 
         let mut packet_count = 0u64;
         let mut byte_count = 0u64;
+        let mut dropped = 0u64;
         let mut last_report = std::time::Instant::now();
         let mut batch = Vec::with_capacity(256);
 
@@ -495,7 +500,9 @@ impl PacketCapture {
                         packet_count += n as u64;
                         for pkt in batch.drain(..) {
                             byte_count += pkt.data.len() as u64;
-                            let _ = self.sender.try_send(pkt);
+                            if self.sender.try_send(pkt).is_err() {
+                                dropped += 1;
+                            }
                         }
                     }
                     Ok(_) => {}
@@ -504,7 +511,7 @@ impl PacketCapture {
             }
 
             if !received {
-                std::thread::yield_now();
+                std::thread::sleep(std::time::Duration::from_micros(10));
             }
 
             let elapsed = last_report.elapsed();
@@ -512,9 +519,10 @@ impl PacketCapture {
                 let secs = elapsed.as_secs().max(1);
                 let pps = packet_count / secs;
                 let mbps = (byte_count * 8) as f64 / secs as f64 / 1_000_000.0;
-                info!("AF_XDP: {} pps, {:.1} Mbps, {} queues", pps, mbps, sockets.len());
+                info!("AF_XDP: {} pps, {:.1} Mbps, {} queues, dropped={}", pps, mbps, sockets.len(), dropped);
                 packet_count = 0;
                 byte_count = 0;
+                dropped = 0;
                 last_report = std::time::Instant::now();
             }
         }
@@ -536,37 +544,99 @@ impl PacketCapture {
             .max(1)
     }
 
-    async fn run_tcpdump_fallback(&self) -> anyhow::Result<()> {
-        info!("Using tcpdump fallback");
-        let mut child = std::process::Command::new("tcpdump")
-            .args(["-i", &self.settings.interface, "-n", "-l", "-w", "-"])
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::null())
-            .spawn()?;
+    fn run_raw_socket_fallback(&self) -> anyhow::Result<()> {
+        info!("Using AF_PACKET raw socket fallback (AF_XDP unavailable)");
 
-        let mut stdout = child.stdout.take().unwrap();
-        let mut buf = [0u8; 65536];
-        let mut count = 0u64;
-        let mut last = std::time::Instant::now();
+        let fd = unsafe {
+            libc::socket(
+                libc::AF_PACKET,
+                libc::SOCK_RAW | libc::SOCK_NONBLOCK,
+                (libc::ETH_P_ALL as u16).to_be() as i32,
+            )
+        };
+        if fd < 0 {
+            return Err(io::Error::last_os_error().into());
+        }
+
+        let mut sll: libc::sockaddr_ll = unsafe { std::mem::zeroed() };
+        sll.sll_family = libc::AF_PACKET as u16;
+        sll.sll_protocol = (libc::ETH_P_ALL as u16).to_be();
+        sll.sll_ifindex = self.if_index;
+
+        let ret = unsafe {
+            libc::bind(
+                fd,
+                &sll as *const _ as *const libc::sockaddr,
+                std::mem::size_of::<libc::sockaddr_ll>() as libc::socklen_t,
+            )
+        };
+        if ret < 0 {
+            let err = io::Error::last_os_error();
+            unsafe { libc::close(fd); }
+            return Err(err.into());
+        }
+
+        let recv_buf_size: libc::c_int = 64 * 1024 * 1024;
+        unsafe {
+            libc::setsockopt(fd, libc::SOL_SOCKET, libc::SO_RCVBUF,
+                &recv_buf_size as *const _ as *const libc::c_void,
+                std::mem::size_of::<libc::c_int>() as libc::socklen_t);
+        }
+
+        info!("AF_PACKET socket bound to {} (index {})", self.settings.interface, self.if_index);
+
+        let mut buf = vec![0u8; 65536];
+        let mut packet_count = 0u64;
+        let mut byte_count = 0u64;
+        let mut dropped = 0u64;
+        let mut last_report = std::time::Instant::now();
 
         loop {
             if !self.running.load(Ordering::Relaxed) {
-                let _ = child.kill();
                 break;
             }
-            match stdout.read(&mut buf) {
-                Ok(0) => break,
-                Ok(_) => {
-                    count += 1;
-                    if last.elapsed() >= std::time::Duration::from_secs(1) {
-                        info!("tcpdump: {} blocks/sec", count);
-                        count = 0;
-                        last = std::time::Instant::now();
+
+            match unsafe {
+                libc::recvfrom(
+                    fd,
+                    buf.as_mut_ptr() as *mut libc::c_void,
+                    buf.len(),
+                    libc::MSG_DONTWAIT,
+                    std::ptr::null_mut(),
+                    std::ptr::null_mut(),
+                )
+            } {
+                n if n > 0 => {
+                    let pkt_data = buf[..n as usize].to_vec();
+                    packet_count += 1;
+                    byte_count += n as u64;
+                    if self.sender.try_send(PacketData {
+                        data: pkt_data,
+                        timestamp: chrono::Utc::now(),
+                    }).is_err() {
+                        dropped += 1;
                     }
                 }
-                Err(e) => { warn!("tcpdump: {}", e); break; }
+                _ => {
+                    std::thread::sleep(std::time::Duration::from_micros(10));
+                }
+            }
+
+            let elapsed = last_report.elapsed();
+            if elapsed >= std::time::Duration::from_secs(1) {
+                let secs = elapsed.as_secs().max(1);
+                let pps = packet_count / secs;
+                let mbps = (byte_count * 8) as f64 / secs as f64 / 1_000_000.0;
+                info!("AF_PACKET: {} pps, {:.1} Mbps, dropped={}", pps, mbps, dropped);
+                packet_count = 0;
+                byte_count = 0;
+                dropped = 0;
+                last_report = std::time::Instant::now();
             }
         }
+
+        unsafe { libc::close(fd); }
+        info!("AF_PACKET capture stopped");
         Ok(())
     }
 }

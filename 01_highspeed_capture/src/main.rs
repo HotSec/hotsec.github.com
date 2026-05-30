@@ -30,20 +30,19 @@ async fn main() -> anyhow::Result<()> {
     let (tx, rx) = crossbeam::channel::bounded::<PacketData>(settings.buffer_size);
 
     let storage = Arc::new(StorageManager::new(&settings, rx)?);
-    let capture = PacketCapture::new(&settings, tx)?;
+    let capture = PacketCapture::new(&settings, tx.clone())?;
 
     let storage_handle = {
         let storage = storage.clone();
-        tokio::spawn(async move {
-            if let Err(e) = storage.run().await {
+        tokio::task::spawn_blocking(move || {
+            if let Err(e) = storage.run() {
                 error!("Storage error: {}", e);
             }
         })
     };
 
     let capture_handle = tokio::task::spawn_blocking(move || {
-        let rt = tokio::runtime::Handle::current();
-        match rt.block_on(capture.run()) {
+        match capture.run() {
             Err(e) => error!("Capture error: {}", e),
             _ => {}
         }
@@ -65,9 +64,27 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
-    if let Ok(mut s) = Arc::try_unwrap(storage) {
-        s.flush()?;
-        s.print_stats();
+    drop(tx);
+
+    match Arc::try_unwrap(storage) {
+        Ok(s) => {
+            let _ = s.flush();
+            s.print_stats();
+        }
+        Err(arc) => {
+            tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+            match Arc::try_unwrap(arc) {
+                Ok(s) => {
+                    let _ = s.flush();
+                    s.print_stats();
+                }
+                Err(arc) => {
+                    let s = arc.as_ref();
+                    let _ = s.flush();
+                    s.print_stats();
+                }
+            }
+        }
     }
 
     Ok(())

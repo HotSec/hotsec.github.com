@@ -80,31 +80,43 @@ impl PcapWriter {
             self.create_new_file()?;
         }
 
-        let mut buffer = Vec::with_capacity(data.len() + 64);
-
-        buffer.extend_from_slice(&[0x06, 0x00, 0x00, 0x00]);
-        buffer.extend_from_slice(&block_len.to_le_bytes());
-
-        buffer.extend_from_slice(&0u32.to_le_bytes());
+        let mmap = self.current_mmap.as_mut().ok_or_else(|| {
+            io::Error::new(io::ErrorKind::Other, "no mmap buffer")
+        })?;
+        let pos = self.current_size as usize;
+        if pos + (block_len as usize) > mmap.len() {
+            return Err(io::Error::new(io::ErrorKind::OutOfMemory, "mmap buffer full"));
+        }
 
         let ts_nanos = timestamp.timestamp_nanos_opt().unwrap_or_default();
         let ts_high = ((ts_nanos >> 32) & 0xffffffff) as u32;
         let ts_low = (ts_nanos & 0xffffffff) as u32;
-        buffer.extend_from_slice(&ts_high.to_le_bytes());
-        buffer.extend_from_slice(&ts_low.to_le_bytes());
 
-        buffer.extend_from_slice(&(data.len() as u32).to_le_bytes());
-        buffer.extend_from_slice(&(data.len() as u32).to_le_bytes());
-
-        buffer.extend_from_slice(data);
-
-        for _ in 0..padding {
-            buffer.push(0);
+        let mut off = pos;
+        mmap[off..off + 4].copy_from_slice(&[0x06, 0x00, 0x00, 0x00]);
+        off += 4;
+        mmap[off..off + 4].copy_from_slice(&block_len.to_le_bytes());
+        off += 4;
+        mmap[off..off + 4].copy_from_slice(&0u32.to_le_bytes());
+        off += 4;
+        mmap[off..off + 4].copy_from_slice(&ts_high.to_le_bytes());
+        off += 4;
+        mmap[off..off + 4].copy_from_slice(&ts_low.to_le_bytes());
+        off += 4;
+        mmap[off..off + 4].copy_from_slice(&(data.len() as u32).to_le_bytes());
+        off += 4;
+        mmap[off..off + 4].copy_from_slice(&(data.len() as u32).to_le_bytes());
+        off += 4;
+        mmap[off..off + data.len()].copy_from_slice(data);
+        off += data.len();
+        if padding > 0 {
+            mmap[off..off + padding].fill(0);
+            off += padding;
         }
+        mmap[off..off + 4].copy_from_slice(&block_len.to_le_bytes());
 
-        buffer.extend_from_slice(&block_len.to_le_bytes());
-
-        self.write_raw(&buffer)
+        self.current_size += block_len as u64;
+        Ok(())
     }
 
     fn write_raw(&mut self, data: &[u8]) -> io::Result<()> {

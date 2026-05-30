@@ -129,6 +129,120 @@ impl FiveTuple {
         })
     }
 
+    pub fn from_ethernet_slice(data: &[u8], packet_size: u32) -> Option<Self> {
+        if data.len() < 14 {
+            return None;
+        }
+
+        let ether_type = u16::from_be_bytes([data[12], data[13]]);
+
+        match ether_type {
+            0x0800 => Self::parse_ipv4(&data[14..], packet_size),
+            0x86DD => Self::parse_ipv6(&data[14..], packet_size),
+            _ => None,
+        }
+    }
+
+    fn parse_ipv4(data: &[u8], packet_size: u32) -> Option<Self> {
+        if data.len() < 20 {
+            return None;
+        }
+
+        let version = data[0] >> 4;
+        if version != 4 {
+            return None;
+        }
+
+        let ihl = (data[0] & 0x0F) as usize * 4;
+        if ihl < 20 || data.len() < ihl {
+            return None;
+        }
+
+        let proto_num = data[9];
+        let protocol = match proto_num {
+            6 => Protocol::Tcp,
+            17 => Protocol::Udp,
+            1 => Protocol::Icmp,
+            p => Protocol::Other(p),
+        };
+
+        let src_ip = IpAddr::V4(Ipv4Addr::new(data[12], data[13], data[14], data[15]));
+        let dst_ip = IpAddr::V4(Ipv4Addr::new(data[16], data[17], data[18], data[19]));
+
+        let (src_port, dst_port) = if data.len() > ihl + 4 {
+            Self::parse_transport_ports(&data[ihl..], proto_num)
+        } else {
+            (0, 0)
+        };
+
+        Some(Self {
+            src_ip,
+            dst_ip,
+            src_port,
+            dst_port,
+            protocol,
+            timestamp: Utc::now(),
+            packet_size,
+        })
+    }
+
+    fn parse_ipv6(data: &[u8], packet_size: u32) -> Option<Self> {
+        if data.len() < 40 {
+            return None;
+        }
+
+        let version = data[0] >> 4;
+        if version != 6 {
+            return None;
+        }
+
+        let proto_num = data[6];
+        let protocol = match proto_num {
+            6 => Protocol::Tcp,
+            17 => Protocol::Udp,
+            58 => Protocol::Icmpv6,
+            p => Protocol::Other(p),
+        };
+
+        let mut src_bytes = [0u8; 16];
+        src_bytes.copy_from_slice(&data[8..24]);
+        let src_ip = IpAddr::V6(Ipv6Addr::from(src_bytes));
+
+        let mut dst_bytes = [0u8; 16];
+        dst_bytes.copy_from_slice(&data[24..40]);
+        let dst_ip = IpAddr::V6(Ipv6Addr::from(dst_bytes));
+
+        let (src_port, dst_port) = if data.len() > 40 + 4 {
+            Self::parse_transport_ports(&data[40..], proto_num)
+        } else {
+            (0, 0)
+        };
+
+        Some(Self {
+            src_ip,
+            dst_ip,
+            src_port,
+            dst_port,
+            protocol,
+            timestamp: Utc::now(),
+            packet_size,
+        })
+    }
+
+    fn parse_transport_ports(data: &[u8], proto: u8) -> (u16, u16) {
+        if data.len() < 4 {
+            return (0, 0);
+        }
+        match proto {
+            6 | 17 => {
+                let src_port = u16::from_be_bytes([data[0], data[1]]);
+                let dst_port = u16::from_be_bytes([data[2], data[3]]);
+                (src_port, dst_port)
+            }
+            _ => (0, 0),
+        }
+    }
+
     pub fn to_csv_line(&self) -> String {
         let src_ip_str = match &self.src_ip {
             IpAddr::V4(ip) => ip.to_string(),
@@ -194,14 +308,6 @@ impl FiveTuple {
                 }
             }
             _ => Vec::new(),
-        }
-    }
-
-    pub fn binary_record_size(&self) -> usize {
-        match (&self.src_ip, &self.dst_ip) {
-            (IpAddr::V4(_), IpAddr::V4(_)) => std::mem::size_of::<BinaryTupleV4>(),
-            (IpAddr::V6(_), IpAddr::V6(_)) => std::mem::size_of::<BinaryTupleV6>(),
-            _ => 0,
         }
     }
 }
