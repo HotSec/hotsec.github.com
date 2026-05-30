@@ -2418,6 +2418,97 @@
 > [📄 Docker安全.md](./mybook/security/3_云与容器安全/Docker安全.md) · [📄 K8s安全.md](./mybook/security/3_云与容器安全/K8s安全.md)
 </details>
 
+### 6.4 安全产品规则库
+
+#### 降噪规则（Aviator 规则）
+
+<details>
+<summary>降噪规则</summary>
+
+- 降噪维度：资产维度/攻击链维度/情报维度/环境维度
+- 降噪策略：白名单/抑制规则/阈值规则/资产感知/时间窗口聚合
+- 评估指标：降噪比（NRR）/ 真阳性率（TPR）/ 误过滤率
+
+
+> [📄 01_安全产品规则库.md](./mybook/security/4_安全产品规则库/01_安全产品规则库.md)
+</details>
+
+#### Suricata 规则
+
+<details>
+<summary>Suricata IDS/IPS 规则</summary>
+
+- 规则结构：action protocol src_ip src_port -> dst_ip dst_port (options)
+- 内容匹配：content/nocase/depth/offset/distance/within/pcre
+- 元数据：msg/sid/rev/reference/classtype/priority
+- 流与阈值：flow/flowbits/threshold/detection_filter
+- 协议感知：http_uri/dns_query/tls_sni 等关键字
+- 规则管理：suricata-update/ET Open&Pro/VRT/性能调优（fast_pattern）
+
+
+> [📄 01_安全产品规则库.md](./mybook/security/4_安全产品规则库/01_安全产品规则库.md)
+</details>
+
+#### Falco 规则
+
+<details>
+<summary>Falco 云原生运行时安全规则</summary>
+
+- 规则语法：YAML 格式（rule/desc/condition/output/priority/tags）
+- 事件类型：syscall（open/execve/connect/accept/ptrace 等）/ evt.type
+- 条件运算符：and/or/not/= /!=/</>/in/contains/startswith/endswith/pmatch/glob/intersects
+- 宏（Macros）与列表（Lists）：定义可复用条件片段和值集合
+- 典型规则：容器敏感文件读取/非预期网络连接/容器逃逸检测
+- 规则管理：热加载/规则覆盖/append/默认+本地规则文件
+
+
+> [📄 01_安全产品规则库.md](./mybook/security/4_安全产品规则库/01_安全产品规则库.md)
+</details>
+
+#### 复杂事件关联规则（Sigma 规则）
+
+<details>
+<summary>Sigma 通用 SIEM 检测规则</summary>
+
+- 规则结构：YAML（title/id/status/description/logsource/detection/level）
+- 字段修饰符：|contains/|startswith/|endswith/|re/|all/|base64/|windash/|cidr/|expand
+- 检测条件组合：多 selection + condition 逻辑表达式 + filter 白名单
+- 关联规则：跨时间窗口的多事件关联（event_count + group-by + timespan）
+- 转换引擎（sigma-cli）：一份规则转换为 Splunk/Elastic/Sentinel/QRadar 等平台查询
+- 典型规则：PowerShell 编码执行/ Linux 反向 Shell
+
+
+> [📄 01_安全产品规则库.md](./mybook/security/4_安全产品规则库/01_安全产品规则库.md)
+</details>
+
+#### 情报规则
+
+<details>
+<summary>威胁情报规则</summary>
+
+- 情报类型（IOC）：IP/Domain/URL/Hash/Email/SSL Cert/User-Agent/ATT&CK/YARA
+- 情报来源：OSINT（OTX/MalShare/URLhaus）/商业情报/行业情报/内部情报
+- 集成方式：Suricata（iprep/dataset）/Falco（列表匹配）/Sigma（IP 列表）
+- 情报生命周期：收集→处理→评估→分发→反馈
+- 质量评估：时效性/准确性/相关性/完整性/可操作性
+
+
+> [📄 01_安全产品规则库.md](./mybook/security/4_安全产品规则库/01_安全产品规则库.md)
+</details>
+
+#### 规则工程最佳实践
+
+<details>
+<summary>规则开发与管理</summary>
+
+- 开发流程：需求分析→数据收集→规则编写→测试验证（阳性/阴性/压力）→灰度上线→持续优化
+- 管理规范：唯一ID/ATT&CK标签/Git版本管理/CI/CD自动化
+- 常见问题：规则膨胀/告警风暴/性能退化/规则过时/维护失控 及解决方案
+
+
+> [📄 01_安全产品规则库.md](./mybook/security/4_安全产品规则库/01_安全产品规则库.md)
+</details>
+
 ---
 
 ## 七、通用基础
