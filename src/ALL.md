@@ -4491,6 +4491,7 @@
 > [📄 25_PromptHub.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/25_PromptHub.md)
 > [📄 26_CodeGraph语义代码索引.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/26_CodeGraph语义代码索引.md)
 > [📄 27_CodeGraphy代码图谱引擎.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/27_CodeGraphy代码图谱引擎.md)
+> [📄 28_AI编程实战三卷书.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/28_AI编程实战三卷书.md)
 > [📁 02_openclaw源码分析/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_openclaw/) · 项目概览/核心架构与Gateway/Agents与Sessions/Config与CLI/整体分析/核心运行时详解
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>
