@@ -4393,6 +4393,11 @@
 > [📄 03_CrewAI.md](./mybook/06_agents/01_智能体框架/03_CrewAI.md)
 > [📄 04_LangGraph.md](./mybook/06_agents/01_智能体框架/04_LangGraph.md)
 > [📄 05_Hello-Agents从零构建智能体.md](./mybook/06_agents/01_智能体框架/05_Hello-Agents从零构建智能体.md)
+> [📄 06_智能体经典范式构建.md](./mybook/06_agents/01_智能体框架/06_智能体经典范式构建.md)
+> [📄 07_记忆与检索.md](./mybook/06_agents/01_智能体框架/07_记忆与检索.md)
+> [📄 08_Hello-Agents补充内容.md](./mybook/06_agents/01_智能体框架/08_Hello-Agents补充内容.md)
+> [📄 09_智能体开发知识点与面试题.md](./mybook/06_agents/01_智能体框架/09_智能体开发知识点与面试题.md)
+> [📄 10_LoRA大模型微调.md](./mybook/06_agents/01_智能体框架/10_LoRA大模型微调.md)
 > [📁 02_MCP协议/](./mybook/06_agents/02_MCP协议/)
 > [📄 01_MCP开发指南.md](./mybook/06_agents/02_MCP协议/01_MCP开发指南.md)
 </details>
