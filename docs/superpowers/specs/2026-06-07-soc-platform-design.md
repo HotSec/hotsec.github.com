@@ -1,10 +1,10 @@
 # SOC Platform 安全运营中心平台 - 技术设计文档
 
-> **文档版本**: v1.1  
+> **文档版本**: v2.0  
 > **创建日期**: 2026-06-07  
 > **更新日期**: 2026-06-07  
 > **项目名称**: Enterprise SOC Platform  
-> **状态**: 已批准
+> **状态**: 已批准 - 优化版本
 
 ---
 
@@ -37,14 +37,26 @@
 
 ### 1.4 性能指标
 
-| 指标 | 目标值 |
-|-----|------|
-| IDS 抓包吞吐量 | 10 Gbps+ |
-| Syslog 接收速率 | 100,000+ 条/秒 |
-| 日志解析延迟 | < 100 ms |
-| 告警响应时间 | < 10 s |
-| 历史查询响应时间 | < 5 s (95th percentile) |
-| ClickHouse 写入速率 | 500,000+ 行/秒 |
+| 指标 | 目标值 | 优化后目标 |
+|-----|------|---------|
+| IDS 抓包吞吐量 | 10 Gbps+ | 20 Gbps+ |
+| Syslog 接收速率 | 100,000+ 条/秒 | 200,000+ 条/秒 |
+| 日志解析延迟 | < 100 ms | < 50 ms |
+| 告警响应时间 | < 10 s | < 5 s |
+| 历史查询响应时间 | < 5 s (95th percentile) | < 2 s (99th percentile) |
+| ClickHouse 写入速率 | 500,000+ 行/秒 | 1,000,000+ 行/秒 |
+| 支持规模 | 1000+ 主机 | 5000+ 主机 + 容器 |
+
+### 1.5 核心优化方向
+
+| 优化领域 | 具体措施 |
+|---------|---------|
+| **架构优化** | 微服务精简（13→8）、图数据库引入、存储分层 |
+| **AI 赋能** | 异常检测引擎、告警降噪、智能分析 |
+| **自动化响应** | SOAR Playbook、响应编排、可视化编辑器 |
+| **容器监控** | eBPF 探针、运行时 API、K8s 集成 |
+| **威胁猎捕** | Hunt 工作台、自动化猎捕、协作功能 |
+| **开放生态** | Webhook、SDK、第三方系统集成 |
 
 ---
 
@@ -248,7 +260,79 @@ type IDSFlowLog struct {
     ThreatLevel    int      `json:"threat_level"`  // 1-5
     RawPayload     []byte   `json:"raw_payload,omitempty"`
 }
+
+// IDS 告警事件
+type IDSAlert struct {
+    AlertID       string    `json:"alert_id"`
+    Timestamp     time.Time `json:"timestamp"`
+    SrcIP         string    `json:"src_ip"`
+    DstIP         string    `json:"dst_ip"`
+    SrcPort       uint16    `json:"src_port"`
+    DstPort       uint16    `json:"dst_port"`
+    Protocol      string    `json:"protocol"`
+    RuleID        string    `json:"rule_id"`
+    RuleName      string    `json:"rule_name"`
+    Category      string    `json:"category"`
+    Severity      string    `json:"severity"` // critical/high/medium/low/info
+    Description   string    `json:"description"`
+    Evidence      []byte    `json:"evidence,omitempty"`
+    RelatedFlows  []string  `json:"related_flows,omitempty"`
+}
 ```
+
+#### 3.1.4 IDS 子模块设计
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Packet Capture** | 流量捕获模块 | Rust + AF_XDP + eBPF |
+| **Protocol Parser** | 协议解析与解码 | Rust + Suricata 引擎集成 |
+| **Rule Engine** | 规则匹配引擎 | Suricata + 自定义规则引擎 |
+| **Flow Collector** | 流数据聚合与统计 | Go + ClickHouse |
+| **IOC Matching** | 威胁情报匹配 | Go + Redis IOC 缓存 |
+| **PCAP Storage** | 原始流量存储 | MinIO |
+
+#### 3.1.5 关键流程设计
+
+```
+1. 流量捕获流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 网卡 → AF_XDP → 环形缓冲区 → 用户空间 → 协议解析     │
+   └─────────────────────────────────────────────────────────┘
+
+2. 告警处理流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 规则匹配 → 告警生成 → IOC 匹配 → 关联分析 → 通知 │
+   └─────────────────────────────────────────────────────────┘
+
+3. PCAP 回溯流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 查询条件 → 检索 ClickHouse → 定位时间段 →            │
+   │ 从 MinIO 读取 PCAP → 回显与分析                      │
+   └─────────────────────────────────────────────────────────┘
+```
+
+#### 3.1.6 IDS API 详情
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/ids/flows` | 流量日志查询（支持时间/IP/端口过滤） |
+| POST | `/api/v1/ids/flows/search` | 高级搜索与聚合 |
+| GET | `/api/v1/ids/alerts` | 告警列表 |
+| GET | `/api/v1/ids/alerts/:id` | 告警详情 |
+| PUT | `/api/v1/ids/alerts/:id` | 更新告警（状态/备注） |
+| GET | `/api/v1/ids/rules` | 规则列表 |
+| POST | `/api/v1/ids/rules` | 新增规则 |
+| GET | `/api/v1/ids/rules/:id` | 规则详情 |
+| PUT | `/api/v1/ids/rules/:id` | 更新规则 |
+| DELETE | `/api/v1/ids/rules/:id` | 删除规则 |
+| POST | `/api/v1/ids/rules/test` | 规则测试 |
+| GET | `/api/v1/ids/probes` | 探针列表 |
+| POST | `/api/v1/ids/probes` | 注册探针 |
+| GET | `/api/v1/ids/probes/:id` | 探针详情 |
+| GET | `/api/v1/ids/probes/:id/stats` | 探针统计 |
+| GET | `/api/v1/ids/attacks/:id` | 攻击链详情 |
+| GET | `/api/v1/ids/attacks/:id/timeline` | 攻击时间线 |
+| POST | `/api/v1/ids/pcap/retrieve` | PCAP 回溯查询 |
 
 ---
 
@@ -336,7 +420,99 @@ type EDREvent struct {
     ThreatLevel  int       `json:"threat_level"`    // 1-5
     RawData      []byte    `json:"raw_data,omitempty"`
 }
+
+// EDR Agent 状态
+type EDRAgentStatus struct {
+    AgentID         string    `json:"agent_id"`
+    Hostname        string    `json:"hostname"`
+    AssetID         string    `json:"asset_id"`
+    Online          bool      `json:"online"`
+    LastHeartbeat   time.Time `json:"last_heartbeat"`
+    Version         string    `json:"version"`
+    CPUUsage        float64   `json:"cpu_usage"`
+    MemoryUsage     float64   `json:"memory_usage"`
+    DiskUsage       float64   `json:"disk_usage"`
+    NetworkUsage    float64   `json:"network_usage"`
+    Status          string    `json:"status"`
+    Policies        []string  `json:"policies"`
+}
+
+// 主机响应任务
+type EDRResponseTask struct {
+    TaskID       string    `json:"task_id"`
+    AssetID      string    `json:"asset_id"`
+    TaskType     string    `json:"task_type"`    // isolate/kill/collect
+    Target       string    `json:"target"`
+    Status       string    `json:"status"`       // pending/running/complete/failed
+    CreatedBy    string    `json:"created_by"`
+    CreatedAt    time.Time `json:"created_at"`
+    UpdatedAt    time.Time `json:"updated_at"`
+    Result       string    `json:"result,omitempty"`
+}
 ```
+
+#### 3.2.4 EDR 子模块设计
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Process Monitor** | 进程监控模块 | eBPF (Linux) / ETW (Windows) |
+| **File Monitor** | 文件监控模块 | inotify / FileSystemWatcher |
+| **Network Monitor** | 网络监控模块 | libpcap / Npcap |
+| **Registry Monitor** | 注册表监控 | Windows Registry API |
+| **Behavior Engine** | 行为分析引擎 | YARA + ML 模型 |
+| **Response Engine** | 响应隔离引擎 | Go + iptables/防火墙API |
+| **Forensics Collector** | 取证采集模块 | Rust + Volatility |
+| **Agent Manager** | Agent 管理 | Go + gRPC |
+
+#### 3.2.5 关键流程设计
+
+```
+1. EDR Agent 启动流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 安装 → 注册 → 心跳 → 策略下发 → 开始监控          │
+   └─────────────────────────────────────────────────────────┘
+
+2. 行为分析流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 事件采集 → 本地过滤 → 上传 → 行为分析 → IOC匹配 → 告警 │
+   └─────────────────────────────────────────────────────────┘
+
+3. 响应隔离流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 告警触发 → 人工/自动决策 → 下发任务 → Agent执行 → 确认 │
+   └─────────────────────────────────────────────────────────┘
+
+4. 取证采集流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 任务下发 → 内存Dump/文件采集 → 加密传输 → 分析存储     │
+   └─────────────────────────────────────────────────────────┘
+```
+
+#### 3.2.6 EDR API 详情
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/edr/hosts` | 主机列表 |
+| GET | `/api/v1/edr/hosts/:id` | 主机详情 |
+| GET | `/api/v1/edr/hosts/:id/events` | 主机事件列表 |
+| GET | `/api/v1/edr/hosts/:id/status` | 主机状态 |
+| POST | `/api/v1/edr/hosts/:id/isolate` | 隔离主机 |
+| POST | `/api/v1/edr/hosts/:id/unisolate` | 取消隔离 |
+| GET | `/api/v1/edr/events` | 事件列表（支持过滤） |
+| GET | `/api/v1/edr/events/:id` | 事件详情 |
+| POST | `/api/v1/edr/events/search` | 事件搜索 |
+| GET | `/api/v1/edr/tasks` | 响应任务列表 |
+| POST | `/api/v1/edr/tasks` | 创建响应任务 |
+| GET | `/api/v1/edr/tasks/:id` | 任务详情 |
+| POST | `/api/v1/edr/tasks/:id/cancel` | 取消任务 |
+| GET | `/api/v1/edr/agents` | Agent 列表 |
+| GET | `/api/v1/edr/agents/:id` | Agent 详情 |
+| POST | `/api/v1/edr/agents/:id/upgrade` | Agent 升级 |
+| GET | `/api/v1/edr/policies` | 策略列表 |
+| POST | `/api/v1/edr/policies` | 创建策略 |
+| GET | `/api/v1/edr/hunting` | 威胁猎捕查询 |
+| POST | `/api/v1/edr/hunting/queries` | 创建猎捕查询 |
+| GET | `/api/v1/edr/forensics/:id` | 取证记录详情 |
 
 ---
 
@@ -424,7 +600,90 @@ type Vuln struct {
     Solution      string    `json:"solution,omitempty"`
     ScanTime      time.Time `json:"scan_time"`
 }
+
+// 服务记录
+type Service struct {
+    ServiceID  string    `json:"service_id"`
+    Port       uint16    `json:"port"`
+    Protocol   string    `json:"protocol"`
+    Name       string    `json:"name"`
+    Version    string    `json:"version,omitempty"`
+    Banner     string    `json:"banner,omitempty"`
+    Status     string    `json:"status"`     // open/filtered/closed
+    FirstSeen  time.Time `json:"first_seen"`
+    LastSeen   time.Time `json:"last_seen"`
+}
+
+// 扫描任务
+type ScanTask struct {
+    TaskID        string    `json:"task_id"`
+    TaskType      string    `json:"task_type"`    // discovery/port/vuln/web/config
+    Targets       []string  `json:"targets"`
+    Status        string    `json:"status"`       // pending/running/complete/failed
+    CreatedBy     string    `json:"created_by"`
+    CreatedAt     time.Time `json:"created_at"`
+    StartedAt     *time.Time `json:"started_at,omitempty"`
+    CompletedAt   *time.Time `json:"completed_at,omitempty"`
+    Summary       string    `json:"summary,omitempty"`
+}
 ```
+
+#### 3.3.4 资产测绘子模块设计
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Active Discovery** | 主动发现模块 | Go + Nmap + Masscan |
+| **Passive Discovery** | 被动发现模块 | Go + 流量分析 + p0f |
+| **Service Identification** | 服务识别模块 | Nmap NSE + banner 抓取 |
+| **Vuln Scanner** | 漏洞扫描引擎 | OpenVAS + Nuclei + 自定义规则 |
+| **Config Scanner** | 配置基线检查 | Ansible/Chef 合规检查 |
+| **Web Scanner** | Web 扫描模块 | Nuclei + 自定义POC |
+| **Risk Engine** | 风险评分引擎 | CVSS 3.1 + 业务权重 |
+| **Topology Builder** | 拓扑发现引擎 | LLDP/CDP 分析 + traceroute |
+| **Change Tracker** | 变更追踪模块 | PostgreSQL 触发器 + 告警 |
+
+#### 3.3.5 关键流程设计
+
+```
+1. 资产发现流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 任务创建 → 主动扫描 → 被动识别 → 指纹识别 → 关联      │
+   └─────────────────────────────────────────────────────────┘
+
+2. 漏洞扫描流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 目标选择 → 端口扫描 → 服务识别 → 漏洞检测 → 结果分析 │
+   └─────────────────────────────────────────────────────────┘
+
+3. 风险评分流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 资产收集 → 漏洞评估 → 业务权重 → 风险计算 → 分级      │
+   └─────────────────────────────────────────────────────────┘
+```
+
+#### 3.3.6 资产测绘 API 详情
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/assets` | 资产列表（支持搜索/过滤） |
+| POST | `/api/v1/assets` | 创建资产 |
+| GET | `/api/v1/assets/:id` | 资产详情 |
+| PUT | `/api/v1/assets/:id` | 更新资产 |
+| DELETE | `/api/v1/assets/:id` | 删除资产 |
+| GET | `/api/v1/assets/:id/vulns` | 资产漏洞列表 |
+| GET | `/api/v1/assets/:id/history` | 资产变更历史 |
+| POST | `/api/v1/assets/discover` | 触发主动发现任务 |
+| GET | `/api/v1/vulns` | 漏洞列表 |
+| GET | `/api/v1/vulns/:id` | 漏洞详情 |
+| PUT | `/api/v1/vulns/:id` | 更新漏洞（状态/修复进度） |
+| GET | `/api/v1/scans` | 扫描任务列表 |
+| POST | `/api/v1/scans` | 创建扫描任务 |
+| GET | `/api/v1/scans/:id` | 扫描任务详情 |
+| POST | `/api/v1/scans/:id/cancel` | 取消扫描 |
+| GET | `/api/v1/scans/:id/report` | 扫描报告 |
+| GET | `/api/v1/topology` | 网络拓扑图 |
+| GET | `/api/v1/dashboard` | 资产测绘概览 |
+| GET | `/api/v1/compliance` | 合规检查报告 |
 
 ---
 
@@ -572,6 +831,115 @@ type Vuln struct {
   }
 }
 ```
+
+#### 3.4.5 SIEM 数据模型
+
+```go
+// 标准化日志记录
+type NormalizedLog struct {
+    ID            string            `json:"id"`
+    Timestamp     time.Time         `json:"timestamp"`
+    SourceID      string            `json:"source_id"`
+    Host          string            `json:"host"`
+    Hostname      string            `json:"hostname"`
+    Program       string            `json:"program"`
+    Facility      string            `json:"facility"`
+    Severity      string            `json:"severity"`
+    Message       string            `json:"message"`
+    Normalized    *LogNormalized    `json:"normalized"`
+    Enriched      *LogEnriched      `json:"enriched"`
+    RawData       []byte            `json:"raw_data,omitempty"`
+}
+
+// 标准化字段
+type LogNormalized struct {
+    DeviceType  string `json:"device_type"`
+    DeviceVendor string `json:"device_vendor"`
+    EventType   string `json:"event_type"`
+    Action      string `json:"action"`
+    SrcIP       string `json:"src_ip"`
+    DstIP       string `json:"dst_ip"`
+    SrcPort     uint16 `json:"src_port,omitempty"`
+    DstPort     uint16 `json:"dst_port,omitempty"`
+    Protocol    string `json:"protocol,omitempty"`
+    User        string `json:"user,omitempty"`
+    SessionID   string `json:"session_id,omitempty"`
+    RequestID   string `json:"request_id,omitempty"`
+}
+
+// 增强字段
+type LogEnriched struct {
+    SrcAssetID    string                 `json:"src_asset_id,omitempty"`
+    DstAssetID    string                 `json:"dst_asset_id,omitempty"`
+    IOCMatches    []string               `json:"ioc_matches,omitempty"`
+    Geolocation   map[string]interface{} `json:"geolocation,omitempty"`
+    MITREATlas    map[string]string      `json:"mitre_attlas,omitempty"`
+}
+
+// 日志源配置
+type LogSource struct {
+    SourceID      string    `json:"source_id"`
+    Name          string    `json:"name"`
+    Type          string    `json:"type"`     // syslog/beat/file/api
+    Protocol      string    `json:"protocol"`  // udp/tcp/tls
+    Port          uint16    `json:"port"`
+    Host          string    `json:"host,omitempty"`
+    ParserConfig  string    `json:"parser_config,omitempty"`
+    Enabled       bool      `json:"enabled"`
+    CreatedAt     time.Time `json:"created_at"`
+}
+```
+
+#### 3.4.6 SIEM 子模块设计
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Syslog Receiver** | Syslog 接收模块 | Go + UDP/TCP/TLS 服务器 |
+| **Beat Collector** | Beats 收集模块 | Go + Elastic Beats 协议 |
+| **API Receiver** | API 日志接收 | Gin + REST API |
+| **File Collector** | 文件收集模块 | Go + 定时任务 + Filebeat |
+| **Log Parser** | 日志解析引擎 | Go + GROK + 设备模板 |
+| **Normalizer** | 字段标准化模块 | Go + 标准化规则 |
+| **Enrichment Engine** | 数据增强引擎 | Go + Redis 缓存 |
+| **Rule Engine** | 告警规则引擎 | Sigma + 自定义规则 |
+| **Anomaly Detector** | 异常检测模块 | ML + 统计分析 |
+
+#### 3.4.7 SIEM 关键流程
+
+```
+1. 日志处理流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 接收 → 验证 → 解析 → 标准化 → 增强 → 检测 → 存储    │
+   └─────────────────────────────────────────────────────────┘
+
+2. 规则匹配流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 事件到达 → 规则库查询 → 匹配条件 → 触发动作 → 通知     │
+   └─────────────────────────────────────────────────────────┘
+```
+
+#### 3.4.8 SIEM API 详情
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/logs` | 日志查询（支持时间范围/源/级别过滤） |
+| POST | `/api/v1/logs/search` | 高级搜索（全文检索/聚合） |
+| GET | `/api/v1/logs/sources` | 日志源列表 |
+| POST | `/api/v1/logs/sources` | 新增日志源 |
+| GET | `/api/v1/logs/sources/:id` | 日志源详情 |
+| PUT | `/api/v1/logs/sources/:id` | 更新日志源配置 |
+| DELETE | `/api/v1/logs/sources/:id` | 删除日志源 |
+| GET | `/api/v1/logs/sources/:id/stats` | 日志源统计 |
+| GET | `/api/v1/logs/parsers` | 解析器列表 |
+| POST | `/api/v1/logs/parsers` | 新增解析器 |
+| GET | `/api/v1/logs/rules` | 告警规则列表 |
+| POST | `/api/v1/logs/rules` | 新增告警规则 |
+| GET | `/api/v1/logs/rules/:id` | 规则详情 |
+| PUT | `/api/v1/logs/rules/:id` | 更新规则 |
+| DELETE | `/api/v1/logs/rules/:id` | 删除规则 |
+| POST | `/api/v1/logs/rules/test` | 规则测试 |
+| GET | `/api/v1/logs/dashboards` | SIEM 概览面板 |
+| GET | `/api/v1/logs/dashboards/:id` | 面板详情 |
 
 ---
 
@@ -758,56 +1126,551 @@ type CorrelationRule struct {
 }
 ```
 
-#### 3.5.5 关联规则 DSL
+#### 3.5.5 关联分析子模块
 
-```yaml
-# 示例规则：端口扫描 -> 漏洞利用 -> 异常登录
-rule: "Recon-Exploit-Lateral"
-type: sequence
-time_window: 1800  # 30分钟
-steps:
-  - name: "Port Scan"
-    condition: >
-      source == "IDS" AND alert_category == "scan"
-  - name: "Exploit Attempt"
-    condition: >
-      source == "IDS" AND (alert_signature includes "CVE" OR alert_signature includes "Exploit")
-      AND src_ip == step1.src_ip
-  - name: "Abnormal Login"
-    condition: >
-      source == "EDR" AND event_type == "login" AND is_abnormal == true
-      AND asset_ip == step1.dst_ip
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Event Collector** | 事件收集器 | Kafka Consumer 消费各模块事件 |
+| **State Storage** | 状态存储 | Redis + 滑动窗口状态管理 |
+| **Rule Engine** | 规则匹配引擎 | 时序规则引擎 + FSM 状态机 |
+| **Graph Query** | 图查询引擎 | 基于图数据库的关系查询 |
+| **Confidence Scoring** | 置信度评分 | 评分算法 + 历史数据校准 |
+| **Incident Generator** | 事件生成器 | 多源融合 + 优先级判定 |
+| **Attack Chain Builder** | 攻击链构建 | MITRE ATT&CK 映射 |
 
-action:
-  risk_level: "CRITICAL"
-  confidence: 0.85
-  create_incident: true
-  notify: ["webhook", "slack"]
+#### 3.5.6 关键流程
+
 ```
+1. 关联分析流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 事件收集 → 标准化 → 规则匹配 → 关联确认 → 生成Incident│
+   └─────────────────────────────────────────────────────────┘
+
+2. 攻击链构建流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 阶段匹配 → 技术识别 → 证据收集 → 时间线整理 → 可视化 │
+   └─────────────────────────────────────────────────────────┘
+```
+
+#### 3.5.7 关联分析 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/incidents` | 事件列表（状态/严重程度/时间过滤） |
+| GET | `/api/v1/incidents/:id` | 事件详情（含攻击链、证据） |
+| PUT | `/api/v1/incidents/:id` | 更新事件状态 |
+| POST | `/api/v1/incidents/:id/close` | 关闭事件 |
+| GET | `/api/v1/incidents/:id/related` | 相关事件查询 |
+| GET | `/api/v1/incidents/:id/timeline` | 时间线视图 |
+| GET | `/api/v1/correlation/rules` | 关联规则列表 |
+| POST | `/api/v1/correlation/rules` | 新增关联规则 |
+| GET | `/api/v1/correlation/rules/:id` | 规则详情 |
+| PUT | `/api/v1/correlation/rules/:id` | 更新规则 |
+| DELETE | `/api/v1/correlation/rules/:id` | 删除规则 |
+| POST | `/api/v1/correlation/rules/test` | 规则测试 |
+| GET | `/api/v1/incidents/dashboard` | 关联分析概览 |
+| GET | `/api/v1/incidents/insights` | 洞察报告 |
+
+---
+
+### 3.6 威胁情报模块
+
+#### 3.6.1 数据模型
+
+```go
+// IOC 指标
+type IOC struct {
+    IOCID         string    `json:"ioc_id"`
+    Type          string    `json:"type"`       // IP/DOMAIN/URL/Hash/EMAIL
+    Value         string    `json:"value"`
+    Source        string    `json:"source"`     // 情报源名称
+    Severity      string    `json:"severity"`   // HIGH/MEDIUM/LOW/INFO
+    Description   string    `json:"description"`
+    TLP           string    `json:"tlp"`        // TLP:WHITE/GREEN/AMBER/RED
+    FirstSeen     time.Time `json:"first_seen"`
+    LastSeen      time.Time `json:"last_seen"`
+    ExpiresAt     time.Time `json:"expires_at,omitempty"`
+    Verified      bool      `json:"verified"`
+    Tags          []string  `json:"tags"`
+}
+
+// 情报源配置
+type IntelSource struct {
+    SourceID      string    `json:"source_id"`
+    Name          string    `json:"name"`
+    Type          string    `json:"type"`       // STIX/TAXII/MISP/CUSTOM/API
+    URL           string    `json:"url"`
+    AuthType      string    `json:"auth_type"`  // NONE/API_KEY/BASIC/OAUTH
+    Credentials   string    `json:"credentials,omitempty"`
+    PollInterval  int       `json:"poll_interval"` // 秒
+    Enabled       bool      `json:"enabled"`
+    LastSync      time.Time `json:"last_sync,omitempty"`
+}
+
+// IOC 匹配记录
+type IOCDetection struct {
+    DetectionID   string    `json:"detection_id"`
+    IOCID         string    `json:"ioc_id"`
+    EventID       string    `json:"event_id"`
+    EventSource   string    `json:"event_source"`
+    MatchField    string    `json:"match_field"`
+    MatchValue    string    `json:"match_value"`
+    Timestamp     time.Time `json:"timestamp"`
+}
+```
+
+#### 3.6.2 威胁情报子模块
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Source Manager** | 情报源管理 | STIX/TAXII 协议 + 自定义 API 适配器 |
+| **IOC Parser** | IOC 解析器 | MISP JSON 解析 + STIX 2.1 解析 |
+| **IOC Storage** | IOC 存储引擎 | PostgreSQL + Redis 缓存 |
+| **Matcher** | 实时匹配引擎 | Redis Bloom Filter + 滑动窗口匹配 |
+| **Feed Poller** | 情报拉取器 | 定时任务 + 并发下载 |
+| **Verifier** | 情报验证模块 | 外部信誉查询 + 验证规则 |
+
+#### 3.6.3 威胁情报 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/intel/iocs` | IOC 列表（类型/严重程度/时间过滤） |
+| POST | `/api/v1/intel/iocs` | 新增 IOC |
+| GET | `/api/v1/intel/iocs/:id` | IOC 详情 |
+| PUT | `/api/v1/intel/iocs/:id` | 更新 IOC |
+| DELETE | `/api/v1/intel/iocs/:id` | 删除 IOC |
+| POST | `/api/v1/intel/iocs/lookup` | 查询值是否命中 IOC |
+| GET | `/api/v1/intel/sources` | 情报源列表 |
+| POST | `/api/v1/intel/sources` | 新增情报源 |
+| GET | `/api/v1/intel/sources/:id` | 情报源详情 |
+| PUT | `/api/v1/intel/sources/:id` | 更新情报源 |
+| POST | `/api/v1/intel/sources/:id/sync` | 触发同步 |
+| GET | `/api/v1/intel/detections` | 匹配记录列表 |
+| GET | `/api/v1/intel/feed` | 情报源下拉选择 |
+
+---
+
+### 3.7 告警通知模块
+
+#### 3.7.1 数据模型
+
+```go
+// 告警事件
+type Alert struct {
+    AlertID       string            `json:"alert_id"`
+    Title         string            `json:"title"`
+    Description   string            `json:"description"`
+    Severity      string            `json:"severity"`    // CRITICAL/HIGH/MEDIUM/LOW
+    Source        string            `json:"source"`      // IDS/EDR/SIEM/VULN/CORRELATION
+    SourceID      string            `json:"source_id"`
+    Status        string            `json:"status"`      // NEW/ACKNOWLEDGED/ESCALATED/RESOLVED/CLOSED
+    Assignee      string            `json:"assignee,omitempty"`
+    Priority      int               `json:"priority"`    // 1-5
+    Tags          []string          `json:"tags"`
+    CreatedAt     time.Time         `json:"created_at"`
+    UpdatedAt     time.Time         `json:"updated_at"`
+    Details       map[string]any    `json:"details,omitempty"`
+}
+
+// 通知通道
+type NotificationChannel struct {
+    ChannelID     string    `json:"channel_id"`
+    Name          string    `json:"name"`
+    Type          string    `json:"type"`       // EMAIL/SMS/SLACK/WEBHOOK/WECHAT/DINGTALK
+    Config        map[string]string `json:"config"` // 通道配置
+    Enabled       bool      `json:"enabled"`
+}
+
+// 通知规则
+type NotificationRule struct {
+    RuleID        string    `json:"rule_id"`
+    Name          string    `json:"name"`
+    Condition     string    `json:"condition"`   // 匹配条件 DSL
+    Channels      []string  `json:"channels"`
+    Enabled       bool      `json:"enabled"`
+}
+```
+
+#### 3.7.2 告警通知子模块
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Alert Router** | 告警路由 | Kafka Consumer + 规则引擎 |
+| **Notifier** | 通知发送器 | 多通道适配器 |
+| **Status Tracker** | 状态追踪 | PostgreSQL 事务 |
+| **Deduplicator** | 告警去重 | 指纹算法 + 时间窗口 |
+| **Escalator** | 升级引擎 | SLA 规则 + 自动升级 |
+
+#### 3.7.3 告警通知 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/alerts` | 告警列表（状态/严重程度/来源过滤） |
+| GET | `/api/v1/alerts/:id` | 告警详情 |
+| PUT | `/api/v1/alerts/:id` | 更新告警（状态/负责人/备注） |
+| POST | `/api/v1/alerts/:id/ack` | 确认告警 |
+| POST | `/api/v1/alerts/:id/escalate` | 升级告警 |
+| POST | `/api/v1/alerts/:id/close` | 关闭告警 |
+| GET | `/api/v1/alerts/:id/history` | 操作历史 |
+| GET | `/api/v1/notifications/channels` | 通知通道列表 |
+| POST | `/api/v1/notifications/channels` | 新增通知通道 |
+| PUT | `/api/v1/notifications/channels/:id` | 更新通知通道 |
+| DELETE | `/api/v1/notifications/channels/:id` | 删除通知通道 |
+| POST | `/api/v1/notifications/channels/:id/test` | 发送测试通知 |
+| GET | `/api/v1/notifications/rules` | 通知规则列表 |
+| POST | `/api/v1/notifications/rules` | 新增通知规则 |
+| PUT | `/api/v1/notifications/rules/:id` | 更新规则 |
+| GET | `/api/v1/alerts/dashboard` | 告警概览 |
+
+---
+
+### 3.8 报表模块
+
+#### 3.8.1 数据模型
+
+```go
+// 报表定义
+type Report struct {
+    ReportID      string    `json:"report_id"`
+    Name          string    `json:"name"`
+    Type          string    `json:"type"`       // SECURITY/COMPLIANCE/INVENTORY/CUSTOM
+    TemplateID    string    `json:"template_id,omitempty"`
+    Parameters    map[string]any `json:"parameters"`
+    Schedule      string    `json:"schedule,omitempty"` // Cron 表达式
+    LastRun       time.Time `json:"last_run,omitempty"`
+    NextRun       time.Time `json:"next_run,omitempty"`
+    Enabled       bool      `json:"enabled"`
+}
+
+// 报表模板
+type ReportTemplate struct {
+    TemplateID    string    `json:"template_id"`
+    Name          string    `json:"name"`
+    Description   string    `json:"description"`
+    Type          string    `json:"type"`
+    Content       string    `json:"content"`    // HTML/Markdown/Go Template
+}
+
+// 报表执行记录
+type ReportExecution struct {
+    ExecutionID   string    `json:"execution_id"`
+    ReportID      string    `json:"report_id"`
+    Status        string    `json:"status"`     // PENDING/RUNNING/SUCCESS/FAILED
+    FilePath      string    `json:"file_path,omitempty"`
+    FileSize      int64     `json:"file_size,omitempty"`
+    Format        string    `json:"format"`     // PDF/EXCEL/HTML/CSV
+    StartedAt     time.Time `json:"started_at"`
+    CompletedAt   time.Time `json:"completed_at,omitempty"`
+    Error         string    `json:"error,omitempty"`
+}
+```
+
+#### 3.8.2 报表子模块
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Scheduler** | 调度引擎 | Cron 调度器 |
+| **Generator** | 报表生成器 | 模板引擎 + 图表库 |
+| **Exporter** | 导出模块 | PDF/Excel/CSV 导出库 |
+| **Storage** | 报表存储 | MinIO + PostgreSQL 元数据 |
+
+#### 3.8.3 报表 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/reports` | 报表列表 |
+| POST | `/api/v1/reports` | 创建报表 |
+| GET | `/api/v1/reports/:id` | 报表详情 |
+| PUT | `/api/v1/reports/:id` | 更新报表 |
+| DELETE | `/api/v1/reports/:id` | 删除报表 |
+| POST | `/api/v1/reports/:id/run` | 立即执行报表 |
+| GET | `/api/v1/reports/:id/executions` | 执行历史 |
+| GET | `/api/v1/reports/:id/executions/:eid/download` | 下载报表 |
+| GET | `/api/v1/reports/templates` | 模板列表 |
+| POST | `/api/v1/reports/templates` | 新增模板 |
+| GET | `/api/v1/reports/insights` | 安全洞察报告 |
+| GET | `/api/v1/reports/compliance` | 合规报告 |
+
+---
+
+### 3.9 知识库模块
+
+#### 3.9.1 数据模型
+
+```go
+// 知识条目
+type KnowledgeItem struct {
+    ItemID        string            `json:"item_id"`
+    Title         string            `json:"title"`
+    Type          string            `json:"type"`       // PLAYBOOK/ARTICLE/GUIDE/TIP
+    Category      string            `json:"category"`
+    Tags          []string          `json:"tags"`
+    Content       string            `json:"content"`    // Markdown/HTML
+    RelatedAlerts []string          `json:"related_alerts,omitempty"`
+    RelatedEvents []string          `json:"related_events,omitempty"`
+    CreatedAt     time.Time         `json:"created_at"`
+    UpdatedAt     time.Time         `json:"updated_at"`
+}
+
+// 处置预案
+type Playbook struct {
+    PlaybookID    string    `json:"playbook_id"`
+    Name          string    `json:"name"`
+    Description   string    `json:"description"`
+    AlertTypes    []string  `json:"alert_types"`
+    Steps         []PlaybookStep `json:"steps"`
+    CreatedAt     time.Time `json:"created_at"`
+}
+
+// 预案步骤
+type PlaybookStep struct {
+    StepID        string    `json:"step_id"`
+    Name          string    `json:"name"`
+    Description   string    `json:"description"`
+    Order         int       `json:"order"`
+    Type          string    `json:"type"`       // CHECK/ACTION/VERIFY
+}
+```
+
+#### 3.9.2 知识库子模块
+
+| 子模块 | 功能说明 | 技术实现 |
+|------|---------|---------|
+| **Item Manager** | 知识条目管理 | PostgreSQL + 全文检索 |
+| **Playbook Engine** | 预案引擎 | 步骤执行器 + 自动化操作 |
+| **Search Engine** | 搜索引擎 | Elasticsearch 全文检索 |
+| **Recommendation** | 推荐引擎 | 关联规则 + 历史匹配 |
+
+#### 3.9.3 知识库 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/knowledge/items` | 知识条目列表 |
+| POST | `/api/v1/knowledge/items` | 新增知识条目 |
+| GET | `/api/v1/knowledge/items/:id` | 条目详情 |
+| PUT | `/api/v1/knowledge/items/:id` | 更新条目 |
+| DELETE | `/api/v1/knowledge/items/:id` | 删除条目 |
+| POST | `/api/v1/knowledge/search` | 搜索 |
+| GET | `/api/v1/knowledge/playbooks` | 预案列表 |
+| POST | `/api/v1/knowledge/playbooks` | 新增预案 |
+| GET | `/api/v1/knowledge/playbooks/:id` | 预案详情 |
+| GET | `/api/v1/knowledge/playbooks/alert/:alert_id` | 根据告警推荐预案 |
+
+---
+
+### 3.10 容器监控模块
+
+#### 3.10.1 模块概述
+
+支持多容器运行时监控（Docker/Containerd/Podman），实现容器内进程、网络、文件操作监控，支持 Kubernetes 资源与事件监控，检测容器逃逸等安全威胁。
+
+#### 3.10.2 核心能力
+
+| 能力 | 说明 |
+|------|------|
+| **多运行时支持** | Docker/Containerd/Podman/K8s |
+| **进程监控** | 容器内进程创建、敏感命令执行 |
+| **网络监控** | 容器网络连接、异常流量 |
+| **文件监控** | 敏感目录访问、挂载操作 |
+| **安全检测** | 容器逃逸、特权容器、危险能力 |
+| **镜像安全** | 镜像漏洞扫描、CVE 检测 |
+
+#### 3.10.3 数据模型
+
+```go
+// 容器运行时信息
+type ContainerInfo struct {
+    ContainerID     string            `json:"container_id"`
+    ContainerName   string            `json:"container_name"`
+    Image           string            `json:"image"`
+    Runtime         string            `json:"runtime"`       // docker/containerd/podman
+    Status          string            `json:"status"`
+    PodName         string            `json:"pod_name,omitempty"`
+    Namespace       string            `json:"namespace,omitempty"`
+    Privileged      bool              `json:"privileged"`
+    Capabilities    []string          `json:"capabilities"`
+}
+
+// 容器监控事件
+type ContainerEvent struct {
+    EventID        string            `json:"event_id"`
+    Timestamp      time.Time         `json:"timestamp"`
+    ContainerID    string            `json:"container_id"`
+    EventType      string            `json:"event_type"`    // lifecycle/process/network/file/security
+    Action         string            `json:"action"`
+    ThreatLevel    int               `json:"threat_level"`
+    Details        map[string]any    `json:"details,omitempty"`
+}
+```
+
+#### 3.10.4 技术实现
+
+| 技术 | 说明 |
+|------|------|
+| **eBPF 探针** | 内核级运行时监控（进程/网络/文件） |
+| **容器运行时 API** | Docker API / Containerd CRI / Podman API |
+| **Kubernetes API** | Pod/Deployment/Service 监控 + 审计日志 |
+| **Falco 集成** | CNCF 运行时安全规则引擎 |
+
+#### 3.10.5 容器逃逸检测规则
+
+| 检测类型 | 条件 | 严重程度 |
+|---------|------|---------|
+| **敏感路径挂载** | 挂载 /proc、/sys、/etc | CRITICAL |
+| **特权容器** | --privileged 开启 | CRITICAL |
+| **危险能力** | CAP_SYS_ADMIN 等 | HIGH |
+| **宿主进程访问** | 访问 /host 路径 | HIGH |
+| **异常系统调用** | syscall 序列异常 | MEDIUM |
+
+#### 3.10.6 容器监控 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/containers` | 容器列表 |
+| GET | `/api/v1/containers/:id` | 容器详情 |
+| GET | `/api/v1/containers/:id/events` | 容器事件 |
+| GET | `/api/v1/containers/images` | 镜像列表 |
+| GET | `/api/v1/containers/images/:id/vulns` | 镜像漏洞 |
+| GET | `/api/v1/k8s/pods` | K8s Pod 列表 |
+| GET | `/api/v1/k8s/namespaces` | K8s 命名空间 |
+| GET | `/api/v1/container-alerts` | 容器告警 |
+
+---
+
+### 3.11 AI 智能分析模块 (新增)
+
+#### 3.11.1 模块概述
+
+引入 AI/ML 能力，实现异常检测、告警降噪、智能分析，提升安全运营效率。
+
+#### 3.11.2 核心能力
+
+| 能力 | 说明 | 技术 |
+|------|------|------|
+| **异常检测** | 流量基线偏离、网络行为异常 | LSTM/Isolation Forest |
+| **告警降噪** | 误报识别、告警分级建议 | XGBoost + 规则 |
+| **用户行为分析** | 异常登录、横向移动检测 | Graph Embedding |
+| **恶意进程分类** | 进程行为智能分类 | CNN + 特征工程 |
+
+#### 3.11.3 数据模型
+
+```go
+// AI 告警分析建议
+type AlertIntelligence struct {
+    AlertID           string    `json:"alert_id"`
+    SeverityOriginal   string    `json:"severity_original"`
+    SeveritySuggested  string    `json:"severity_suggested"`  // AI 修正建议
+    Confidence         float64   `json:"confidence"`          // 置信度
+    FalsePositiveProb  float64   `json:"false_positive_prob"` // 误报概率
+    Reasoning          string    `json:"reasoning"`           // AI 解释
+    RelatedContext     map[string]any `json:"related_context"`
+}
+```
+
+#### 3.11.4 AI 分析 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/v1/ai/analyze/alert/:id` | AI 告警分析 |
+| POST | `/api/v1/ai/analyze/batch` | 批量告警分析 |
+| GET | `/api/v1/ai/anomalies` | 异常检测结果 |
+| GET | `/api/v1/ai/models` | AI 模型列表 |
+| POST | `/api/v1/ai/models/train` | 模型训练 |
+
+---
+
+### 3.12 SOAR 自动化响应模块 (新增)
+
+#### 3.12.1 模块概述
+
+实现安全编排、自动化与响应（SOAR），通过 Playbook 自动化处理安全事件。
+
+#### 3.12.2 核心能力
+
+| 能力 | 说明 |
+|------|------|
+| **响应编排** | 拖拽式 Playbook 编辑器 |
+| **自动化响应** | 网络隔离、进程终止、账户禁用 |
+| **人工介入** | 审批节点、人工确认 |
+| **执行历史** | 完整执行记录与回滚 |
+
+#### 3.12.3 响应类型
+
+| 响应类型 | 自动化操作 |
+|---------|---------|
+| **网络隔离** | 防火墙阻断、网络 ACL 调整 |
+| **主机响应** | 进程终止、文件隔离、服务重启 |
+| **账户响应** | 强制登出、密码重置、禁用账户 |
+| **取证响应** | 内存 Dump、网络抓包、日志采集 |
+
+#### 3.12.4 SOAR API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/soar/playbooks` | Playbook 列表 |
+| POST | `/api/v1/soar/playbooks` | 创建 Playbook |
+| POST | `/api/v1/soar/playbooks/:id/execute` | 执行 Playbook |
+| GET | `/api/v1/soar/executions` | 执行历史 |
+| POST | `/api/v1/soar/executions/:id/rollback` | 回滚执行 |
+
+---
+
+### 3.13 威胁猎捕模块 (新增)
+
+#### 3.13.1 模块概述
+
+提供威胁猎捕工作台，支持自定义查询、可视化分析、协作猎捕。
+
+#### 3.13.2 核心能力
+
+| 能力 | 说明 |
+|------|------|
+| **Hunt Notebooks** | Jupyter 风格分析笔记本 |
+| **自定义查询** | SQL/DSL/GraphQL 多语言支持 |
+| **可视化** | 时间线、热力图、攻击链图 |
+| **猎捕库** | 预设猎捕查询、MITRE ATT&CK 映射 |
+| **协作功能** | 共享猎捕结果、评论、版本控制 |
+
+#### 3.13.3 威胁猎捕 API
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/hunt/notebooks` | 猎捕笔记本列表 |
+| POST | `/api/v1/hunt/notebooks` | 创建笔记本 |
+| POST | `/api/v1/hunt/queries` | 执行猎捕查询 |
+| GET | `/api/v1/hunt/library` | 猎捕查询库 |
+| POST | `/api/v1/hunt/schedule` | 定时猎捕任务 |
 
 ---
 
 ## 4. 微服务设计
 
-### 4.1 微服务清单
+### 4.1 微服务优化策略
+
+将原有的 13+ 微服务精简整合为 **8 个核心服务**，降低运维复杂度：
+
+| 原服务 | 整合方案 |
+|------|---------|
+| asset-svc + vuln-svc | → **asset-vuln-svc** (资产与漏洞一体化) |
+| ids-svc + edr-svc + siem-svc + log-svc | → **detection-svc** (检测能力聚合) |
+| intel-svc + correlation-svc | → **intelligence-svc** (情报与关联分析) |
+| alert-svc + response engine | → **response-svc** (告警与响应) |
+| report-svc + knowledge-svc + ws-svc | → **platform-svc** (平台能力) |
+
+### 4.2 优化后微服务清单
 
 | 服务 | 镜像 | 副本 | 说明 |
 |------|------|------|------|
 | **api-gateway** | soc/api-gateway | 2+ | 统一网关，限流/鉴权 |
 | **auth-svc** | soc/auth-svc | 2+ | 认证/授权/JWT |
-| **asset-svc** | soc/asset-svc | 2+ | 资产管理/发现 |
-| **ids-svc** | soc/ids-svc | 2+ | IDS 检测/告警 |
-| **edr-svc** | soc/edr-svc | 2+ | EDR 管理/响应 |
-| **vuln-svc** | soc/vuln-svc | 2+ | 漏洞扫描/评估 |
-| **alert-svc** | soc/alert-svc | 2+ | 告警处理/通知 |
-| **report-svc** | soc/report-svc | 2+ | 报表生成/导出 |
-| **intel-svc** | soc/intel-svc | 1+ | 威胁情报管理 |
-| **ws-svc** | soc/ws-svc | 2+ | WebSocket 实时推送 |
-| **log-svc** | soc/log-svc | 3+ | Syslog 接收 |
-| **siem-svc** | soc/siem-svc | 3+ | 日志解析/告警检测 |
-| **correlation-svc** | soc/correlation-svc | 3+ | 关联分析/攻击链匹配 |
+| **asset-vuln-svc** | soc/asset-vuln-svc | 2+ | 资产管理 + 漏洞扫描 |
+| **detection-svc** | soc/detection-svc | 3+ | IDS + EDR + SIEM 检测聚合 |
+| **intelligence-svc** | soc/intelligence-svc | 2+ | 威胁情报 + 关联分析 |
+| **response-svc** | soc/response-svc | 2+ | 告警处理 + 自动化响应 |
+| **platform-svc** | soc/platform-svc | 2+ | 报表 + 知识库 + WebSocket |
+| **container-svc** | soc/container-svc | 2+ | 容器监控 (新增) |
 
-### 4.2 服务间通信
+### 4.3 服务间通信
 
 | 通信模式 | 协议 | 场景 |
 |---------|------|------|
@@ -919,11 +1782,37 @@ GET    /api/v1/correlation/stats                # 关联分析统计
 | **PostgreSQL** | 核心业务数据 | 关系型 |
 | **ClickHouse** | 时序/流量/事件 | 列式存储 |
 | **Elasticsearch** | 全文检索/分析 | 文档存储 |
+| **NebulaGraph** | 图关系数据 | 图数据库 (新增) |
 | **Kafka** | 消息队列/事件流 | 日志存储 |
 | **Redis** | 缓存/会话/队列 | 内存/KV |
 | **MinIO** | 文件/pcap/镜像 | 对象存储 |
 
-### 6.2 ClickHouse 表设计
+### 6.2 存储分层策略
+
+| 数据类型 | 存储 | 保留期限 | 说明 |
+|---------|------|---------|------|
+| **实时告警/事件** | ClickHouse (热数据) | 90天 | 高频查询 |
+| **历史数据** | MinIO (冷数据归档) | 1年 | 低频访问 |
+| **全文检索** | Elasticsearch | 180天 | 日志检索 |
+| **业务数据** | PostgreSQL | 永久 | 核心数据 |
+| **图关系数据** | NebulaGraph | 1年 | 关系图谱 |
+| **会话/缓存** | Redis | 24小时 | 临时数据 |
+
+### 6.3 图数据库应用场景
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    NebulaGraph 应用场景              │
+├─────────────────────────────────────────────────────┤
+│  1. 资产-漏洞-告警-攻击链图谱                        │
+│  2. 攻击者 IP 关系网络                               │
+│  3. 用户-设备-网络访问关系图谱                       │
+│  4. MITRE ATT&CK 战术-技术映射                       │
+│  5. 威胁情报 IOC 关联网络                            │
+└─────────────────────────────────────────────────────┘
+```
+
+### 6.4 ClickHouse 表设计
 
 ```sql
 -- IDS 流量日志表
@@ -1440,7 +2329,15 @@ spec:
 
 > 本文档为技术设计文档，实施计划将在 Implementation Plan 文档中详细描述。
 
-### 10.1 待细化内容
+### 10.1 分阶段实施建议
+
+| 阶段 | 内容 | 时间估算 |
+|------|------|---------|
+| **第一阶段** | 架构优化 + 容器监控整合 | 2-3 周 |
+| **第二阶段** | AI 能力 + SOAR 自动化响应 | 3-4 周 |
+| **第三阶段** | 威胁猎捕 + 开放生态集成 | 2-3 周 |
+
+### 10.2 待细化内容
 
 - [ ] 详细的 API 接口规范（OpenAPI/Swagger）
 - [ ] 数据库 DDL 脚本
@@ -1448,15 +2345,68 @@ spec:
 - [ ] CI/CD 流水线设计
 - [ ] 容器镜像构建规范
 - [ ] 详细的测试策略
+- [ ] AI 模型训练数据准备
+- [ ] SOAR Playbook 示例库
 
-### 10.2 依赖关系
+### 10.3 依赖关系
 
 ```
 graph LR
     A[auth-svc] --> B[所有服务]
-    C[资产服务] --> D[漏洞/IDS/EDR]
-    E[log-svc] --> F[siem-svc]
-    F --> G[alert-svc]
+    C[asset-vuln-svc] --> D[detection-svc]
+    E[detection-svc] --> F[intelligence-svc]
+    F --> G[response-svc]
+    G --> H[platform-svc]
+    I[container-svc] --> F
+```
+
+---
+
+## 11. 开放生态与集成
+
+### 11.1 开放 API 与 Webhook
+
+| 集成方式 | 说明 |
+|---------|------|
+| **RESTful API** | 完整的 OpenAPI 3.0 规范 |
+| **Webhook** | 告警/事件实时推送 |
+| **SDK** | Go/Python/Java SDK |
+| **Kafka 消费** | 原始事件流输出 |
+
+### 11.2 第三方系统集成
+
+| 系统类型 | 集成内容 |
+|---------|---------|
+| **SIEM** | Splunk/Elastic/LogRhythm |
+| **ITSM** | Jira/ServiceNow/运维平台 |
+| **情报源** | MISP/VirusTotal/OTX |
+| **云平台** | AWS/Azure/阿里云安全中心 |
+
+---
+
+## 12. 可观测性增强
+
+### 12.1 Metrics/Tracing/Logging 一体化
+
+| 组件 | 技术 | 用途 |
+|------|------|------|
+| **Metrics** | Prometheus + Grafana | 性能指标、告警 |
+| **Tracing** | Jaeger | 服务链路追踪 |
+| **Logging** | Loki | 应用日志聚合 |
+
+### 12.2 一键部署工具链
+
+提供 **helm chart + Terraform + Ansible** 全链路部署：
+
+```bash
+# K3s 应用部署
+helm install soc ./soc-chart
+
+# 基础设施管理
+terraform apply
+
+# 探针部署
+ansible-playbook deploy.yml
 ```
 
 ---
