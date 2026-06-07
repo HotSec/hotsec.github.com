@@ -347,16 +347,29 @@ type IDSAlert struct {
 │                                                        │
 │  ┌─────────────────────────────────────────────────┐  │
 │  │              EDR Agent (部署在每台主机)           │  │
-│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ │  │
-│  │  │进程监控│ │文件监控│ │网络监控│ │行为监控│ │  │
-│  │  │  Fork  │ │  Read  │ │Connect │ │   YARA │ │  │
-│  │  └────┬───┘ └────┬───┘ └────┬───┘ └────┬───┘ │  │
-│  │       └──────────┼──────────┴──────────┘     │  │
+│  │  ┌─────────────────────────────────────────┐   │  │
+│  │  │          核心监控模块                  │   │  │
+│  │  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐│  │  │
+│  │  │  │进程监控│ │文件监控│ │网络监控│ │注册表监控│ │  │
+│  │  │  │  Fork  │ │  Read  │ │Connect │ │ Windows │ │  │
+│  │  │  └────────┘ └────────┘ └────────┘ └────────┘│  │  │
+│  │  └─────────────────────────────────────────┘   │  │
+│  │  ┌─────────────────────────────────────────┐   │  │
+│  │  │        可插拔插件系统                  │   │  │
+│  │  │  ┌─────────────────────────────────┐   │  │  │
+│  │  │  │       容器监控插件 (可选)       │   │  │  │
+│  │  │  │  ┌────────┐ ┌────────┐ ┌────────┐│   │  │  │
+│  │  │  │  │eBPF探针│ │容器API│ │K8s监控││   │  │  │
+│  │  │  │  │运行时行为│ │元数据采集│ │资源监控││   │  │  │
+│  │  │  │  └────────┘ └────────┘ └────────┘│   │  │  │
+│  │  │  └─────────────────────────────────┘   │  │  │
+│  │  └─────────────────────────────────────────┘   │  │
+│  │                    │                          │  │
 │  │                    ▼                          │  │
-│  │           ┌──────────────┐                   │  │
-│  │           │  行为采集器   │                   │  │
-│  │           │  Event Log   │                   │  │
-│  │           └───────┬──────┘                   │  │
+│  │           ┌─────────────────┐                 │  │
+│  │           │ 事件统一处理层    │                 │  │
+│  │           │ 事件标准化+容器丰富│                 │  │
+│  │           └───────────┬─────┘                 │  │
 │  │                   │                           │  │
 │  │                   ▼                           │  │
 │  │           ┌──────────────┐                   │  │
@@ -392,6 +405,7 @@ type IDSAlert struct {
 | **文件监控** | 文件创建/读取/修改/删除/权限变更 |
 | **网络监控** | TCP/UDP 连接、DNS 查询、端口扫描检测 |
 | **注册表监控** | Windows 注册表键值变更（仅 Windows） |
+| **容器监控** | 容器生命周期、容器内进程、网络、文件监控 |
 | **行为分析** | 基于 YARA 规则的行为匹配 |
 | **威胁猎捕** | 预定义狩猎查询、异常行为检测 |
 | **主机隔离** | 网络隔离、进程终止、文件隔离 |
@@ -402,39 +416,49 @@ type IDSAlert struct {
 ```go
 // EDR 行为事件
 type EDREvent struct {
-    EventID      string    `json:"event_id"`
-    Hostname     string    `json:"hostname"`
-    AssetID      string    `json:"asset_id"`
-    Timestamp    time.Time `json:"timestamp"`
-    EventType    string    `json:"event_type"`     // process/file/network/registry
-    Action       string    `json:"action"`         // create/read/write/delete
-    ProcessID    uint32    `json:"process_id"`
-    ProcessName  string    `json:"process_name"`
-    ProcessPath  string    `json:"process_path"`
-    ParentPID    uint32    `json:"parent_pid"`
-    ParentName   string    `json:"parent_name"`
-    User         string    `json:"user"`
-    TargetPath   string    `json:"target_path,omitempty"`
-    TargetIP     string    `json:"target_ip,omitempty"`
-    TargetPort   uint16    `json:"target_port,omitempty"`
-    ThreatLevel  int       `json:"threat_level"`    // 1-5
-    RawData      []byte    `json:"raw_data,omitempty"`
+    EventID          string        `json:"event_id"`
+    Hostname         string        `json:"hostname"`
+    AssetID          string        `json:"asset_id"`
+    Timestamp        time.Time     `json:"timestamp"`
+    EventType        string        `json:"event_type"`     // process/file/network/registry/container
+    Action           string        `json:"action"`         // create/read/write/delete/start/stop
+    ProcessID        uint32        `json:"process_id"`
+    ProcessName      string        `json:"process_name"`
+    ProcessPath      string        `json:"process_path"`
+    ParentPID        uint32        `json:"parent_pid"`
+    ParentName       string        `json:"parent_name"`
+    User             string        `json:"user"`
+    TargetPath       string        `json:"target_path,omitempty"`
+    TargetIP         string        `json:"target_ip,omitempty"`
+    TargetPort       uint16        `json:"target_port,omitempty"`
+    // 容器相关字段
+    ContainerID      string        `json:"container_id,omitempty"`
+    ContainerName    string        `json:"container_name,omitempty"`
+    PodName          string        `json:"pod_name,omitempty"`
+    Namespace        string        `json:"namespace,omitempty"`
+    Image            string        `json:"image,omitempty"`
+    ThreatLevel      int           `json:"threat_level"`    // 1-5
+    RawData          []byte        `json:"raw_data,omitempty"`
 }
 
 // EDR Agent 状态
 type EDRAgentStatus struct {
-    AgentID         string    `json:"agent_id"`
-    Hostname        string    `json:"hostname"`
-    AssetID         string    `json:"asset_id"`
-    Online          bool      `json:"online"`
-    LastHeartbeat   time.Time `json:"last_heartbeat"`
-    Version         string    `json:"version"`
-    CPUUsage        float64   `json:"cpu_usage"`
-    MemoryUsage     float64   `json:"memory_usage"`
-    DiskUsage       float64   `json:"disk_usage"`
-    NetworkUsage    float64   `json:"network_usage"`
-    Status          string    `json:"status"`
-    Policies        []string  `json:"policies"`
+    AgentID         string            `json:"agent_id"`
+    Hostname        string            `json:"hostname"`
+    AssetID         string            `json:"asset_id"`
+    Online          bool              `json:"online"`
+    LastHeartbeat   time.Time         `json:"last_heartbeat"`
+    Version         string            `json:"version"`
+    CPUUsage        float64           `json:"cpu_usage"`
+    MemoryUsage     float64           `json:"memory_usage"`
+    DiskUsage       float64           `json:"disk_usage"`
+    NetworkUsage    float64           `json:"network_usage"`
+    Status          string            `json:"status"`
+    Policies        []string          `json:"policies"`
+    // 容器监控能力状态
+    ContainerEnabled bool             `json:"container_enabled"`
+    ContainerCount  int               `json:"container_count"`
+    ContainerRuntime string           `json:"container_runtime,omitempty"`
 }
 
 // 主机响应任务
@@ -459,6 +483,7 @@ type EDRResponseTask struct {
 | **File Monitor** | 文件监控模块 | inotify / FileSystemWatcher |
 | **Network Monitor** | 网络监控模块 | libpcap / Npcap |
 | **Registry Monitor** | 注册表监控 | Windows Registry API |
+| **Container Monitor** | 容器监控插件 | eBPF + 容器运行时 API + K8s API |
 | **Behavior Engine** | 行为分析引擎 | YARA + ML 模型 |
 | **Response Engine** | 响应隔离引擎 | Go + iptables/防火墙API |
 | **Forensics Collector** | 取证采集模块 | Rust + Volatility |
@@ -469,20 +494,25 @@ type EDRResponseTask struct {
 ```
 1. EDR Agent 启动流程
    ┌─────────────────────────────────────────────────────────┐
-   │ 安装 → 注册 → 心跳 → 策略下发 → 开始监控          │
+   │ 安装 → 注册 → 心跳 → 策略下发 → 检测并加载插件 → 开始监控 │
    └─────────────────────────────────────────────────────────┘
 
-2. 行为分析流程
+2. 容器监控插件初始化流程
    ┌─────────────────────────────────────────────────────────┐
-   │ 事件采集 → 本地过滤 → 上传 → 行为分析 → IOC匹配 → 告警 │
+   │ 检测容器运行时 → 加载 eBPF 探针 → 连接容器 API → 注册事件监听 │
    └─────────────────────────────────────────────────────────┘
 
-3. 响应隔离流程
+3. 行为分析流程
+   ┌─────────────────────────────────────────────────────────┐
+   │ 事件采集（主机/容器）→ 本地过滤 → 容器信息丰富 → 上传 → 行为分析 → IOC匹配 → 告警 │
+   └─────────────────────────────────────────────────────────┘
+
+4. 响应隔离流程
    ┌─────────────────────────────────────────────────────────┐
    │ 告警触发 → 人工/自动决策 → 下发任务 → Agent执行 → 确认 │
    └─────────────────────────────────────────────────────────┘
 
-4. 取证采集流程
+5. 取证采集流程
    ┌─────────────────────────────────────────────────────────┐
    │ 任务下发 → 内存Dump/文件采集 → 加密传输 → 分析存储     │
    └─────────────────────────────────────────────────────────┘
@@ -1458,11 +1488,11 @@ type PlaybookStep struct {
 
 ---
 
-### 3.10 容器监控模块
+### 3.10 容器监控模块（EDR Agent 插件）
 
 #### 3.10.1 模块概述
 
-支持多容器运行时监控（Docker/Containerd/Podman），实现容器内进程、网络、文件操作监控，支持 Kubernetes 资源与事件监控，检测容器逃逸等安全威胁。
+容器监控作为 EDR Agent 的可插拔插件实现，支持多容器运行时监控（Docker/Containerd/Podman），实现容器内进程、网络、文件操作监控，支持 Kubernetes 资源与事件监控，检测容器逃逸等安全威胁。容器监控插件自动检测并适配主机上安装的容器运行时。
 
 #### 3.10.2 核心能力
 
@@ -1477,8 +1507,10 @@ type PlaybookStep struct {
 
 #### 3.10.3 数据模型
 
+容器监控事件通过扩展的 `EDREvent` 模型统一上报，容器特定字段已整合到 EDREvent 中（见 3.2.3）。
+
 ```go
-// 容器运行时信息
+// 容器运行时信息（插件内部使用）
 type ContainerInfo struct {
     ContainerID     string            `json:"container_id"`
     ContainerName   string            `json:"container_name"`
@@ -1489,17 +1521,6 @@ type ContainerInfo struct {
     Namespace       string            `json:"namespace,omitempty"`
     Privileged      bool              `json:"privileged"`
     Capabilities    []string          `json:"capabilities"`
-}
-
-// 容器监控事件
-type ContainerEvent struct {
-    EventID        string            `json:"event_id"`
-    Timestamp      time.Time         `json:"timestamp"`
-    ContainerID    string            `json:"container_id"`
-    EventType      string            `json:"event_type"`    // lifecycle/process/network/file/security
-    Action         string            `json:"action"`
-    ThreatLevel    int               `json:"threat_level"`
-    Details        map[string]any    `json:"details,omitempty"`
 }
 ```
 
@@ -1522,18 +1543,9 @@ type ContainerEvent struct {
 | **宿主进程访问** | 访问 /host 路径 | HIGH |
 | **异常系统调用** | syscall 序列异常 | MEDIUM |
 
-#### 3.10.6 容器监控 API
+#### 3.10.5 容器监控 API
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/v1/containers` | 容器列表 |
-| GET | `/api/v1/containers/:id` | 容器详情 |
-| GET | `/api/v1/containers/:id/events` | 容器事件 |
-| GET | `/api/v1/containers/images` | 镜像列表 |
-| GET | `/api/v1/containers/images/:id/vulns` | 镜像漏洞 |
-| GET | `/api/v1/k8s/pods` | K8s Pod 列表 |
-| GET | `/api/v1/k8s/namespaces` | K8s 命名空间 |
-| GET | `/api/v1/container-alerts` | 容器告警 |
+容器监控 API 已整合到 EDR API 中，详见 5.2 节 EDR 接口部分。
 
 ---
 
@@ -1664,11 +1676,10 @@ type AlertIntelligence struct {
 | **api-gateway** | soc/api-gateway | 2+ | 统一网关，限流/鉴权 |
 | **auth-svc** | soc/auth-svc | 2+ | 认证/授权/JWT |
 | **asset-vuln-svc** | soc/asset-vuln-svc | 2+ | 资产管理 + 漏洞扫描 |
-| **detection-svc** | soc/detection-svc | 3+ | IDS + EDR + SIEM 检测聚合 |
+| **detection-svc** | soc/detection-svc | 3+ | IDS + EDR（含容器监控插件） + SIEM 检测聚合 |
 | **intelligence-svc** | soc/intelligence-svc | 2+ | 威胁情报 + 关联分析 |
 | **response-svc** | soc/response-svc | 2+ | 告警处理 + 自动化响应 |
 | **platform-svc** | soc/platform-svc | 2+ | 报表 + 知识库 + WebSocket |
-| **container-svc** | soc/container-svc | 2+ | 容器监控 (新增) |
 
 ### 4.3 服务间通信
 
@@ -1732,6 +1743,12 @@ POST   /api/v1/edr/hosts/{id}/isolate    # 主机隔离
 POST   /api/v1/edr/hosts/{id}/unisolate  # 取消隔离
 POST   /api/v1/edr/hosts/{id}/kill/{pid} # 终止进程
 GET    /api/v1/edr/hunting               # 威胁猎捕查询
+
+# 容器监控相关 API（通过 EDR 暴露）
+GET    /api/v1/edr/hosts/{id}/containers  # 主机上的容器列表
+GET    /api/v1/edr/hosts/{id}/containers/{cid}/events  # 容器事件
+GET    /api/v1/edr/hosts/{id}/containers/{cid}/isolate  # 容器隔离
+GET    /api/v1/edr/container-alerts    # 容器告警列表
 ```
 
 #### SIEM 接口
