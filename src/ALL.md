@@ -3543,7 +3543,6 @@
 - 集成方案：ELK Stack、Zeek（Community ID关联）、Kafka、Go自研平台
 
 > [📄 07_Suricata详解.md](./mybook/12_security/4_安全开发/07_Suricata详解.md)
-> [📄 07_Suricata知识点总结.md](./mybook/12_security/4_安全开发/07_Suricata知识点总结.md)
 </details>
 
 <details>
@@ -3558,6 +3557,75 @@
 - Go解析：MySQL Handshake解析、PgSSLRequest识别、TDS Pre-Login解析、通用数据库协议识别
 
 > [📄 08_数据库加密协议解析.md](./mybook/12_security/4_安全开发/08_数据库加密协议解析.md)
+</details>
+
+<details>
+<summary>应用安全测试：SAST / DAST / IAST / IaC</summary>
+
+- **SAST**（静态）：分析源码检测漏洞，编码阶段最早发现，工具：Semgrep/CodeQL/SonarQube
+- **DAST**（动态）：模拟攻击运行中应用，黑盒测试，工具：OWASP ZAP/Nuclei/Burp Suite
+- **IAST**（交互式）：插桩运行时监控，实时报告+精确数据流，工具：DongTai/Contrast
+- **IaC安全**：扫描 Terraform/K8s/Dockerfile 配置风险，权限/加密/网络暴露/合规，工具：Checkov/Trivy/tfsec
+- **DevSecOps 流水线**：Push → SAST+IaC扫描 → 功能测试+IAST → 预发布+DAST，安全测试金字塔
+- 完整对比表（误报率/覆盖率/SDLC位置）、CI/CD集成示例（GitHub Actions）
+
+
+> [📄 09_应用安全测试SAST-DAST-IAST与IaC安全检查.md](./mybook/12_security/4_安全开发/09_应用安全测试SAST-DAST-IAST与IaC安全检查.md)
+</details>
+
+<details>
+<summary>DevSecOps 安全开发运维一体化</summary>
+
+- DevSecOps = 开发 + 安全 + 运维一体化，核心思想：安全左移 + 持续内嵌
+- 传统模式痛点：发布前集中检查，修复成本指数增长；DevSecOps：编码阶段就发现问题
+- 工具链全景：编码(pre-commit/git-secrets) → 构建(SAST/SCA/IaC) → 测试(IAST/DAST) → 部署(Kyverno/Cosign) → 运行(Falco/OpenRASP) → 管理(DefectDojo)
+- 完整 GitHub Actions 流水线示例、安全门禁规则配置
+- K8s DevSecOps：Kyverno准入控制、Falco运行时安全、Cosign镜像签名
+- 五级成熟度模型、落地路线图（12个月分四阶段建设）、常见陷阱与最佳实践
+
+
+> [📄 10_DevSecOps安全开发运维一体化.md](./mybook/12_security/4_安全开发/10_DevSecOps安全开发运维一体化.md)
+</details>
+
+<details>
+<summary>SAST工具对比：SonarQube / CodeQL / Fortify</summary>
+
+- **SonarQube**：代码质量+安全一体化，质量门禁/技术债务/代码异味/Bug/漏洞/热点，30+语言，Community免费
+- **CodeQL**：Code as Data，把代码编译成关系数据库，QL查询语言图灵完备，变体分析独占能力，MIT开源
+- **Fortify**：五引擎协同（数据流+控制流+语义+结构+配置），企业合规标杆，OWASP/CWE/PCI-DSS全覆盖，价格昂贵
+- 深度对比：分析深度、误报率、规则数量、自定义能力、扫描速度、价格、适用场景
+- 组合推荐：开源方案（SonarQube+CodeQL+Trivy，$0）vs 企业方案（SonarQube+CodeQL+Fortify）
+
+
+> [📄 11_SAST工具对比SonarQube-CodeQL-Fortify.md](./mybook/12_security/4_安全开发/11_SAST工具对比SonarQube-CodeQL-Fortify.md)
+</details>
+
+<details>
+<summary>XDR 威胁检测与 UEBA 异常行为建模</summary>
+
+- **XDR**：打破数据孤岛的一体化安全平台，整合端点+网络+云+邮件+身份多源数据，攻击链视角统一检测与响应
+- 架构四层：数据采集层（Telemetry）→ 数据湖（Kafka+ES）→ 检测分析层（规则+UEBA+威胁情报）→ 响应编排层（SOAR）
+- **UEBA**：ML 建立用户/实体行为基线，检测偏离异常。三大算法：统计基线（Z-Score）、孤立森林、自编码器（Autoencoder）+ 多模型融合评分
+- XDR+UEBA 联动：UEBA 发现异常 → XDR 跨源关联 → 攻击链还原 → 自动响应（隔离/阻断/禁用）
+- 开源方案：Wazuh/Elastic Security/Velociraptor/Security Onion
+- 实施路线：四阶段 12 个月建设 + 关键指标（MTTD < 15min / 告警准确率 > 80%）
+
+
+> [📄 12_XDR威胁检测与UEBA异常行为建模.md](./mybook/12_security/4_安全开发/12_XDR威胁检测与UEBA异常行为建模.md)
+</details>
+
+<details>
+<summary>汽车网络安全：ISO 21434 / UN R155 / UN R156 / TARA</summary>
+
+- **UN R155**：联合国汽车网络安全法规（强制准入），要求 CSMS（网络安全管理体系）+ VTA 型式认证
+- **UN R156**：联合国汽车软件升级法规（强制准入），要求 SUMS（软件升级管理体系），RXSWIN 软件标识
+- **ISO/SAE 21434**：汽车网络安全工程国际标准，定义全生命周期网络安全流程（概念→开发→生产→运维→报废）
+- **TARA**：威胁分析与风险评估（ISO 21434 核心方法），七步流程：项目定义→资产识别→威胁识别→影响评级→攻击路径→可行性评级→风险判定
+- 风险公式：风险值 = 影响 × 可行性，≥9 需要处置，风险等级分为 CRITICAL/HIGH/MEDIUM/LOW
+- 中国对应：GB 44495-2024 对标 ISO 21434，2026 年强制实施
+
+
+> [📄 13_汽车网络安全ISO21434-UNR155-R156-TARA.md](./mybook/12_security/4_安全开发/13_汽车网络安全ISO21434-UNR155-R156-TARA.md)
 </details>
 
 ### 6.5 域安全与凭证提取
@@ -3946,7 +4014,49 @@
 - 冲突解决策略与最佳实践
 
 
-> [📄 10_Git高级.md](./mybook/10_os-linux/10_Git高级.md) · [📄 12_Windows驱动开发.md](./mybook/10_os-linux/12_Windows驱动开发.md) · [📄 13_Linux_eBPF.md](./mybook/10_os-linux/13_Linux_eBPF.md)
+> [📄 10_Git高级.md](./mybook/10_os-linux/10_Git高级.md) · [📄 12_Windows驱动开发.md](./mybook/10_os-linux/12_Windows驱动开发.md) · [📄 13_Linux_eBPF.md](./mybook/10_os-linux/13_Linux_eBPF.md) · [📄 15_DPDK开发教程.md](./mybook/10_os-linux/15_DPDK开发教程.md) · [📄 16_AF_XDP开发教程.md](./mybook/10_os-linux/16_AF_XDP开发教程.md)
+</details>
+
+<details>
+<summary>RHCA红帽认证架构师</summary>
+
+- 红帽认证金字塔（RHCSA → RHCE → RHCA），最高级别架构师认证
+- 前置要求：必须持有RHCE，再通过5门专家级考试（全程实操、无选择题）
+- 两条路径：基础架构认证架构师 / 企业应用认证架构师
+- 核心热门科目：EX342故障排除、EX442性能调优、EX436高可用集群、EX415安全、EX280 OpenShift、EX374 Ansible自动化平台
+- 国内主流组合：云原生+自动化(EX280/EX374/EX342/EX415/EX442)、基础架构(EX342/EX436/EX318/EX415/EX442)、混合云
+- 有效期3年，全球持证不足万人，含金量极高
+- 备考路线：RHCE基础 → 选方向 → 逐门攻克(每门2-3月) → 5门全通过获证
+
+
+> [📄 14_RHCA红帽认证架构师.md](./mybook/10_os-linux/14_RHCA红帽认证架构师.md)
+</details>
+
+<details>
+<summary>DPDK 开发教程</summary>
+
+- **DPDK**（Data Plane Development Kit）：绕过内核网络栈，用户态直接收发包，微秒级延迟
+- **核心组件**：EAL（环境抽象层）/ mbuf（数据包缓冲区）/ Memory Pool / PMD（轮询模式驱动）
+- **环境配置**：大页内存（Hugepages 1G/2MB）、网卡绑定（UIO/VFIO/dpdk-devbind.py）
+- **基础流程**：EAL 初始化 → 创建 mbuf pool → 配置网卡端口 → 收发包主循环
+- **典型应用**：NFV/SDN/负载均衡/DDoS 防护/金融低延迟/DPDK + OVS
+- **vs AF_XDP**：DPDK 独占网卡/最高性能/复杂；AF_XDP 与内核共存/中等性能/易用
+
+> [📄 15_DPDK开发教程.md](./mybook/10_os-linux/15_DPDK开发教程.md)
+</details>
+
+<details>
+<summary>AF_XDP 开发教程</summary>
+
+- **AF_XDP**：Linux 内核 4.18+ 提供的用户态高性能套接字，XDP 重定向到用户空间
+- **核心机制**：UMEM（用户-内核共享内存）/ Fill Queue / RX Queue / Completion Queue
+- **环境要求**：内核 XDP 支持 + 支持 XDP 的网卡（mlx5/i40e/virtio-net）
+- **开发流程**：XDP 内核程序（clang -O2 -target bpf）→ 加载到网卡（ip link set xdp）→ 用户态 AF_XDP socket 接收
+- **与 XDP 区别**：XDP 是内核态包处理；AF_XDP 是 XDP 的用户态套接字封装
+- **与 DPDK 区别**：AF_XDP 不独占网卡、可与内核网络栈共存、开发更简单
+- **典型应用**：Cilium CNI 数据平面/DDoS 防护/负载均衡/无干扰抓包/快速代理
+
+> [📄 16_AF_XDP开发教程.md](./mybook/10_os-linux/16_AF_XDP开发教程.md)
 </details>
 
 ### 7.3 架构设计
@@ -4006,7 +4116,7 @@
 > [📁 architecture/数据库/](./mybook/08_architecture/01_数据库/)
 
 **详细文档**：
-> [📄 1_关系数据库.md](./mybook/08_architecture/01_数据库/1_关系数据库.md) · [📄 2_NoSQL.md](./mybook/08_architecture/01_数据库/2_NoSQL.md) · [📄 3_分布式数据库.md](./mybook/08_architecture/01_数据库/3_分布式数据库.md) · [📄 4_Redis深度实践.md](./mybook/08_architecture/01_数据库/4_Redis深度实践.md)
+> [📄 1_关系数据库.md](./mybook/08_architecture/01_数据库/1_关系数据库.md) · [📄 2_NoSQL.md](./mybook/08_architecture/01_数据库/2_NoSQL.md) · [📄 3_分布式数据库.md](./mybook/08_architecture/01_数据库/3_分布式数据库.md) · [📄 4_Redis深度实践.md](./mybook/08_architecture/01_数据库/4_Redis深度实践.md) · [📄 5_FlinkCEP复杂事件处理.md](./mybook/08_architecture/01_数据库/5_FlinkCEP复杂事件处理.md)
 </details>
 
 #### 信息系统与安全
@@ -4353,6 +4463,37 @@
 </details>
 
 <details>
+<summary>华为S5725S-S25T4X交换机</summary>
+
+- 华为S5700系列企业交换机，24GE+4SFP+接入交换机
+- 产品规格（交换容量48G/176G、包转发96Mpps、MAC表32K）
+- 初始化配置（Console口登录、系统名称/密码、管理IP、SSH远程登录）
+- 基础配置（VLAN/Access/Trunk、静态路由、DHCP、链路聚合Eth-Trunk、MSTP）
+- 高级功能（ACL五元组、QoS流量监管、端口安全、SNMP、NTP时间同步、堆叠配置）
+- 日常运维监控（版本/接口/VLAN/MAC/路由/CPU/内存/日志/堆叠）
+- 故障排查（端口Up问题/VLAN通信/SSH登录/密码恢复/出厂重置）
+- 安全加固与最佳实践、命令速查与快捷键
+
+
+> [📄 10_华为S5725S-S25T4X交换机使用教程.md](./mybook/09_devops/基础设施/10_华为S5725S-S25T4X交换机使用教程.md)
+</details>
+
+<details>
+<summary>H3CIE路由交换专家认证</summary>
+
+- H3C认证金字塔（H3CNE/H3CSE/H3CIE）与H3CIE-RS+概述
+- 考试体系：GB0-801笔试(1.5h) → HL0-201机试(6h) → HI0-102面试(0.5h)
+- 核心知识点：VLAN/STP/Eth-Trunk、RIP/OSPF/IS-IS/BGP路由协议详解、MPLS/MPLS VPN
+- H3CIE面试题：MTU/IP分片、OSPF分区域原因、BGP选路原则、RD/RT区别
+- 分层排错思路（物理层→二层→三层→传输层→应用层）
+- H3C与华为命令差异对照（port access vlan vs port default vlan、port trunk permit vs port trunk allow-pass）
+- 备考资料推荐（官方教材6本、白皮书3册、面试真题）、备考路线规划
+
+
+> [📄 11_H3CIE路由交换知识点总结.md](./mybook/09_devops/基础设施/11_H3CIE路由交换知识点总结.md)
+</details>
+
+<details>
 <summary>KubeSphere</summary>
 
 - K3s 集群上安装 KubeSphere
@@ -4385,6 +4526,8 @@
 - 核心概念：Agent（角色+工具+记忆）、Tool（函数调用）、Memory（短期/长期记忆）、Workflow（编排策略）
 - MCP（Model Context Protocol）：AI 模型与外部工具/数据的标准通信协议
 - Function Calling / Tool Use 标准：OpenAI 兼容格式 / JSON Schema 描述
+- **RAG 复杂 PDF 处理**：MinerU（VLM+Pipeline 双模式，OmniDocBench ~90.7% 综合准确率）为当前最佳方案，LlamaParse / Docling / Marker / Unstructured 各有适用场景。多栏布局用布局分析模型（DocLayoutYOLO）+VLM 理解，表格用 Camelot/pdfplumber/TableFormer，公式用 UniMERNet/Pix2Tex，扫描件用 SuryaOCR。生产级 Pipeline：解析→分类分块→多集合索引→混合检索（向量+BM25）
+- **上下文管理与记忆系统**：Claude Code 7 层递进防御体系（大结果磁盘→时间衰减→Snip→Micro-Compact→Context Collapse→Auto-Compact），核心原则「保信息结构而非省 token」。全量重写 9 部分结构化摘要（用户消息枚举不遗漏），分通道恢复（摘要/附件/缓存各司其职）。OpenClaw 用 MEMORY.md + SQLite 向量，NanoBot 用 Dream 反思 + Consolidator 压缩，PicoClaw 极简裁剪，Codex/OpenCode 无原生 Memory
 
 
 > [📁 01_智能体框架/](./mybook/06_agents/01_智能体框架/)
@@ -4398,6 +4541,8 @@
 > [📄 08_Hello-Agents补充内容.md](./mybook/06_agents/01_智能体框架/08_Hello-Agents补充内容.md)
 > [📄 09_智能体开发知识点与面试题.md](./mybook/06_agents/01_智能体框架/09_智能体开发知识点与面试题.md)
 > [📄 10_LoRA大模型微调.md](./mybook/06_agents/01_智能体框架/10_LoRA大模型微调.md)
+> [📄 11_Agent的RAG复杂PDF处理.md](./mybook/06_agents/01_智能体框架/11_Agent的RAG复杂PDF处理.md)
+> [📄 12_Agent上下文管理与记忆系统对比.md](./mybook/06_agents/01_智能体框架/12_Agent上下文管理与记忆系统对比.md)
 > [📁 02_MCP协议/](./mybook/06_agents/02_MCP协议/)
 > [📄 01_MCP开发指南.md](./mybook/06_agents/02_MCP协议/01_MCP开发指南.md)
 </details>
@@ -4497,6 +4642,9 @@
 > [📄 26_CodeGraph语义代码索引.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/26_CodeGraph语义代码索引.md)
 > [📄 27_CodeGraphy代码图谱引擎.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/27_CodeGraphy代码图谱引擎.md)
 > [📄 28_AI编程实战三卷书.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/28_AI编程实战三卷书.md)
+> [📄 29_nanobot源码分析.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/29_nanobot源码分析.md)
+> [📄 10_PiAgent零件化工具链.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/10_PiAgent零件化工具链.md)
+> [📄 11_AI-Agent技能包生态综述.md](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/11_AI-Agent技能包生态综述.md)
 > [📁 02_openclaw源码分析/](./mybook/06_agents/03_AI-Coding实践/04_工具与框架/02_openclaw/) · 项目概览/核心架构与Gateway/Agents与Sessions/Config与CLI/整体分析/核心运行时详解
 > [📄 AGENTS示例.md](./mybook/06_agents/AGENTS示例.md)
 </details>

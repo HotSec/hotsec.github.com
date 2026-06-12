@@ -1057,3 +1057,48 @@ outputs:
       rotate-interval: day
       max-keep: 30
 ```
+
+***
+
+## 相关知识点链接
+
+- 安全产品体系：[02_安全产品与检测体系.md](./02_安全产品与检测体系.md)
+- 告警处理与关联分析：[03_告警处理与关联分析.md](./03_告警处理与关联分析.md)
+- 网络流量安全分析：[01_网络流量安全分析.md](./01_网络流量安全分析.md)
+- AI 在安全中的应用（ML 检测）：[05_AI在安全中的应用.md](./05_AI在安全中的应用.md)
+- ATT&CK 与威胁情报：[06_ATTCK与威胁情报.md](./06_ATTCK与威胁情报.md)
+
+***
+
+## 快速参考
+
+### 常用变量
+
+| 变量 | 说明 |
+|------|------|
+| `$HOME_NET` | 内部网络地址 |
+| `$EXTERNAL_NET` | 外部网络地址 |
+| `$HTTP_PORTS` | HTTP 服务端口 |
+| `$DNS_PORTS` | DNS 服务端口 |
+| `$SSH_PORTS` | SSH 服务端口 |
+
+### 常用命令速查
+
+| 命令 | 用途 |
+|------|------|
+| `suricata -c config.yaml -i eth0` | IDS 模式启动 |
+| `suricata -c config.yaml -q 0` | IPS 模式启动 |
+| `suricata -T -c config.yaml` | 测试配置 |
+| `suricata -r file.pcap` | 离线分析 |
+| `suricata-update` | 更新规则 |
+| `suricatasc -c info` | 查看统计 |
+
+### 监控指标
+
+| 指标 | 说明 |
+|------|------|
+| `capture.kernel_drops` | 抓包丢包率 |
+| `detect.alert` | 告警数 |
+| `flow.memuse` | 流内存使用 |
+| `tcp.reassembly_memuse` | 重组内存使用 |
+| `decoder.pkts` | 解码包数 |
